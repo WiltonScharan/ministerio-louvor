@@ -129,6 +129,7 @@ const STATUS_LABELS = { pendente:"🟡 Pendente", concluido:"🟢 Concluído", c
 
 let isEditor = false, activeTab = "escala", showPasswordModal = false, passwordError = "";
 let editIndex = null;
+let showBirthdayPopup = true;
 let escala = [], louvores = [], aniversariantes = [], cronograma = [], regras = [];
 
 // Forms separados por aba para evitar conflito
@@ -161,9 +162,34 @@ function initListeners() {
 }
 function saveData(key, arr) { db.ref("ministerio/" + key).set(arr); }
 
+// BIRTHDAY POPUP
+function renderBirthdayPopup() {
+  const hoje = new Date();
+  const dia = hoje.getDate(), mes = hoje.getMonth()+1;
+  const aniversariantes_hoje = aniversariantes.filter(a => parseInt(a.dia)===dia && parseInt(a.mes)===mes);
+  if (!aniversariantes_hoje.length || !showBirthdayPopup) return "";
+  return `
+    <div class="modal-bg" onclick="showBirthdayPopup=false;render()">
+      <div class="modal" onclick="event.stopPropagation()" style="max-width:360px">
+        <div style="font-size:48px;margin-bottom:8px">🎂</div>
+        <h2 style="color:#7c3aed">Aniversário hoje!</h2>
+        <div style="margin:16px 0;display:flex;flex-direction:column;gap:10px">
+          ${aniversariantes_hoje.map(a=>`
+            <div style="background:#f5f3ff;border-radius:10px;padding:12px 16px;text-align:left">
+              <div style="font-weight:700;font-size:15px;color:#1f2937">🎉 ${esc(a.nome)}</div>
+              ${a.funcao?`<div style="font-size:12px;color:#7c3aed;margin-top:2px">${esc(a.funcao)}</div>`:""}
+              ${a.tel?`<div style="font-size:12px;color:#6b7280;margin-top:2px">📱 ${esc(a.tel)}</div>`:""}
+            </div>`).join("")}
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="showBirthdayPopup=false;render()">🙌 Que Deus abençoe!</button>
+      </div>
+    </div>`;
+}
+
 // RENDER
 function render() {
   document.getElementById("app").innerHTML = `
+    ${renderBirthdayPopup()}
     ${showPasswordModal ? renderModal() : ""}
     <div class="header">
       <h1>🎸 Ministério de Louvor</h1>
@@ -342,9 +368,13 @@ function saveEscala() {
   else arr.push({...f});
   arr.sort((a,b) => (a.data||"").localeCompare(b.data||""));
   saveData("escala", arr);
+  // Mantém data, mês e local para continuar preenchendo a mesma escala
+  const mesSalvo = f.mes, dataSalva = f.data, localSalvo = f.local;
   formEscala = emptyEscala();
-  formEscala.mes = f.mes; // mantém o mês selecionado
-  escalaMesFiltro = f.mes;
+  formEscala.mes = mesSalvo;
+  formEscala.data = dataSalva;
+  formEscala.local = localSalvo;
+  escalaMesFiltro = mesSalvo;
 }
 function cancelEscala() { editIndex = null; formEscala = emptyEscala(); render(); }
 function editEscala(i) {
