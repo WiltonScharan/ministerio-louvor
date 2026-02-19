@@ -429,8 +429,13 @@ function renderLouvores() {
             ${l.nota?`<span class="badge badge-green">${l.nota}</span>`:""}
           </div>
           ${l.artista?`<div class="card-sub">${esc(l.artista)}</div>`:""}
-          ${l.obs?`<div class="card-obs">${esc(l.obs)}</div>`:""}
           ${l.link?`<a href="${l.link}" target="_blank" class="card-link">🔗 Ver louvor</a>`:""}
+          ${l.obs?`
+            <div style="margin-top:8px">
+              <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.textContent=this.textContent.includes('Ver')?' ▲ Ocultar cifra':' ▼ Ver cifra'" 
+                style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;padding:0">▼ Ver cifra</button>
+              <div class="card-obs" style="display:none">${esc(l.obs)}</div>
+            </div>`:""}
           ${isEditor?`<div class="card-actions"><button class="icon-btn" onclick="editLouvor(${i})">✏️</button><button class="icon-btn" onclick="delLouvor(${i})">🗑️</button></div>`:""}
         </div>`;
       }).join("")}
