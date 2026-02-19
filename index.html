@@ -121,7 +121,7 @@ firebase.initializeApp(FIREBASE_CONFIG);
 const db = firebase.database();
 
 const FUNCOES = ["Ministro","Backing 1","Backing 2","Backing 3","Backing 4","Bateria","Baixo","Guitarra","Violão","Teclado"];
-const LOCAIS  = ["Domingo","Quinta-feira","Vigília","Culto de Mulheres","Homens","Outro"];
+const LOCAIS  = ["Domingo","Quinta-feira","Vigília","Mulheres","Homens","Outro"];
 const MESES   = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const NOTAS   = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 const MESES_CURTOS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
@@ -270,7 +270,7 @@ function renderEscala() {
           ${MESES.map((m,i)=>`<option value="${i}" ${f.mes===i?"selected":""}>${m}</option>`).join("")}
         </select>
       </div>
-      <div class="form-group"><label>Local *</label>
+      <div class="form-group"><label>Culto *</label>
         <select id="e-local" onchange="formEscala.local=this.value">
           <option value="">Selecionar...</option>
           ${LOCAIS.map(l=>`<option value="${l}" ${f.local===l?"selected":""}>${l}</option>`).join("")}
