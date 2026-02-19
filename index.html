@@ -1,21 +1,15 @@
 Ministério de Louvor
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Ministério de Louvor</title>
-
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; }
-
-/* HEADER */
 .header { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 20px 24px; }
 .header h1 { font-size: 22px; font-weight: 700; }
 .header-sub { font-size: 12px; opacity: 0.8; margin-top: 4px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -23,8 +17,6 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100
 .mode-badge.editor { background: rgba(255,220,50,0.35); }
 .btn-lock { background: rgba(255,255,255,0.15); border: none; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; }
 .btn-lock:hover { background: rgba(255,255,255,0.25); }
-
-/* MODAL */
 .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
 .modal { background: white; border-radius: 16px; padding: 32px; width: 340px; text-align: center; }
 .modal h2 { font-size: 18px; color: #1f2937; margin-bottom: 8px; }
@@ -33,50 +25,35 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100
 .modal input:focus { border-color: #7c3aed; }
 .modal .error { color: #ef4444; font-size: 12px; margin-top: 8px; }
 .modal-btns { display: flex; gap: 8px; margin-top: 16px; }
-
-/* TABS */
 .tabs { background: white; border-bottom: 1px solid #e5e7eb; display: flex; overflow-x: auto; padding: 0 16px; }
 .tab { padding: 14px 16px; cursor: pointer; font-size: 13px; font-weight: 500; color: #6b7280; border-bottom: 3px solid transparent; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; transition: all 0.2s; }
 .tab:hover { color: #7c3aed; }
 .tab.active { color: #7c3aed; border-bottom-color: #7c3aed; }
-
-/* CONTENT */
-.content { max-width: 1000px; margin: 0 auto; padding: 24px 16px; }
+.content { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
 .section-title { font-size: 20px; font-weight: 700; color: #1f2937; margin-bottom: 20px; }
 .view-only-banner { background: #fef9c3; border: 1px solid #fde68a; color: #92400e; padding: 10px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
-
-/* FORM */
 .form-box { background: white; padding: 20px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .form-group { display: flex; flex-direction: column; gap: 4px; }
 .form-group.full { grid-column: span 2; }
 .form-group label { font-size: 12px; font-weight: 600; color: #6b7280; }
 .form-group input, .form-group select, .form-group textarea { padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; color: #1f2937; background: #fafafa; outline: none; font-family: inherit; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #7c3aed; background: white; }
-.form-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-/* BOTÕES */
+.form-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
 .btn-primary { background: #7c3aed; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
 .btn-primary:hover { background: #6d28d9; }
 .btn-secondary { background: #f3f4f6; color: #374151; border: none; padding: 10px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+.btn-green { background: #059669; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-green:hover { background: #047857; }
 .icon-btn { background: none; border: none; cursor: pointer; font-size: 15px; padding: 4px; opacity: 0.6; }
 .icon-btn:hover { opacity: 1; }
 .status-btn { background: none; border: none; cursor: pointer; font-size: 12px; white-space: nowrap; }
-
-/* TABELA */
 .table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.07); font-size: 13px; }
 .table th { background: #f9fafb; padding: 11px 14px; text-align: left; font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
 .table td { padding: 11px 14px; border-top: 1px solid #f3f4f6; color: #374151; }
 .table tr:hover td { background: #f9fafb; }
-
-/* BADGES */
 .badge { background: #ede9fe; color: #7c3aed; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
 .badge-green { background: #d1fae5; color: #059669; }
-
-/* BUSCA */
 .search-input { width: 100%; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; margin-top: 16px; background: white; outline: none; }
-.search-input:focus { border-color: #7c3aed; }
-
-/* CARDS LOUVORES */
 .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 16px; }
 .card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
 .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
@@ -85,13 +62,9 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100
 .card-obs { font-size: 12px; color: #6b7280; margin-top: 8px; background: #f9fafb; padding: 8px; border-radius: 6px; white-space: pre-wrap; }
 .card-link { display: inline-block; font-size: 12px; color: #7c3aed; text-decoration: none; margin-top: 8px; }
 .card-actions { display: flex; gap: 4px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f3f4f6; }
-
-/* ANIVERSARIANTES */
 .mes-header { font-size: 15px; font-weight: 700; color: #374151; margin: 20px 0 8px; padding: 8px 12px; background: white; border-radius: 8px; }
 .mes-header.mes-atual { background: #ede9fe; color: #7c3aed; }
 .row-destaque td { background: #fef9c3 !important; }
-
-/* REGRAS */
 .regras-list { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
 .regra-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); display: flex; gap: 16px; align-items: flex-start; }
 .regra-num { background: #7c3aed; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
@@ -99,10 +72,29 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100
 .regra-titulo { font-weight: 700; font-size: 14px; color: #1f2937; }
 .regra-desc { font-size: 13px; color: #6b7280; margin-top: 6px; line-height: 1.5; }
 .regra-actions { display: flex; gap: 2px; flex-shrink: 0; }
-
 .empty { text-align: center; padding: 32px; color: #aaa; font-size: 14px; }
 .loading { text-align: center; padding: 40px; color: #888; }
 
+/* ESCALA - filtro de mês e visualização */
+.escala-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.escala-controls select { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: white; outline: none; }
+.escala-controls select:focus { border-color: #7c3aed; }
+
+/* TABELA DE PRINT */
+.print-wrap { margin-top: 20px; overflow-x: auto; }
+.print-table { border-collapse: collapse; font-size: 12px; min-width: 600px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.07); border-radius: 8px; overflow: hidden; }
+.print-table th { background: #4f46e5; color: white; padding: 8px 12px; text-align: center; font-size: 11px; white-space: nowrap; border: 1px solid #4338ca; }
+.print-table th.func-col { background: #374151; }
+.print-table td { padding: 7px 12px; border: 1px solid #e5e7eb; text-align: center; font-size: 12px; color: #1f2937; white-space: nowrap; }
+.print-table tr:nth-child(even) td { background: #f9fafb; }
+.print-table td.func-name { background: #1f2937 !important; color: white; font-weight: 700; text-align: left; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+  .print-wrap { margin: 0; }
+  .print-table { box-shadow: none; font-size: 11px; }
+}
 @media (max-width: 600px) {
   .form-box { grid-template-columns: 1fr; }
   .form-group.full { grid-column: span 1; }
@@ -111,15 +103,9 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100
 </style>
 </head>
 <body>
-
-<div id="app">
-  <div class="loading">Carregando...</div>
-</div>
+<div id="app"><div class="loading">Carregando...</div></div>
 
 <script>
-// =====================================================
-// 🔧 CONFIGURAÇÕES — PREENCHA COM SEUS DADOS DO FIREBASE
-// =====================================================
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyCfj6HRNRmCsaU7lSZ84rJC2Qp18sNNFLk",
   authDomain:        "ministerio-louvor---hermom.firebaseapp.com",
@@ -129,31 +115,37 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "1074507943287",
   appId:             "1:1074507943287:web:ff3d404076242eef9f6572"
 };
-
-// 🔑 DEFINA A SENHA DOS EDITORES
 const EDITOR_PASSWORD = "DH#2026";
-
-// =====================================================
 
 firebase.initializeApp(FIREBASE_CONFIG);
 const db = firebase.database();
 
-const NOTAS = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const FUNCOES = ["Ministro","Backing 1","Backing 2","Backing 3","Backing 4","Bateria","Baixo","Guitarra","Violão","Teclado"];
+const LOCAIS  = ["Domingo","Quinta-feira","Vigília","Culto de Mulheres","Homens","Outro"];
+const MESES   = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const NOTAS   = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 const MESES_CURTOS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const STATUS_LABELS = { pendente:"🟡 Pendente", concluido:"🟢 Concluído", cancelado:"🔴 Cancelado" };
 
-let isEditor = false;
-let activeTab = "escala";
-let showPasswordModal = false;
-let passwordInput = "";
-let passwordError = "";
+let isEditor = false, activeTab = "escala", showPasswordModal = false, passwordError = "";
 let editIndex = null;
-
-// Estado de cada módulo
 let escala = [], louvores = [], aniversariantes = [], cronograma = [], regras = [];
-let form = {};
 
-// Listeners Firebase
+// Forms separados por aba para evitar conflito
+let formEscala = emptyEscala();
+let formLouvor = emptyLouvor();
+let formAniv   = { nome:"", dia:"", mes:"", funcao:"", tel:"" };
+let formCron   = { data:"", titulo:"", descricao:"", responsavel:"", status:"pendente" };
+let formRegra  = { titulo:"", descricao:"" };
+
+// Filtros
+let escalaMesFiltro = new Date().getMonth(); // 0-based
+let buscaLouvor = "";
+
+function emptyEscala() { return { data:"", local:"", funcao:"", nome:"", obs:"", mes: new Date().getMonth() }; }
+function emptyLouvor() { return { titulo:"", artista:"", nota:"", link:"", obs:"" }; }
+
+// Firebase
 function initListeners() {
   ["escala","louvores","aniversariantes","cronograma","regras"].forEach(key => {
     db.ref("ministerio/" + key).on("value", snap => {
@@ -167,140 +159,212 @@ function initListeners() {
     });
   });
 }
+function saveData(key, arr) { db.ref("ministerio/" + key).set(arr); }
 
-function saveData(key, arr) {
-  db.ref("ministerio/" + key).set(arr);
-}
-
-// =====================================================
-// RENDER PRINCIPAL
-// =====================================================
+// RENDER
 function render() {
-  const app = document.getElementById("app");
-  app.innerHTML = `
-    ${showPasswordModal ? renderPasswordModal() : ""}
+  document.getElementById("app").innerHTML = `
+    ${showPasswordModal ? renderModal() : ""}
     <div class="header">
       <h1>🎸 Ministério de Louvor</h1>
       <div class="header-sub">
         <span>Painel compartilhado • Atualização em tempo real</span>
-        <span class="mode-badge ${isEditor ? 'editor' : ''}">${isEditor ? "✏️ Modo Editor" : "👁️ Somente Visualização"}</span>
+        <span class="mode-badge ${isEditor?'editor':''}">${isEditor?"✏️ Modo Editor":"👁️ Somente Visualização"}</span>
         ${isEditor
           ? `<button class="btn-lock" onclick="logout()">🔒 Sair do modo editor</button>`
-          : `<button class="btn-lock" onclick="openPasswordModal()">🔑 Entrar como editor</button>`
-        }
+          : `<button class="btn-lock" onclick="openModal()">🔑 Entrar como editor</button>`}
       </div>
     </div>
-
     <div class="tabs">
-      ${["escala","louvores","aniversariantes","cronograma","regras"].map(t => `
-        <button class="tab ${activeTab === t ? 'active' : ''}" onclick="setTab('${t}')">
-          ${{ escala:"📅 Escala", louvores:"🎵 Louvores", aniversariantes:"🎂 Aniversariantes", cronograma:"📋 Cronograma", regras:"📜 Regras" }[t]}
-        </button>
-      `).join("")}
+      ${[["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"]].map(([id,label])=>
+        `<button class="tab ${activeTab===id?'active':''}" onclick="setTab('${id}')">${label}</button>`
+      ).join("")}
     </div>
-
     <div class="content">
-      ${!isEditor ? `<div class="view-only-banner">👁️ Você está no modo visualização. Para editar, clique em "Entrar como editor" no topo.</div>` : ""}
-      ${activeTab === "escala" ? renderEscala() : ""}
-      ${activeTab === "louvores" ? renderLouvores() : ""}
-      ${activeTab === "aniversariantes" ? renderAniversariantes() : ""}
-      ${activeTab === "cronograma" ? renderCronograma() : ""}
-      ${activeTab === "regras" ? renderRegras() : ""}
-    </div>
-  `;
+      ${!isEditor ? `<div class="view-only-banner no-print">👁️ Modo visualização. Clique em "Entrar como editor" para editar.</div>` : ""}
+      ${activeTab==="escala"         ? renderEscala()         : ""}
+      ${activeTab==="louvores"       ? renderLouvores()       : ""}
+      ${activeTab==="aniversariantes"? renderAniversariantes(): ""}
+      ${activeTab==="cronograma"     ? renderCronograma()     : ""}
+      ${activeTab==="regras"         ? renderRegras()         : ""}
+    </div>`;
 }
 
-// =====================================================
-// MODAL DE SENHA
-// =====================================================
-function renderPasswordModal() {
-  return `
-    <div class="modal-bg" onclick="closePasswordModal(event)">
-      <div class="modal" onclick="event.stopPropagation()">
-        <h2>🔑 Modo Editor</h2>
-        <p>Digite a senha para habilitar a edição</p>
-        <input type="password" id="pwd-input" placeholder="••••••••" 
-          onkeydown="if(event.key==='Enter') checkPassword()"
-          autofocus />
-        ${passwordError ? `<div class="error">${passwordError}</div>` : ""}
-        <div class="modal-btns">
-          <button class="btn-secondary" style="flex:1" onclick="closePasswordModal()">Cancelar</button>
-          <button class="btn-primary" style="flex:1" onclick="checkPassword()">Entrar</button>
-        </div>
+// MODAL
+function renderModal() {
+  return `<div class="modal-bg" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h2>🔑 Modo Editor</h2>
+      <p>Digite a senha para habilitar a edição</p>
+      <input type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPwd()" autofocus />
+      ${passwordError ? `<div class="error">${passwordError}</div>` : ""}
+      <div class="modal-btns">
+        <button class="btn-secondary" style="flex:1" onclick="closeModal()">Cancelar</button>
+        <button class="btn-primary" style="flex:1" onclick="checkPwd()">Entrar</button>
       </div>
     </div>
-  `;
+  </div>`;
 }
-function openPasswordModal() { showPasswordModal = true; passwordError = ""; render(); setTimeout(() => document.getElementById("pwd-input")?.focus(), 50); }
-function closePasswordModal(e) { if (!e || e.target.classList.contains("modal-bg")) { showPasswordModal = false; render(); } }
-function checkPassword() {
-  const val = document.getElementById("pwd-input")?.value || "";
-  if (val === EDITOR_PASSWORD) { isEditor = true; showPasswordModal = false; passwordError = ""; render(); }
-  else { passwordError = "Senha incorreta. Tente novamente."; render(); setTimeout(() => document.getElementById("pwd-input")?.focus(), 50); }
+function openModal() { showPasswordModal = true; passwordError = ""; render(); setTimeout(()=>document.getElementById("pwd-input")?.focus(),50); }
+function closeModal(e) { if (!e || e.target.classList.contains("modal-bg")) { showPasswordModal = false; render(); } }
+function checkPwd() {
+  const v = document.getElementById("pwd-input")?.value || "";
+  if (v === EDITOR_PASSWORD) { isEditor = true; showPasswordModal = false; render(); }
+  else { passwordError = "Senha incorreta."; render(); setTimeout(()=>document.getElementById("pwd-input")?.focus(),50); }
 }
 function logout() { isEditor = false; render(); }
-function setTab(t) { activeTab = t; editIndex = null; form = {}; render(); }
+function setTab(t) { activeTab = t; editIndex = null; render(); }
 
 // =====================================================
 // ESCALA
 // =====================================================
-function resetFormEscala() { form = { data:"", horario:"", local:"", funcao:"", nome:"", obs:"" }; editIndex = null; }
-
 function renderEscala() {
-  if (!form.nome && activeTab === "escala" && !editIndex) form = { data:"", horario:"", local:"", funcao:"", nome:"", obs:"" };
+  const f = formEscala;
+  // Entradas do mês selecionado
+  const doMes = escala.filter(e => parseInt(e.mes) === escalaMesFiltro);
+  // Eventos únicos (local + data), ordenados por data
+  const eventos = [];
+  const eventoKeys = new Set();
+  doMes.forEach(e => {
+    const k = e.data + "||" + e.local;
+    if (!eventoKeys.has(k)) { eventoKeys.add(k); eventos.push({ data: e.data, local: e.local }); }
+  });
+  eventos.sort((a,b) => a.data.localeCompare(b.data));
+
   return `
     <h2 class="section-title">Escala do Ministério</h2>
+
     ${isEditor ? `
     <div class="form-box">
-      <div class="form-group"><label>Data *</label><input type="date" value="${form.data||''}" oninput="form.data=this.value" /></div>
-      <div class="form-group"><label>Horário</label><input type="time" value="${form.horario||''}" oninput="form.horario=this.value" /></div>
-      <div class="form-group"><label>Local</label><input placeholder="Ex: Culto domingo" value="${esc(form.local)}" oninput="form.local=this.value" /></div>
-      <div class="form-group"><label>Função</label><input placeholder="Ex: Vocal, Guitarra..." value="${esc(form.funcao)}" oninput="form.funcao=this.value" /></div>
-      <div class="form-group"><label>Nome *</label><input placeholder="Nome do membro" value="${esc(form.nome)}" oninput="form.nome=this.value" /></div>
-      <div class="form-group"><label>Obs</label><input placeholder="Observações" value="${esc(form.obs)}" oninput="form.obs=this.value" /></div>
+      <div class="form-group"><label>Data *</label>
+        <input type="date" id="e-data" value="${f.data}" onchange="formEscala.data=this.value" />
+      </div>
+      <div class="form-group"><label>Mês da Escala *</label>
+        <select id="e-mes" onchange="formEscala.mes=parseInt(this.value)">
+          ${MESES.map((m,i)=>`<option value="${i}" ${f.mes===i?"selected":""}>${m}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-group"><label>Local *</label>
+        <select id="e-local" onchange="formEscala.local=this.value">
+          <option value="">Selecionar...</option>
+          ${LOCAIS.map(l=>`<option value="${l}" ${f.local===l?"selected":""}>${l}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-group"><label>Função *</label>
+        <select id="e-funcao" onchange="formEscala.funcao=this.value">
+          <option value="">Selecionar...</option>
+          ${FUNCOES.map(fn=>`<option value="${fn}" ${f.funcao===fn?"selected":""}>${fn}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-group"><label>Nome *</label>
+        <input type="text" id="e-nome" value="${esc(f.nome)}" oninput="formEscala.nome=this.value" placeholder="Nome do membro" />
+      </div>
+      <div class="form-group"><label>Obs</label>
+        <input type="text" id="e-obs" value="${esc(f.obs)}" oninput="formEscala.obs=this.value" placeholder="Observações" />
+      </div>
     </div>
-    <div class="form-actions">
-      <button class="btn-primary" onclick="saveEscala()">${editIndex !== null ? "✏️ Atualizar" : "➕ Adicionar"}</button>
-      ${editIndex !== null ? `<button class="btn-secondary" onclick="resetFormEscala();render()">Cancelar</button>` : ""}
+    <div class="form-actions no-print">
+      <button class="btn-primary" onclick="saveEscala()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar"}</button>
+      ${editIndex!==null?`<button class="btn-secondary" onclick="cancelEscala()">Cancelar</button>`:""}
     </div>
     ` : ""}
-    ${escala.length === 0 ? `<div class="empty">Nenhum item na escala ainda.</div>` : `
-    <table class="table">
-      <thead><tr><th>Data</th><th>Horário</th><th>Local</th><th>Função</th><th>Nome</th><th>Obs</th>${isEditor ? "<th></th>" : ""}</tr></thead>
-      <tbody>
-        ${escala.map((e,i) => `
-          <tr>
-            <td>${e.data ? fmtDate(e.data) : ""}</td>
-            <td>${e.horario||""}</td>
-            <td>${esc(e.local)}</td>
-            <td><span class="badge">${esc(e.funcao)}</span></td>
-            <td><strong>${esc(e.nome)}</strong></td>
-            <td>${esc(e.obs)}</td>
-            ${isEditor ? `<td><button class="icon-btn" onclick="editEscala(${i})">✏️</button><button class="icon-btn" onclick="delEscala(${i})">🗑️</button></td>` : ""}
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>`}
+
+    <!-- Filtro de mês e botão imprimir -->
+    <div class="escala-controls no-print">
+      <label style="font-size:13px;font-weight:600;color:#6b7280;">Visualizar mês:</label>
+      <select onchange="escalaMesFiltro=parseInt(this.value);render()">
+        ${MESES.map((m,i)=>`<option value="${i}" ${escalaMesFiltro===i?"selected":""}>${m}</option>`).join("")}
+      </select>
+      <button class="btn-green" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+    </div>
+
+    <!-- TABELA VISUAL estilo planilha -->
+    <div class="print-wrap">
+      ${eventos.length === 0
+        ? `<div class="empty">Nenhuma escala para ${MESES[escalaMesFiltro]} ainda.</div>`
+        : `<table class="print-table">
+            <thead>
+              <tr>
+                <th class="func-col">${MESES[escalaMesFiltro]}</th>
+                ${eventos.map(ev=>`<th>
+                  <div>${ev.local}</div>
+                  <div style="font-weight:400;opacity:0.85;font-size:10px">${fmtDate(ev.data)}</div>
+                </th>`).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${FUNCOES.map(fn => {
+                const cells = eventos.map(ev => {
+                  const entry = doMes.find(e => e.funcao === fn && e.data === ev.data && e.local === ev.local);
+                  return `<td>${entry ? esc(entry.nome) : ""}</td>`;
+                }).join("");
+                return `<tr><td class="func-name">${fn}</td>${cells}</tr>`;
+              }).join("")}
+            </tbody>
+          </table>`
+      }
+    </div>
+
+    <!-- Lista editável (só para editor) -->
+    ${isEditor && escala.length > 0 ? `
+    <div class="no-print" style="margin-top:24px">
+      <h3 style="font-size:14px;font-weight:700;color:#6b7280;margin-bottom:10px">TODOS OS REGISTROS</h3>
+      <table class="table">
+        <thead><tr><th>Data</th><th>Mês</th><th>Local</th><th>Função</th><th>Nome</th><th>Obs</th><th></th></tr></thead>
+        <tbody>
+          ${escala.map((e,i)=>`
+            <tr>
+              <td>${e.data?fmtDate(e.data):""}</td>
+              <td>${MESES[parseInt(e.mes)]||""}</td>
+              <td><span class="badge">${esc(e.local)}</span></td>
+              <td>${esc(e.funcao)}</td>
+              <td><strong>${esc(e.nome)}</strong></td>
+              <td>${esc(e.obs)}</td>
+              <td>
+                <button class="icon-btn" onclick="editEscala(${i})">✏️</button>
+                <button class="icon-btn" onclick="delEscala(${i})">🗑️</button>
+              </td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>` : ""}
   `;
 }
+
 function saveEscala() {
-  if (!form.nome) return alert("Preencha o nome.");
+  const f = formEscala;
+  if (!f.nome.trim()) { alert("Preencha o nome do membro."); return; }
+  if (!f.local)       { alert("Selecione o local."); return; }
+  if (!f.funcao)      { alert("Selecione a função."); return; }
+  if (!f.data)        { alert("Selecione a data."); return; }
   let arr = [...escala];
-  if (editIndex !== null) { arr[editIndex] = {...form}; editIndex = null; }
-  else arr.push({...form});
+  if (editIndex !== null) { arr[editIndex] = {...f}; editIndex = null; }
+  else arr.push({...f});
   arr.sort((a,b) => (a.data||"").localeCompare(b.data||""));
   saveData("escala", arr);
-  form = { data:"", horario:"", local:"", funcao:"", nome:"", obs:"" };
+  formEscala = emptyEscala();
+  formEscala.mes = f.mes; // mantém o mês selecionado
+  escalaMesFiltro = f.mes;
 }
-function editEscala(i) { form = {...escala[i]}; editIndex = i; render(); }
-function delEscala(i) { if (confirm("Remover?")) { let arr = [...escala]; arr.splice(i,1); saveData("escala", arr); } }
+function cancelEscala() { editIndex = null; formEscala = emptyEscala(); render(); }
+function editEscala(i) {
+  formEscala = {...escala[i], mes: parseInt(escala[i].mes)||0};
+  editIndex = i;
+  escalaMesFiltro = formEscala.mes;
+  window.scrollTo(0,0);
+  render();
+}
+function delEscala(i) {
+  if (confirm("Remover este registro?")) {
+    let arr = [...escala]; arr.splice(i,1); saveData("escala", arr);
+  }
+}
 
 // =====================================================
 // LOUVORES
 // =====================================================
-let buscaLouvor = "";
 function renderLouvores() {
-  if (activeTab === "louvores" && !form.titulo && editIndex === null) form = { titulo:"", artista:"", nota:"", link:"", obs:"" };
+  const f = formLouvor;
   const filtrados = louvores.filter(l =>
     (l.titulo||"").toLowerCase().includes(buscaLouvor.toLowerCase()) ||
     (l.artista||"").toLowerCase().includes(buscaLouvor.toLowerCase())
@@ -309,249 +373,223 @@ function renderLouvores() {
     <h2 class="section-title">Lista de Louvores</h2>
     ${isEditor ? `
     <div class="form-box">
-      <div class="form-group full"><label>Título *</label><input placeholder="Nome do louvor" value="${esc(form.titulo)}" oninput="form.titulo=this.value" /></div>
-      <div class="form-group"><label>Artista / Banda</label><input placeholder="Ex: Hillsong" value="${esc(form.artista)}" oninput="form.artista=this.value" /></div>
+      <div class="form-group full"><label>Título *</label><input placeholder="Nome do louvor" value="${esc(f.titulo)}" oninput="formLouvor.titulo=this.value" /></div>
+      <div class="form-group"><label>Artista / Banda</label><input placeholder="Ex: Hillsong" value="${esc(f.artista)}" oninput="formLouvor.artista=this.value" /></div>
       <div class="form-group"><label>Tom / Nota</label>
-        <select onchange="form.nota=this.value">
+        <select onchange="formLouvor.nota=this.value">
           <option value="">Selecionar...</option>
-          ${NOTAS.map(n => `<option value="${n}" ${form.nota===n?"selected":""}>${n}</option>`).join("")}
+          ${NOTAS.map(n=>`<option value="${n}" ${f.nota===n?"selected":""}>${n}</option>`).join("")}
         </select>
       </div>
-      <div class="form-group full"><label>Link (YouTube/Drive)</label><input placeholder="https://..." value="${esc(form.link)}" oninput="form.link=this.value" /></div>
-      <div class="form-group full"><label>Obs / Cifra / Letra</label><textarea rows="2" oninput="form.obs=this.value">${esc(form.obs)}</textarea></div>
+      <div class="form-group full"><label>Link (YouTube/Drive)</label><input placeholder="https://..." value="${esc(f.link)}" oninput="formLouvor.link=this.value" /></div>
+      <div class="form-group full"><label>Obs / Cifra / Letra</label><textarea rows="2" oninput="formLouvor.obs=this.value">${esc(f.obs)}</textarea></div>
     </div>
     <div class="form-actions">
-      <button class="btn-primary" onclick="saveLouvor()">${editIndex !== null ? "✏️ Atualizar" : "➕ Adicionar"}</button>
-      ${editIndex !== null ? `<button class="btn-secondary" onclick="editIndex=null;form={};render()">Cancelar</button>` : ""}
-    </div>
-    ` : ""}
+      <button class="btn-primary" onclick="saveLouvor()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar"}</button>
+      ${editIndex!==null?`<button class="btn-secondary" onclick="editIndex=null;formLouvor=emptyLouvor();render()">Cancelar</button>`:""}
+    </div>` : ""}
     <input class="search-input" placeholder="🔍 Buscar louvor..." value="${esc(buscaLouvor)}" oninput="buscaLouvor=this.value;render()" />
-    ${filtrados.length === 0 ? `<div class="empty">Nenhum louvor encontrado.</div>` : `
+    ${filtrados.length===0 ? `<div class="empty">Nenhum louvor encontrado.</div>` : `
     <div class="cards-grid">
-      ${filtrados.map((l) => {
+      ${filtrados.map(l => {
         const i = louvores.indexOf(l);
-        return `
-        <div class="card">
+        return `<div class="card">
           <div class="card-header">
             <span class="card-title">${esc(l.titulo)}</span>
-            ${l.nota ? `<span class="badge badge-green">${l.nota}</span>` : ""}
+            ${l.nota?`<span class="badge badge-green">${l.nota}</span>`:""}
           </div>
-          ${l.artista ? `<div class="card-sub">${esc(l.artista)}</div>` : ""}
-          ${l.obs ? `<div class="card-obs">${esc(l.obs)}</div>` : ""}
-          ${l.link ? `<a href="${l.link}" target="_blank" class="card-link">🔗 Ver louvor</a>` : ""}
-          ${isEditor ? `<div class="card-actions"><button class="icon-btn" onclick="editLouvor(${i})">✏️</button><button class="icon-btn" onclick="delLouvor(${i})">🗑️</button></div>` : ""}
+          ${l.artista?`<div class="card-sub">${esc(l.artista)}</div>`:""}
+          ${l.obs?`<div class="card-obs">${esc(l.obs)}</div>`:""}
+          ${l.link?`<a href="${l.link}" target="_blank" class="card-link">🔗 Ver louvor</a>`:""}
+          ${isEditor?`<div class="card-actions"><button class="icon-btn" onclick="editLouvor(${i})">✏️</button><button class="icon-btn" onclick="delLouvor(${i})">🗑️</button></div>`:""}
         </div>`;
       }).join("")}
-    </div>`}
-  `;
+    </div>`}`;
 }
 function saveLouvor() {
-  if (!form.titulo) return alert("Preencha o título.");
+  if (!formLouvor.titulo.trim()) { alert("Preencha o título."); return; }
   let arr = [...louvores];
-  if (editIndex !== null) { arr[editIndex] = {...form}; editIndex = null; }
-  else arr.push({...form});
-  arr.sort((a,b) => (a.titulo||"").localeCompare(b.titulo||""));
+  if (editIndex!==null) { arr[editIndex]={...formLouvor}; editIndex=null; }
+  else arr.push({...formLouvor});
+  arr.sort((a,b)=>(a.titulo||"").localeCompare(b.titulo||""));
   saveData("louvores", arr);
-  form = { titulo:"", artista:"", nota:"", link:"", obs:"" };
+  formLouvor = emptyLouvor();
 }
-function editLouvor(i) { form = {...louvores[i]}; editIndex = i; window.scrollTo(0,0); render(); }
-function delLouvor(i) { if (confirm("Remover?")) { let arr = [...louvores]; arr.splice(i,1); saveData("louvores", arr); } }
+function editLouvor(i) { formLouvor={...louvores[i]}; editIndex=i; window.scrollTo(0,0); render(); }
+function delLouvor(i) { if(confirm("Remover?")){ let arr=[...louvores]; arr.splice(i,1); saveData("louvores",arr); } }
 
 // =====================================================
 // ANIVERSARIANTES
 // =====================================================
 function renderAniversariantes() {
-  if (activeTab === "aniversariantes" && !form.nome && editIndex === null) form = { nome:"", dia:"", mes:"", funcao:"", tel:"" };
+  const f = formAniv;
   const hoje = new Date();
-  const mesAtual = hoje.getMonth() + 1;
+  const mesAtual = hoje.getMonth()+1;
   return `
     <h2 class="section-title">Aniversariantes</h2>
     ${isEditor ? `
     <div class="form-box">
-      <div class="form-group full"><label>Nome *</label><input placeholder="Nome completo" value="${esc(form.nome)}" oninput="form.nome=this.value" /></div>
-      <div class="form-group"><label>Dia *</label><input type="number" min="1" max="31" placeholder="Ex: 15" value="${form.dia||''}" oninput="form.dia=this.value" /></div>
+      <div class="form-group full"><label>Nome *</label><input placeholder="Nome completo" value="${esc(f.nome)}" oninput="formAniv.nome=this.value" /></div>
+      <div class="form-group"><label>Dia *</label><input type="number" min="1" max="31" placeholder="Ex: 15" value="${f.dia||''}" oninput="formAniv.dia=this.value" /></div>
       <div class="form-group"><label>Mês *</label>
-        <select onchange="form.mes=this.value">
+        <select onchange="formAniv.mes=this.value">
           <option value="">Mês...</option>
-          ${MESES.map((m,i) => `<option value="${i+1}" ${form.mes==i+1?"selected":""}>${m}</option>`).join("")}
+          ${MESES.map((m,i)=>`<option value="${i+1}" ${f.mes==i+1?"selected":""}>${m}</option>`).join("")}
         </select>
       </div>
-      <div class="form-group"><label>Função</label><input placeholder="Ex: Vocal" value="${esc(form.funcao)}" oninput="form.funcao=this.value" /></div>
-      <div class="form-group"><label>Telefone</label><input placeholder="(99) 99999-9999" value="${esc(form.tel)}" oninput="form.tel=this.value" /></div>
+      <div class="form-group"><label>Função</label><input placeholder="Ex: Vocal" value="${esc(f.funcao)}" oninput="formAniv.funcao=this.value" /></div>
+      <div class="form-group"><label>Telefone</label><input placeholder="(99) 99999-9999" value="${esc(f.tel)}" oninput="formAniv.tel=this.value" /></div>
     </div>
     <div class="form-actions">
-      <button class="btn-primary" onclick="saveAniv()">${editIndex !== null ? "✏️ Atualizar" : "➕ Adicionar"}</button>
-      ${editIndex !== null ? `<button class="btn-secondary" onclick="editIndex=null;form={};render()">Cancelar</button>` : ""}
-    </div>
-    ` : ""}
-    ${aniversariantes.length === 0 ? `<div class="empty">Nenhum aniversariante cadastrado.</div>` : 
-      MESES.map((mes, mi) => {
-        const doMes = aniversariantes.filter(a => parseInt(a.mes) === mi+1);
+      <button class="btn-primary" onclick="saveAniv()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar"}</button>
+      ${editIndex!==null?`<button class="btn-secondary" onclick="editIndex=null;formAniv={nome:'',dia:'',mes:'',funcao:'',tel:''};render()">Cancelar</button>`:""}
+    </div>` : ""}
+    ${aniversariantes.length===0 ? `<div class="empty">Nenhum aniversariante cadastrado.</div>` :
+      MESES.map((mes,mi) => {
+        const doMes = aniversariantes.filter(a=>parseInt(a.mes)===mi+1);
         if (!doMes.length) return "";
-        return `
-          <h3 class="mes-header ${mi+1===mesAtual ? 'mes-atual' : ''}">${mes} ${mi+1===mesAtual ? "🎉" : ""}</h3>
-          <table class="table">
-            <thead><tr><th>Dia</th><th>Nome</th><th>Função</th><th>Telefone</th>${isEditor ? "<th></th>" : ""}</tr></thead>
-            <tbody>
-              ${doMes.map(a => {
-                const i = aniversariantes.indexOf(a);
-                const destaque = mi+1 === mesAtual && parseInt(a.dia) === hoje.getDate();
-                return `<tr class="${destaque ? 'row-destaque' : ''}">
-                  <td><strong>${String(a.dia).padStart(2,"0")}</strong></td>
-                  <td>${esc(a.nome)}</td>
-                  <td><span class="badge">${esc(a.funcao)}</span></td>
-                  <td>${esc(a.tel)}</td>
-                  ${isEditor ? `<td><button class="icon-btn" onclick="editAniv(${i})">✏️</button><button class="icon-btn" onclick="delAniv(${i})">🗑️</button></td>` : ""}
-                </tr>`;
-              }).join("")}
-            </tbody>
-          </table>`;
+        return `<h3 class="mes-header ${mi+1===mesAtual?'mes-atual':''}">${mes} ${mi+1===mesAtual?"🎉":""}</h3>
+        <table class="table">
+          <thead><tr><th>Dia</th><th>Nome</th><th>Função</th><th>Telefone</th>${isEditor?"<th></th>":""}</tr></thead>
+          <tbody>
+            ${doMes.map(a => {
+              const i = aniversariantes.indexOf(a);
+              const d = mi+1===mesAtual && parseInt(a.dia)===hoje.getDate();
+              return `<tr class="${d?'row-destaque':''}">
+                <td><strong>${String(a.dia).padStart(2,"0")}</strong></td>
+                <td>${esc(a.nome)}</td>
+                <td><span class="badge">${esc(a.funcao)}</span></td>
+                <td>${esc(a.tel)}</td>
+                ${isEditor?`<td><button class="icon-btn" onclick="editAniv(${i})">✏️</button><button class="icon-btn" onclick="delAniv(${i})">🗑️</button></td>`:""}
+              </tr>`;
+            }).join("")}
+          </tbody>
+        </table>`;
       }).join("")
-    }
-  `;
+    }`;
 }
 function saveAniv() {
-  if (!form.nome || !form.dia || !form.mes) return alert("Preencha nome, dia e mês.");
-  let arr = [...aniversariantes];
-  if (editIndex !== null) { arr[editIndex] = {...form}; editIndex = null; }
-  else arr.push({...form});
-  arr.sort((a,b) => (parseInt(a.mes)*100 + parseInt(a.dia)) - (parseInt(b.mes)*100 + parseInt(b.dia)));
-  saveData("aniversariantes", arr);
-  form = { nome:"", dia:"", mes:"", funcao:"", tel:"" };
+  if (!formAniv.nome.trim()||!formAniv.dia||!formAniv.mes) { alert("Preencha nome, dia e mês."); return; }
+  let arr=[...aniversariantes];
+  if (editIndex!==null) { arr[editIndex]={...formAniv}; editIndex=null; }
+  else arr.push({...formAniv});
+  arr.sort((a,b)=>(parseInt(a.mes)*100+parseInt(a.dia))-(parseInt(b.mes)*100+parseInt(b.dia)));
+  saveData("aniversariantes",arr);
+  formAniv={nome:"",dia:"",mes:"",funcao:"",tel:""};
 }
-function editAniv(i) { form = {...aniversariantes[i]}; editIndex = i; window.scrollTo(0,0); render(); }
-function delAniv(i) { if (confirm("Remover?")) { let arr = [...aniversariantes]; arr.splice(i,1); saveData("aniversariantes", arr); } }
+function editAniv(i) { formAniv={...aniversariantes[i]}; editIndex=i; window.scrollTo(0,0); render(); }
+function delAniv(i) { if(confirm("Remover?")){ let arr=[...aniversariantes]; arr.splice(i,1); saveData("aniversariantes",arr); } }
 
 // =====================================================
 // CRONOGRAMA
 // =====================================================
-const STATUS_LABELS = { pendente:"🟡 Pendente", concluido:"🟢 Concluído", cancelado:"🔴 Cancelado" };
 function renderCronograma() {
-  if (activeTab === "cronograma" && !form.titulo && editIndex === null) form = { data:"", titulo:"", descricao:"", responsavel:"", status:"pendente" };
+  const f = formCron;
   return `
     <h2 class="section-title">Cronograma de Atividades</h2>
     ${isEditor ? `
     <div class="form-box">
-      <div class="form-group"><label>Data</label><input type="date" value="${form.data||''}" oninput="form.data=this.value" /></div>
-      <div class="form-group full"><label>Título *</label><input placeholder="Nome da atividade" value="${esc(form.titulo)}" oninput="form.titulo=this.value" /></div>
-      <div class="form-group"><label>Responsável</label><input placeholder="Quem vai fazer" value="${esc(form.responsavel)}" oninput="form.responsavel=this.value" /></div>
+      <div class="form-group"><label>Data</label><input type="date" value="${f.data||''}" onchange="formCron.data=this.value" /></div>
+      <div class="form-group full"><label>Título *</label><input placeholder="Nome da atividade" value="${esc(f.titulo)}" oninput="formCron.titulo=this.value" /></div>
+      <div class="form-group"><label>Responsável</label><input placeholder="Quem vai fazer" value="${esc(f.responsavel)}" oninput="formCron.responsavel=this.value" /></div>
       <div class="form-group"><label>Status</label>
-        <select onchange="form.status=this.value">
-          ${Object.entries(STATUS_LABELS).map(([v,l]) => `<option value="${v}" ${form.status===v?"selected":""}>${l}</option>`).join("")}
+        <select onchange="formCron.status=this.value">
+          ${Object.entries(STATUS_LABELS).map(([v,l])=>`<option value="${v}" ${f.status===v?"selected":""}>${l}</option>`).join("")}
         </select>
       </div>
-      <div class="form-group full"><label>Descrição</label><textarea rows="2" oninput="form.descricao=this.value">${esc(form.descricao)}</textarea></div>
+      <div class="form-group full"><label>Descrição</label><textarea rows="2" oninput="formCron.descricao=this.value">${esc(f.descricao)}</textarea></div>
     </div>
     <div class="form-actions">
-      <button class="btn-primary" onclick="saveCron()">${editIndex !== null ? "✏️ Atualizar" : "➕ Adicionar"}</button>
-      ${editIndex !== null ? `<button class="btn-secondary" onclick="editIndex=null;form={};render()">Cancelar</button>` : ""}
-    </div>
-    ` : ""}
-    ${cronograma.length === 0 ? `<div class="empty">Nenhuma atividade no cronograma.</div>` : `
+      <button class="btn-primary" onclick="saveCron()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar"}</button>
+      ${editIndex!==null?`<button class="btn-secondary" onclick="editIndex=null;formCron={data:'',titulo:'',descricao:'',responsavel:'',status:'pendente'};render()">Cancelar</button>`:""}
+    </div>` : ""}
+    ${cronograma.length===0 ? `<div class="empty">Nenhuma atividade no cronograma.</div>` : `
     <table class="table">
-      <thead><tr><th>Data</th><th>Atividade</th><th>Responsável</th><th>Status</th>${isEditor ? "<th></th>" : ""}</tr></thead>
+      <thead><tr><th>Data</th><th>Atividade</th><th>Responsável</th><th>Status</th>${isEditor?"<th></th>":""}</tr></thead>
       <tbody>
-        ${cronograma.map((c,i) => `
+        ${cronograma.map((c,i)=>`
           <tr style="opacity:${c.status==='cancelado'?'0.5':'1'}">
-            <td>${c.data ? fmtDate(c.data) : "—"}</td>
-            <td><strong>${esc(c.titulo)}</strong>${c.descricao ? `<div style="font-size:12px;color:#888;margin-top:2px">${esc(c.descricao)}</div>` : ""}</td>
+            <td>${c.data?fmtDate(c.data):"—"}</td>
+            <td><strong>${esc(c.titulo)}</strong>${c.descricao?`<div style="font-size:12px;color:#888;margin-top:2px">${esc(c.descricao)}</div>`:""}</td>
             <td>${esc(c.responsavel)}</td>
-            <td>${isEditor
-              ? `<button class="status-btn" onclick="toggleStatus(${i})">${STATUS_LABELS[c.status||"pendente"]}</button>`
-              : STATUS_LABELS[c.status||"pendente"]
-            }</td>
-            ${isEditor ? `<td><button class="icon-btn" onclick="editCron(${i})">✏️</button><button class="icon-btn" onclick="delCron(${i})">🗑️</button></td>` : ""}
-          </tr>
-        `).join("")}
+            <td>${isEditor?`<button class="status-btn" onclick="toggleStatus(${i})">${STATUS_LABELS[c.status||"pendente"]}</button>`:STATUS_LABELS[c.status||"pendente"]}</td>
+            ${isEditor?`<td><button class="icon-btn" onclick="editCron(${i})">✏️</button><button class="icon-btn" onclick="delCron(${i})">🗑️</button></td>`:""}
+          </tr>`).join("")}
       </tbody>
-    </table>`}
-  `;
+    </table>`}`;
 }
 function saveCron() {
-  if (!form.titulo) return alert("Preencha o título.");
-  let arr = [...cronograma];
-  if (editIndex !== null) { arr[editIndex] = {...form}; editIndex = null; }
-  else arr.push({...form});
-  arr.sort((a,b) => (a.data||"").localeCompare(b.data||""));
-  saveData("cronograma", arr);
-  form = { data:"", titulo:"", descricao:"", responsavel:"", status:"pendente" };
+  if (!formCron.titulo.trim()) { alert("Preencha o título."); return; }
+  let arr=[...cronograma];
+  if (editIndex!==null) { arr[editIndex]={...formCron}; editIndex=null; }
+  else arr.push({...formCron});
+  arr.sort((a,b)=>(a.data||"").localeCompare(b.data||""));
+  saveData("cronograma",arr);
+  formCron={data:"",titulo:"",descricao:"",responsavel:"",status:"pendente"};
 }
 function toggleStatus(i) {
-  const order = ["pendente","concluido","cancelado"];
-  const arr = [...cronograma];
-  arr[i].status = order[(order.indexOf(arr[i].status||"pendente")+1) % order.length];
-  saveData("cronograma", arr);
+  const order=["pendente","concluido","cancelado"];
+  const arr=[...cronograma];
+  arr[i].status=order[(order.indexOf(arr[i].status||"pendente")+1)%order.length];
+  saveData("cronograma",arr);
 }
-function editCron(i) { form = {...cronograma[i]}; editIndex = i; window.scrollTo(0,0); render(); }
-function delCron(i) { if (confirm("Remover?")) { let arr = [...cronograma]; arr.splice(i,1); saveData("cronograma", arr); } }
+function editCron(i) { formCron={...cronograma[i]}; editIndex=i; window.scrollTo(0,0); render(); }
+function delCron(i) { if(confirm("Remover?")){ let arr=[...cronograma]; arr.splice(i,1); saveData("cronograma",arr); } }
 
 // =====================================================
 // REGRAS
 // =====================================================
 function renderRegras() {
-  if (activeTab === "regras" && !form.titulo && editIndex === null) form = { titulo:"", descricao:"" };
+  const f = formRegra;
   return `
     <h2 class="section-title">Regras do Ministério</h2>
     ${isEditor ? `
     <div class="form-box">
-      <div class="form-group full"><label>Título da Regra *</label><input placeholder="Ex: Pontualidade" value="${esc(form.titulo)}" oninput="form.titulo=this.value" /></div>
-      <div class="form-group full"><label>Descrição / Detalhamento</label><textarea rows="3" oninput="form.descricao=this.value">${esc(form.descricao)}</textarea></div>
+      <div class="form-group full"><label>Título da Regra *</label><input placeholder="Ex: Pontualidade" value="${esc(f.titulo)}" oninput="formRegra.titulo=this.value" /></div>
+      <div class="form-group full"><label>Descrição / Detalhamento</label><textarea rows="3" oninput="formRegra.descricao=this.value">${esc(f.descricao)}</textarea></div>
     </div>
     <div class="form-actions">
-      <button class="btn-primary" onclick="saveRegra()">${editIndex !== null ? "✏️ Atualizar" : "➕ Adicionar Regra"}</button>
-      ${editIndex !== null ? `<button class="btn-secondary" onclick="editIndex=null;form={};render()">Cancelar</button>` : ""}
-    </div>
-    ` : ""}
-    ${regras.length === 0 ? `<div class="empty">Nenhuma regra cadastrada ainda.</div>` : `
+      <button class="btn-primary" onclick="saveRegra()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar Regra"}</button>
+      ${editIndex!==null?`<button class="btn-secondary" onclick="editIndex=null;formRegra={titulo:'',descricao:''};render()">Cancelar</button>`:""}
+    </div>` : ""}
+    ${regras.length===0 ? `<div class="empty">Nenhuma regra cadastrada ainda.</div>` : `
     <div class="regras-list">
-      ${regras.map((r,i) => `
+      ${regras.map((r,i)=>`
         <div class="regra-card">
           <div class="regra-num">${i+1}</div>
           <div class="regra-body">
             <div class="regra-titulo">${esc(r.titulo)}</div>
-            ${r.descricao ? `<div class="regra-desc">${esc(r.descricao)}</div>` : ""}
+            ${r.descricao?`<div class="regra-desc">${esc(r.descricao)}</div>`:""}
           </div>
-          ${isEditor ? `<div class="regra-actions">
+          ${isEditor?`<div class="regra-actions">
             <button class="icon-btn" onclick="moveRegra(${i},-1)">⬆️</button>
             <button class="icon-btn" onclick="moveRegra(${i},1)">⬇️</button>
             <button class="icon-btn" onclick="editRegra(${i})">✏️</button>
             <button class="icon-btn" onclick="delRegra(${i})">🗑️</button>
-          </div>` : ""}
-        </div>
-      `).join("")}
-    </div>`}
-  `;
+          </div>`:""}
+        </div>`).join("")}
+    </div>`}`;
 }
 function saveRegra() {
-  if (!form.titulo) return alert("Preencha o título.");
-  let arr = [...regras];
-  if (editIndex !== null) { arr[editIndex] = {...form}; editIndex = null; }
-  else arr.push({...form});
-  saveData("regras", arr);
-  form = { titulo:"", descricao:"" };
+  if (!formRegra.titulo.trim()) { alert("Preencha o título."); return; }
+  let arr=[...regras];
+  if (editIndex!==null) { arr[editIndex]={...formRegra}; editIndex=null; }
+  else arr.push({...formRegra});
+  saveData("regras",arr);
+  formRegra={titulo:"",descricao:""};
 }
-function moveRegra(i, dir) {
-  const arr = [...regras];
-  const j = i + dir;
-  if (j < 0 || j >= arr.length) return;
-  [arr[i], arr[j]] = [arr[j], arr[i]];
-  saveData("regras", arr);
+function moveRegra(i,dir) {
+  const arr=[...regras]; const j=i+dir;
+  if(j<0||j>=arr.length) return;
+  [arr[i],arr[j]]=[arr[j],arr[i]]; saveData("regras",arr);
 }
-function editRegra(i) { form = {...regras[i]}; editIndex = i; window.scrollTo(0,0); render(); }
-function delRegra(i) { if (confirm("Remover?")) { let arr = [...regras]; arr.splice(i,1); saveData("regras", arr); } }
+function editRegra(i) { formRegra={...regras[i]}; editIndex=i; window.scrollTo(0,0); render(); }
+function delRegra(i) { if(confirm("Remover?")){ let arr=[...regras]; arr.splice(i,1); saveData("regras",arr); } }
 
-// =====================================================
 // UTILS
-// =====================================================
-function esc(str) {
-  return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-function fmtDate(d) {
-  const [y,m,day] = d.split("-");
-  return `${day}/${m}/${y}`;
-}
+function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function fmtDate(d) { if(!d) return ""; const [y,m,day]=d.split("-"); return `${day}/${m}/${y}`; }
 
-// INIT
 initListeners();
 </script>
 </body>
