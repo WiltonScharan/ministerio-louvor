@@ -412,7 +412,7 @@ function renderLouvores() {
         </select>
       </div>
       <div class="form-group full"><label>Link (YouTube/Drive)</label><input placeholder="https://..." value="${esc(f.link)}" oninput="formLouvor.link=this.value" /></div>
-      <div class="form-group full"><label>Obs / Cifra / Letra</label><textarea rows="2" oninput="formLouvor.obs=this.value">${esc(f.obs)}</textarea></div>
+      <div class="form-group full"><label>Trecho do Hino</label><textarea rows="3" placeholder="Cole aqui um trecho da letra do hino..." oninput="formLouvor.obs=this.value">${esc(f.obs)}</textarea></div>
     </div>
     <div class="form-actions">
       <button class="btn-primary" onclick="saveLouvor()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar"}</button>
@@ -432,8 +432,8 @@ function renderLouvores() {
           ${l.link?`<a href="${l.link}" target="_blank" class="card-link">🔗 Ver louvor</a>`:""}
           ${l.obs?`
             <div style="margin-top:8px">
-              <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.textContent=this.textContent.includes('Ver')?' ▲ Ocultar cifra':' ▼ Ver cifra'" 
-                style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;padding:0">▼ Ver cifra</button>
+              <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.textContent=this.textContent.includes('Ver')?' ▲ Ocultar trecho':' ▼ Ver trecho do hino'" 
+                style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;padding:0">▼ Ver trecho do hino</button>
               <div class="card-obs" style="display:none">${esc(l.obs)}</div>
             </div>`:""}
           ${isEditor?`<div class="card-actions"><button class="icon-btn" onclick="editLouvor(${i})">✏️</button><button class="icon-btn" onclick="delLouvor(${i})">🗑️</button></div>`:""}
@@ -629,3 +629,4 @@ initListeners();
 </script>
 </body>
 </html>
+
