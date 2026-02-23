@@ -421,13 +421,13 @@ function renderLouvores() {
             (l.nota ? '<span class="badge badge-green">Tom: ' + esc(l.nota) + '</span>' : "") +
           '</div>' +
           (l.artista ? '<div class="card-sub">' + esc(l.artista) + '</div>' : "") +
-          (l.link ?
-            '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">' +
-              '<a href="' + esc(l.link) + '" target="_blank" class="card-link">🔗 Ver louvor</a>' +
-              (ytId ? '<button onclick="togglePreview(this,\'' + ytId + '\')" style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;padding:0">▶ Ouvir trecho</button>' : "") +
-            '</div>' +
-            '<div class="yt-preview" style="display:none;margin-top:8px"></div>'
-          : "") +
+          '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">' +
+            (l.link ? '<a href="' + esc(l.link) + '" target="_blank" class="card-link">🔗 Ver louvor</a>' : "") +
+            (ytId ? '<button onclick="togglePreview(this,\'' + ytId + '\')" style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;padding:0">▶ Ouvir trecho</button>' : "") +
+            '<a href="https://www.cifraclub.com.br/busca/?q=' + encodeURIComponent((l.titulo||"")+" "+(l.artista||"")) + '" target="_blank" class="card-link">🎸 Buscar cifra</a>' +
+            '<a href="https://www.letras.mus.br/busca/?q=' + encodeURIComponent((l.titulo||"")+" "+(l.artista||"")) + '" target="_blank" class="card-link">📝 Buscar letra</a>' +
+          '</div>' +
+          '<div class="yt-preview" style="display:none;margin-top:8px"></div>' +
           (l.obs ?
             '<div style="margin-top:8px">' +
               '<button onclick="var d=this.nextElementSibling;var open=d.style.display===\'block\';d.style.display=open?\'none\':\'block\';this.textContent=open?\'▼ Ver trecho do hino\':\'▲ Ocultar trecho\'" ' +
