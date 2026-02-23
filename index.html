@@ -54,13 +54,14 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100
 .badge { background: #ede9fe; color: #7c3aed; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
 .badge-green { background: #d1fae5; color: #059669; }
 .search-input { width: 100%; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; margin-top: 16px; background: white; outline: none; }
+.search-input:focus { border-color: #7c3aed; }
 .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 16px; }
 .card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
 .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .card-title { font-weight: 700; font-size: 14px; color: #1f2937; }
 .card-sub { font-size: 12px; color: #9ca3af; margin-top: 4px; }
 .card-obs { font-size: 12px; color: #6b7280; margin-top: 8px; background: #f9fafb; padding: 8px; border-radius: 6px; white-space: pre-wrap; }
-.card-link { display: inline-block; font-size: 12px; color: #7c3aed; text-decoration: none; margin-top: 8px; }
+.card-link { display: inline-block; font-size: 12px; color: #7c3aed; text-decoration: none; }
 .card-actions { display: flex; gap: 4px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f3f4f6; }
 .mes-header { font-size: 15px; font-weight: 700; color: #374151; margin: 20px 0 8px; padding: 8px 12px; background: white; border-radius: 8px; }
 .mes-header.mes-atual { background: #ede9fe; color: #7c3aed; }
@@ -73,14 +74,8 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100
 .regra-desc { font-size: 13px; color: #6b7280; margin-top: 6px; line-height: 1.5; }
 .regra-actions { display: flex; gap: 2px; flex-shrink: 0; }
 .empty { text-align: center; padding: 32px; color: #aaa; font-size: 14px; }
-.loading { text-align: center; padding: 40px; color: #888; }
-
-/* ESCALA - filtro de mês e visualização */
 .escala-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
 .escala-controls select { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: white; outline: none; }
-.escala-controls select:focus { border-color: #7c3aed; }
-
-/* TABELA DE PRINT */
 .print-wrap { margin-top: 20px; overflow-x: auto; }
 .print-table { border-collapse: collapse; font-size: 12px; min-width: 600px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.07); border-radius: 8px; overflow: hidden; }
 .print-table th { background: #4f46e5; color: white; padding: 8px 12px; text-align: center; font-size: 11px; white-space: nowrap; border: 1px solid #4338ca; }
@@ -88,12 +83,10 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100
 .print-table td { padding: 7px 12px; border: 1px solid #e5e7eb; text-align: center; font-size: 12px; color: #1f2937; white-space: nowrap; }
 .print-table tr:nth-child(even) td { background: #f9fafb; }
 .print-table td.func-name { background: #1f2937 !important; color: white; font-weight: 700; text-align: left; }
-
 @media print {
   .no-print { display: none !important; }
   body { background: white; }
   .print-wrap { margin: 0; }
-  .print-table { box-shadow: none; font-size: 11px; }
 }
 @media (max-width: 600px) {
   .form-box { grid-template-columns: 1fr; }
@@ -103,8 +96,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100
 </style>
 </head>
 <body>
-<div id="app"><div class="loading">Carregando...</div></div>
-
+<div id="app"><div style="text-align:center;padding:60px;color:#888">Carregando...</div></div>
 <script>
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyCfj6HRNRmCsaU7lSZ84rJC2Qp18sNNFLk",
@@ -121,346 +113,59 @@ firebase.initializeApp(FIREBASE_CONFIG);
 const db = firebase.database();
 
 const FUNCOES = ["Ministro","Backing 1","Backing 2","Backing 3","Backing 4","Bateria","Baixo","Guitarra","Violão","Teclado"];
-const LOCAIS  = ["Domingo","Quinta-feira","Vigília","Mulheres","Homens","Outro"];
+const CULTOS  = ["Domingo","Quinta-feira","Vigília","Mulheres","Homens","Outro"];
 const MESES   = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const NOTAS   = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-const MESES_CURTOS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 const STATUS_LABELS = { pendente:"🟡 Pendente", concluido:"🟢 Concluído", cancelado:"🔴 Cancelado" };
 
 let isEditor = false, activeTab = "escala", showPasswordModal = false, passwordError = "";
-let editIndex = null;
-let showBirthdayPopup = true;
+let showBirthdayPopup = true, editIndex = null;
 let escala = [], louvores = [], aniversariantes = [], cronograma = [], regras = [];
+let escalaMesFiltro = new Date().getMonth();
+let buscaLouvor = "";
 
-// Forms separados por aba para evitar conflito
+function emptyEscala() { return { data:"", culto:"", funcao:"", nome:"", obs:"", mes: new Date().getMonth() }; }
+function emptyLouvor() { return { titulo:"", artista:"", nota:"", link:"", obs:"" }; }
 let formEscala = emptyEscala();
 let formLouvor = emptyLouvor();
 let formAniv   = { nome:"", dia:"", mes:"", funcao:"", tel:"" };
 let formCron   = { data:"", titulo:"", descricao:"", responsavel:"", status:"pendente" };
 let formRegra  = { titulo:"", descricao:"" };
 
-// Filtros
-let escalaMesFiltro = new Date().getMonth(); // 0-based
-let buscaLouvor = "";
-
-function emptyEscala() { return { data:"", local:"", funcao:"", nome:"", obs:"", mes: new Date().getMonth() }; }
-function emptyLouvor() { return { titulo:"", artista:"", nota:"", link:"", obs:"" }; }
-
-// Firebase
+// Firebase listeners
 function initListeners() {
-  ["escala","louvores","aniversariantes","cronograma","regras"].forEach(key => {
-    db.ref("ministerio/" + key).on("value", snap => {
-      const val = snap.val();
-      if (key === "escala") escala = val ? Object.values(val) : [];
-      if (key === "louvores") louvores = val ? Object.values(val) : [];
+  ["escala","louvores","aniversariantes","cronograma","regras"].forEach(function(key) {
+    db.ref("ministerio/" + key).on("value", function(snap) {
+      var val = snap.val();
+      if (key === "escala")          escala          = val ? Object.values(val) : [];
+      if (key === "louvores")        louvores        = val ? Object.values(val) : [];
       if (key === "aniversariantes") aniversariantes = val ? Object.values(val) : [];
-      if (key === "cronograma") cronograma = val ? Object.values(val) : [];
-      if (key === "regras") regras = val ? Object.values(val) : [];
+      if (key === "cronograma")      cronograma      = val ? Object.values(val) : [];
+      if (key === "regras")          regras          = val ? Object.values(val) : [];
       render();
     });
   });
 }
 function saveData(key, arr) { db.ref("ministerio/" + key).set(arr); }
 
-// BIRTHDAY POPUP
-function renderBirthdayPopup() {
-  const hoje = new Date();
-  const dia = hoje.getDate(), mes = hoje.getMonth()+1;
-  const aniversariantes_hoje = aniversariantes.filter(a => parseInt(a.dia)===dia && parseInt(a.mes)===mes);
-  if (!aniversariantes_hoje.length || !showBirthdayPopup) return "";
-  return `
-    <div class="modal-bg" onclick="showBirthdayPopup=false;render()">
-      <div class="modal" onclick="event.stopPropagation()" style="max-width:360px">
-        <div style="font-size:48px;margin-bottom:8px">🎂</div>
-        <h2 style="color:#7c3aed">Aniversário hoje!</h2>
-        <div style="margin:16px 0;display:flex;flex-direction:column;gap:10px">
-          ${aniversariantes_hoje.map(a=>`
-            <div style="background:#f5f3ff;border-radius:10px;padding:12px 16px;text-align:left">
-              <div style="font-weight:700;font-size:15px;color:#1f2937">🎉 ${esc(a.nome)}</div>
-              ${a.funcao?`<div style="font-size:12px;color:#7c3aed;margin-top:2px">${esc(a.funcao)}</div>`:""}
-              ${a.tel?`<div style="font-size:12px;color:#6b7280;margin-top:2px">📱 ${esc(a.tel)}</div>`:""}
-            </div>`).join("")}
-        </div>
-        <button class="btn-primary" style="width:100%" onclick="showBirthdayPopup=false;render()">🙌 Que Deus abençoe!</button>
-      </div>
-    </div>`;
+function esc(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
-
-// RENDER
-function render() {
-  const scrollY = window.scrollY;
-  document.getElementById("app").innerHTML = `
-    ${renderBirthdayPopup()}
-    ${showPasswordModal ? renderModal() : ""}
-    <div class="header">
-      <h1>🎸 Ministério de Louvor</h1>
-      <div class="header-sub">
-        <span>Painel compartilhado • Atualização em tempo real</span>
-        <span class="mode-badge ${isEditor?'editor':''}">${isEditor?"✏️ Modo Editor":"👁️ Somente Visualização"}</span>
-        ${isEditor
-          ? `<button class="btn-lock" onclick="logout()">🔒 Sair do modo editor</button>`
-          : `<button class="btn-lock" onclick="openModal()">🔑 Entrar como editor</button>`}
-      </div>
-    </div>
-    <div class="tabs">
-      ${[["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"]].map(([id,label])=>
-        `<button class="tab ${activeTab===id?'active':''}" onclick="setTab('${id}')">${label}</button>`
-      ).join("")}
-    </div>
-    <div class="content">
-      ${!isEditor ? `<div class="view-only-banner no-print">👁️ Modo visualização. Clique em "Entrar como editor" para editar.</div>` : ""}
-      ${activeTab==="escala"         ? renderEscala()         : ""}
-      ${activeTab==="louvores"       ? renderLouvores()       : ""}
-      ${activeTab==="aniversariantes"? renderAniversariantes(): ""}
-      ${activeTab==="cronograma"     ? renderCronograma()     : ""}
-      ${activeTab==="regras"         ? renderRegras()         : ""}
-    </div>`;
-  window.scrollTo(0, scrollY);
-  // Restaura foco no campo de busca
-  if (activeTab === "louvores") {
-    const inp = document.querySelector('.search-input');
-    if (inp && buscaLouvor !== "") { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
-  }
-}
-}
-
-// MODAL
-function renderModal() {
-  return `<div class="modal-bg" onclick="closeModal(event)">
-    <div class="modal" onclick="event.stopPropagation()">
-      <h2>🔑 Modo Editor</h2>
-      <p>Digite a senha para habilitar a edição</p>
-      <input type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPwd()" autofocus />
-      ${passwordError ? `<div class="error">${passwordError}</div>` : ""}
-      <div class="modal-btns">
-        <button class="btn-secondary" style="flex:1" onclick="closeModal()">Cancelar</button>
-        <button class="btn-primary" style="flex:1" onclick="checkPwd()">Entrar</button>
-      </div>
-    </div>
-  </div>`;
-}
-function openModal() { showPasswordModal = true; passwordError = ""; render(); setTimeout(()=>document.getElementById("pwd-input")?.focus(),50); }
-function closeModal(e) { if (!e || e.target.classList.contains("modal-bg")) { showPasswordModal = false; render(); } }
-function checkPwd() {
-  const v = document.getElementById("pwd-input")?.value || "";
-  if (v === EDITOR_PASSWORD) { isEditor = true; showPasswordModal = false; render(); }
-  else { passwordError = "Senha incorreta."; render(); setTimeout(()=>document.getElementById("pwd-input")?.focus(),50); }
-}
-function logout() { isEditor = false; render(); }
-function setTab(t) { activeTab = t; editIndex = null; render(); }
-
-// =====================================================
-// ESCALA
-// =====================================================
-function renderEscala() {
-  const f = formEscala;
-  // Entradas do mês selecionado
-  const doMes = escala.filter(e => parseInt(e.mes) === escalaMesFiltro);
-  // Eventos únicos (local + data), ordenados por data
-  const eventos = [];
-  const eventoKeys = new Set();
-  doMes.forEach(e => {
-    const k = e.data + "||" + e.local;
-    if (!eventoKeys.has(k)) { eventoKeys.add(k); eventos.push({ data: e.data, local: e.local }); }
-  });
-  eventos.sort((a,b) => a.data.localeCompare(b.data));
-
-  return `
-    <h2 class="section-title">Escala do Ministério</h2>
-
-    ${isEditor ? `
-    <div class="form-box">
-      <div class="form-group"><label>Data *</label>
-        <input type="date" id="e-data" value="${f.data}" onchange="formEscala.data=this.value" />
-      </div>
-      <div class="form-group"><label>Mês da Escala *</label>
-        <select id="e-mes" onchange="formEscala.mes=parseInt(this.value)">
-          ${MESES.map((m,i)=>`<option value="${i}" ${f.mes===i?"selected":""}>${m}</option>`).join("")}
-        </select>
-      </div>
-      <div class="form-group"><label>Culto *</label>
-        <select id="e-local" onchange="formEscala.local=this.value">
-          <option value="">Selecionar...</option>
-          ${LOCAIS.map(l=>`<option value="${l}" ${f.local===l?"selected":""}>${l}</option>`).join("")}
-        </select>
-      </div>
-      <div class="form-group"><label>Função *</label>
-        <select id="e-funcao" onchange="formEscala.funcao=this.value">
-          <option value="">Selecionar...</option>
-          ${FUNCOES.map(fn=>`<option value="${fn}" ${f.funcao===fn?"selected":""}>${fn}</option>`).join("")}
-        </select>
-      </div>
-      <div class="form-group"><label>Nome *</label>
-        <input type="text" id="e-nome" value="${esc(f.nome)}" oninput="formEscala.nome=this.value" placeholder="Nome do membro" />
-      </div>
-      <div class="form-group"><label>Obs</label>
-        <input type="text" id="e-obs" value="${esc(f.obs)}" oninput="formEscala.obs=this.value" placeholder="Observações" />
-      </div>
-    </div>
-    <div class="form-actions no-print">
-      <button class="btn-primary" onclick="saveEscala()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar"}</button>
-      ${editIndex!==null?`<button class="btn-secondary" onclick="cancelEscala()">Cancelar</button>`:""}
-    </div>
-    ` : ""}
-
-    <!-- Filtro de mês e botão imprimir -->
-    <div class="escala-controls no-print">
-      <label style="font-size:13px;font-weight:600;color:#6b7280;">Visualizar mês:</label>
-      <select onchange="escalaMesFiltro=parseInt(this.value);render()">
-        ${MESES.map((m,i)=>`<option value="${i}" ${escalaMesFiltro===i?"selected":""}>${m}</option>`).join("")}
-      </select>
-      <button class="btn-green" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
-    </div>
-
-    <!-- TABELA VISUAL estilo planilha -->
-    <div class="print-wrap">
-      ${eventos.length === 0
-        ? `<div class="empty">Nenhuma escala para ${MESES[escalaMesFiltro]} ainda.</div>`
-        : `<table class="print-table">
-            <thead>
-              <tr>
-                <th class="func-col">${MESES[escalaMesFiltro]}</th>
-                ${eventos.map(ev=>`<th>
-                  <div>${ev.local}</div>
-                  <div style="font-weight:400;opacity:0.85;font-size:10px">${fmtDate(ev.data)}</div>
-                </th>`).join("")}
-              </tr>
-            </thead>
-            <tbody>
-              ${FUNCOES.map(fn => {
-                const cells = eventos.map(ev => {
-                  const entry = doMes.find(e => e.funcao === fn && e.data === ev.data && e.local === ev.local);
-                  return `<td>${entry ? esc(entry.nome) : ""}</td>`;
-                }).join("");
-                return `<tr><td class="func-name">${fn}</td>${cells}</tr>`;
-              }).join("")}
-            </tbody>
-          </table>`
-      }
-    </div>
-
-    <!-- Lista editável (só para editor) -->
-    ${isEditor && escala.length > 0 ? `
-    <div class="no-print" style="margin-top:24px">
-      <h3 style="font-size:14px;font-weight:700;color:#6b7280;margin-bottom:10px">TODOS OS REGISTROS</h3>
-      <table class="table">
-        <thead><tr><th>Data</th><th>Mês</th><th>Local</th><th>Função</th><th>Nome</th><th>Obs</th><th></th></tr></thead>
-        <tbody>
-          ${escala.map((e,i)=>`
-            <tr>
-              <td>${e.data?fmtDate(e.data):""}</td>
-              <td>${MESES[parseInt(e.mes)]||""}</td>
-              <td><span class="badge">${esc(e.local)}</span></td>
-              <td>${esc(e.funcao)}</td>
-              <td><strong>${esc(e.nome)}</strong></td>
-              <td>${esc(e.obs)}</td>
-              <td>
-                <button class="icon-btn" onclick="editEscala(${i})">✏️</button>
-                <button class="icon-btn" onclick="delEscala(${i})">🗑️</button>
-              </td>
-            </tr>`).join("")}
-        </tbody>
-      </table>
-    </div>` : ""}
-  `;
-}
-
-function saveEscala() {
-  const f = formEscala;
-  if (!f.nome.trim()) { alert("Preencha o nome do membro."); return; }
-  if (!f.local)       { alert("Selecione o local."); return; }
-  if (!f.funcao)      { alert("Selecione a função."); return; }
-  if (!f.data)        { alert("Selecione a data."); return; }
-  let arr = [...escala];
-  if (editIndex !== null) { arr[editIndex] = {...f}; editIndex = null; }
-  else arr.push({...f});
-  arr.sort((a,b) => (a.data||"").localeCompare(b.data||""));
-  saveData("escala", arr);
-  // Mantém data, mês e local para continuar preenchendo a mesma escala
-  const mesSalvo = f.mes, dataSalva = f.data, localSalvo = f.local;
-  formEscala = emptyEscala();
-  formEscala.mes = mesSalvo;
-  formEscala.data = dataSalva;
-  formEscala.local = localSalvo;
-  escalaMesFiltro = mesSalvo;
-}
-function cancelEscala() { editIndex = null; formEscala = emptyEscala(); render(); }
-function editEscala(i) {
-  formEscala = {...escala[i], mes: parseInt(escala[i].mes)||0};
-  editIndex = i;
-  escalaMesFiltro = formEscala.mes;
-  window.scrollTo(0,0);
-  render();
-}
-function delEscala(i) {
-  if (confirm("Remover este registro?")) {
-    let arr = [...escala]; arr.splice(i,1); saveData("escala", arr);
-  }
-}
-
-// =====================================================
-// LOUVORES
-// =====================================================
-function renderLouvores() {
-  const f = formLouvor;
-  const filtrados = louvores.filter(l =>
-    (l.titulo||"").toLowerCase().includes(buscaLouvor.toLowerCase()) ||
-    (l.artista||"").toLowerCase().includes(buscaLouvor.toLowerCase()) ||
-    (l.obs||"").toLowerCase().includes(buscaLouvor.toLowerCase()) ||
-    (l.nota||"").toLowerCase().includes(buscaLouvor.toLowerCase())
-  );
-  return `
-    <h2 class="section-title">Lista de Louvores</h2>
-    ${isEditor ? `
-    <div class="form-box">
-      <div class="form-group full"><label>Título *</label><input placeholder="Nome do louvor" value="${esc(f.titulo)}" oninput="formLouvor.titulo=this.value" /></div>
-      <div class="form-group"><label>Artista / Banda</label><input placeholder="Ex: Hillsong" value="${esc(f.artista)}" oninput="formLouvor.artista=this.value" /></div>
-      <div class="form-group"><label>Tom / Nota</label>
-        <select onchange="formLouvor.nota=this.value">
-          <option value="">Selecionar...</option>
-          ${NOTAS.map(n=>`<option value="${n}" ${f.nota===n?"selected":""}>${n}</option>`).join("")}
-        </select>
-      </div>
-      <div class="form-group full"><label>Link (YouTube/Drive)</label><input placeholder="https://..." value="${esc(f.link)}" oninput="formLouvor.link=this.value" /></div>
-      <div class="form-group full"><label>Trecho do Hino</label><textarea rows="3" placeholder="Cole aqui um trecho da letra do hino..." oninput="formLouvor.obs=this.value">${esc(f.obs)}</textarea></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-primary" onclick="saveLouvor()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar"}</button>
-      ${editIndex!==null?`<button class="btn-secondary" onclick="editIndex=null;formLouvor=emptyLouvor();render()">Cancelar</button>`:""}
-    </div>` : ""}
-    <input class="search-input" placeholder="🔍 Buscar por nome, artista, tom (ex: F#) ou trecho do hino..." value="${esc(buscaLouvor)}" oninput="buscaLouvor=this.value;render()" />
-    ${filtrados.length===0 ? `<div class="empty">Nenhum louvor encontrado.</div>` : `
-    <div class="cards-grid">
-      ${filtrados.map(l => {
-        const i = louvores.indexOf(l);
-        return `<div class="card">
-          <div class="card-header">
-            <span class="card-title">${esc(l.titulo)}</span>
-            ${l.nota?`<span class="badge badge-green">${l.nota}</span>`:""}
-          </div>
-          ${l.artista?`<div class="card-sub">${esc(l.artista)}</div>`:""}
-          ${l.link?`<a href="${l.link}" target="_blank" class="card-link">🔗 Ver louvor</a>`:""}
-          ${l.obs?`
-            <div style="margin-top:8px">
-              <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.textContent=this.textContent.includes('Ver')?' ▲ Ocultar trecho':' ▼ Ver trecho do hino'" 
-                style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;padding:0">▼ Ver trecho do hino</button>
-              <div class="card-obs" style="display:none">${esc(l.obs)}</div>
-            </div>`:""}
-          ${isEditor?`<div class="card-actions"><button class="icon-btn" onclick="editLouvor(${i})">✏️</button><button class="icon-btn" onclick="delLouvor(${i})">🗑️</button></div>`:""}
-        </div>`;
-      }).join("")}
-    </div>`}`;
+function fmtDate(d) {
+  if (!d) return "";
+  var p = d.split("-");
+  return p[2] + "/" + p[1] + "/" + p[0];
 }
 function getYoutubeId(url) {
   if (!url) return null;
-  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
+  var m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
   return m ? m[1] : null;
 }
 function togglePreview(btn, ytId) {
-  const preview = btn.parentElement.nextElementSibling;
+  var preview = btn.parentElement.nextElementSibling;
   if (preview.style.display === "none") {
     preview.style.display = "block";
-    preview.innerHTML = `<iframe width="100%" height="150" src="https://www.youtube.com/embed/${ytId}?autoplay=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="border-radius:8px"></iframe>`;
+    preview.innerHTML = '<iframe width="100%" height="150" src="https://www.youtube.com/embed/' + ytId + '?autoplay=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="border-radius:8px"></iframe>';
     btn.textContent = "⏹ Fechar player";
   } else {
     preview.style.display = "none";
@@ -468,210 +173,470 @@ function togglePreview(btn, ytId) {
     btn.textContent = "▶ Ouvir trecho";
   }
 }
+
+// RENDER PRINCIPAL
+function render() {
+  var scrollY = window.scrollY;
+  document.getElementById("app").innerHTML =
+    renderBirthdayPopup() +
+    (showPasswordModal ? renderModal() : "") +
+    '<div class="header">' +
+      '<h1>🎸 Ministério de Louvor</h1>' +
+      '<div class="header-sub">' +
+        '<span>Painel compartilhado • Atualização em tempo real</span>' +
+        '<span class="mode-badge ' + (isEditor ? "editor" : "") + '">' + (isEditor ? "✏️ Modo Editor" : "👁️ Somente Visualização") + '</span>' +
+        (isEditor
+          ? '<button class="btn-lock" onclick="logout()">🔒 Sair do modo editor</button>'
+          : '<button class="btn-lock" onclick="openModal()">🔑 Entrar como editor</button>') +
+      '</div>' +
+    '</div>' +
+    '<div class="tabs">' +
+      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"]].map(function(t) {
+        return '<button class="tab ' + (activeTab===t[0]?"active":"") + '" onclick="setTab(\'' + t[0] + '\')">' + t[1] + '</button>';
+      }).join("") +
+    '</div>' +
+    '<div class="content">' +
+      (!isEditor ? '<div class="view-only-banner no-print">👁️ Modo visualização. Clique em "Entrar como editor" para editar.</div>' : "") +
+      (activeTab === "escala"          ? renderEscala()          : "") +
+      (activeTab === "louvores"        ? renderLouvores()        : "") +
+      (activeTab === "aniversariantes" ? renderAniversariantes() : "") +
+      (activeTab === "cronograma"      ? renderCronograma()      : "") +
+      (activeTab === "regras"          ? renderRegras()          : "") +
+    '</div>';
+  window.scrollTo(0, scrollY);
+  if (activeTab === "louvores" && buscaLouvor !== "") {
+    var inp = document.querySelector(".search-input");
+    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  }
+}
+
+// BIRTHDAY POPUP
+function renderBirthdayPopup() {
+  if (!showBirthdayPopup) return "";
+  var hoje = new Date();
+  var dia = hoje.getDate(), mes = hoje.getMonth() + 1;
+  var hoje_aniv = aniversariantes.filter(function(a) { return parseInt(a.dia)===dia && parseInt(a.mes)===mes; });
+  if (!hoje_aniv.length) return "";
+  return '<div class="modal-bg" onclick="showBirthdayPopup=false;render()">' +
+    '<div class="modal" onclick="event.stopPropagation()" style="max-width:360px">' +
+      '<div style="font-size:48px;margin-bottom:8px">🎂</div>' +
+      '<h2 style="color:#7c3aed">Aniversário hoje!</h2>' +
+      '<div style="margin:16px 0;display:flex;flex-direction:column;gap:10px">' +
+        hoje_aniv.map(function(a) {
+          return '<div style="background:#f5f3ff;border-radius:10px;padding:12px 16px;text-align:left">' +
+            '<div style="font-weight:700;font-size:15px;color:#1f2937">🎉 ' + esc(a.nome) + '</div>' +
+            (a.funcao ? '<div style="font-size:12px;color:#7c3aed;margin-top:2px">' + esc(a.funcao) + '</div>' : "") +
+            (a.tel    ? '<div style="font-size:12px;color:#6b7280;margin-top:2px">📱 ' + esc(a.tel) + '</div>' : "") +
+          '</div>';
+        }).join("") +
+      '</div>' +
+      '<button class="btn-primary" style="width:100%" onclick="showBirthdayPopup=false;render()">🙌 Que Deus abençoe!</button>' +
+    '</div>' +
+  '</div>';
+}
+
+// MODAL SENHA
+function renderModal() {
+  return '<div class="modal-bg" onclick="closeModal(event)">' +
+    '<div class="modal" onclick="event.stopPropagation()">' +
+      '<h2>🔑 Modo Editor</h2>' +
+      '<p>Digite a senha para habilitar a edição</p>' +
+      '<input type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')checkPwd()" autofocus />' +
+      (passwordError ? '<div class="error">' + passwordError + '</div>' : "") +
+      '<div class="modal-btns">' +
+        '<button class="btn-secondary" style="flex:1" onclick="closeModal()">Cancelar</button>' +
+        '<button class="btn-primary" style="flex:1" onclick="checkPwd()">Entrar</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+function openModal()  { showPasswordModal = true; passwordError = ""; render(); setTimeout(function(){ var el=document.getElementById("pwd-input"); if(el) el.focus(); }, 50); }
+function closeModal(e){ if (!e || e.target.classList.contains("modal-bg")) { showPasswordModal = false; render(); } }
+function checkPwd()   {
+  var v = (document.getElementById("pwd-input")||{}).value || "";
+  if (v === EDITOR_PASSWORD) { isEditor = true; showPasswordModal = false; render(); }
+  else { passwordError = "Senha incorreta."; render(); setTimeout(function(){ var el=document.getElementById("pwd-input"); if(el) el.focus(); }, 50); }
+}
+function logout()  { isEditor = false; render(); }
+function setTab(t) { activeTab = t; editIndex = null; render(); }
+
+// ============================
+// ESCALA
+// ============================
+function renderEscala() {
+  var f = formEscala;
+  var doMes = escala.filter(function(e) { return parseInt(e.mes) === escalaMesFiltro; });
+  var eventos = [], eventoKeys = {};
+  doMes.forEach(function(e) {
+    var k = e.data + "||" + e.culto;
+    if (!eventoKeys[k]) { eventoKeys[k] = true; eventos.push({ data: e.data, culto: e.culto }); }
+  });
+  eventos.sort(function(a,b) { return a.data.localeCompare(b.data); });
+
+  var html = '<h2 class="section-title">Escala do Ministério</h2>';
+
+  if (isEditor) {
+    html += '<div class="form-box">' +
+      '<div class="form-group"><label>Data *</label>' +
+        '<input type="date" value="' + esc(f.data) + '" onchange="formEscala.data=this.value" /></div>' +
+      '<div class="form-group"><label>Mês da Escala *</label>' +
+        '<select onchange="formEscala.mes=parseInt(this.value)">' +
+          MESES.map(function(m,i){ return '<option value="'+i+'"'+(f.mes===i?" selected":"")+'>'+m+'</option>'; }).join("") +
+        '</select></div>' +
+      '<div class="form-group"><label>Culto *</label>' +
+        '<select onchange="formEscala.culto=this.value">' +
+          '<option value="">Selecionar...</option>' +
+          CULTOS.map(function(c){ return '<option value="'+c+'"'+(f.culto===c?" selected":"")+'>' + c + '</option>'; }).join("") +
+        '</select></div>' +
+      '<div class="form-group"><label>Função *</label>' +
+        '<select onchange="formEscala.funcao=this.value">' +
+          '<option value="">Selecionar...</option>' +
+          FUNCOES.map(function(fn){ return '<option value="'+fn+'"'+(f.funcao===fn?" selected":"")+'>' + fn + '</option>'; }).join("") +
+        '</select></div>' +
+      '<div class="form-group"><label>Nome *</label>' +
+        '<input type="text" value="' + esc(f.nome) + '" oninput="formEscala.nome=this.value" placeholder="Nome do membro" /></div>' +
+      '<div class="form-group"><label>Obs</label>' +
+        '<input type="text" value="' + esc(f.obs) + '" oninput="formEscala.obs=this.value" placeholder="Observações" /></div>' +
+    '</div>' +
+    '<div class="form-actions no-print">' +
+      '<button class="btn-primary" onclick="saveEscala()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar") + '</button>' +
+      (editIndex!==null ? '<button class="btn-secondary" onclick="cancelEscala()">Cancelar</button>' : "") +
+    '</div>';
+  }
+
+  html += '<div class="escala-controls no-print">' +
+    '<label style="font-size:13px;font-weight:600;color:#6b7280">Visualizar mês:</label>' +
+    '<select onchange="escalaMesFiltro=parseInt(this.value);render()">' +
+      MESES.map(function(m,i){ return '<option value="'+i+'"'+(escalaMesFiltro===i?" selected":"")+'>'+m+'</option>'; }).join("") +
+    '</select>' +
+    '<button class="btn-green" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>' +
+  '</div>';
+
+  html += '<div class="print-wrap">';
+  if (eventos.length === 0) {
+    html += '<div class="empty">Nenhuma escala para ' + MESES[escalaMesFiltro] + ' ainda.</div>';
+  } else {
+    html += '<table class="print-table"><thead><tr>' +
+      '<th class="func-col">' + MESES[escalaMesFiltro] + '</th>' +
+      eventos.map(function(ev){ return '<th><div>' + esc(ev.culto) + '</div><div style="font-weight:400;opacity:0.85;font-size:10px">' + fmtDate(ev.data) + '</div></th>'; }).join("") +
+      '</tr></thead><tbody>' +
+      FUNCOES.map(function(fn) {
+        var cells = eventos.map(function(ev) {
+          var entry = doMes.find(function(e){ return e.funcao===fn && e.data===ev.data && e.culto===ev.culto; });
+          return '<td>' + (entry ? esc(entry.nome) : "") + '</td>';
+        }).join("");
+        return '<tr><td class="func-name">' + fn + '</td>' + cells + '</tr>';
+      }).join("") +
+      '</tbody></table>';
+  }
+  html += '</div>';
+
+  if (isEditor && escala.length > 0) {
+    html += '<div class="no-print" style="margin-top:24px">' +
+      '<h3 style="font-size:14px;font-weight:700;color:#6b7280;margin-bottom:10px">TODOS OS REGISTROS</h3>' +
+      '<table class="table"><thead><tr><th>Data</th><th>Mês</th><th>Culto</th><th>Função</th><th>Nome</th><th>Obs</th><th></th></tr></thead><tbody>' +
+      escala.map(function(e,i) {
+        return '<tr>' +
+          '<td>' + fmtDate(e.data) + '</td>' +
+          '<td>' + (MESES[parseInt(e.mes)]||"") + '</td>' +
+          '<td><span class="badge">' + esc(e.culto) + '</span></td>' +
+          '<td>' + esc(e.funcao) + '</td>' +
+          '<td><strong>' + esc(e.nome) + '</strong></td>' +
+          '<td>' + esc(e.obs) + '</td>' +
+          '<td><button class="icon-btn" onclick="editEscala(' + i + ')">✏️</button>' +
+              '<button class="icon-btn" onclick="delEscala(' + i + ')">🗑️</button></td>' +
+        '</tr>';
+      }).join("") +
+      '</tbody></table></div>';
+  }
+  return html;
+}
+function saveEscala() {
+  var f = formEscala;
+  if (!f.nome.trim()) { alert("Preencha o nome do membro."); return; }
+  if (!f.culto)       { alert("Selecione o culto."); return; }
+  if (!f.funcao)      { alert("Selecione a função."); return; }
+  if (!f.data)        { alert("Selecione a data."); return; }
+  var arr = escala.slice();
+  if (editIndex !== null) { arr[editIndex] = Object.assign({}, f); editIndex = null; }
+  else arr.push(Object.assign({}, f));
+  arr.sort(function(a,b){ return (a.data||"").localeCompare(b.data||""); });
+  saveData("escala", arr);
+  var mesSalvo = f.mes, dataSalva = f.data, cultoSalvo = f.culto;
+  formEscala = emptyEscala();
+  formEscala.mes = mesSalvo;
+  formEscala.data = dataSalva;
+  formEscala.culto = cultoSalvo;
+  escalaMesFiltro = mesSalvo;
+}
+function cancelEscala() { editIndex = null; formEscala = emptyEscala(); render(); }
+function editEscala(i)  { formEscala = Object.assign({}, escala[i], {mes: parseInt(escala[i].mes)||0}); editIndex = i; escalaMesFiltro = formEscala.mes; window.scrollTo(0,0); render(); }
+function delEscala(i)   { if (confirm("Remover este registro?")) { var arr = escala.slice(); arr.splice(i,1); saveData("escala", arr); } }
+
+// ============================
+// LOUVORES
+// ============================
+function renderLouvores() {
+  var f = formLouvor;
+  var filtrados = louvores.filter(function(l) {
+    var q = buscaLouvor.toLowerCase();
+    return (l.titulo||"").toLowerCase().includes(q) ||
+           (l.artista||"").toLowerCase().includes(q) ||
+           (l.obs||"").toLowerCase().includes(q) ||
+           (l.nota||"").toLowerCase().includes(q);
+  });
+
+  var html = '<h2 class="section-title">Lista de Louvores</h2>';
+
+  if (isEditor) {
+    html += '<div class="form-box">' +
+      '<div class="form-group full"><label>Título *</label><input placeholder="Nome do louvor" value="' + esc(f.titulo) + '" oninput="formLouvor.titulo=this.value" /></div>' +
+      '<div class="form-group"><label>Artista / Banda</label><input placeholder="Ex: Hillsong" value="' + esc(f.artista) + '" oninput="formLouvor.artista=this.value" /></div>' +
+      '<div class="form-group"><label>Tom</label>' +
+        '<select onchange="formLouvor.nota=this.value">' +
+          '<option value="">Selecionar...</option>' +
+          NOTAS.map(function(n){ return '<option value="'+n+'"'+(f.nota===n?" selected":"")+'>'+n+'</option>'; }).join("") +
+        '</select></div>' +
+      '<div class="form-group full"><label>Link (YouTube/Drive)</label><input placeholder="https://..." value="' + esc(f.link) + '" oninput="formLouvor.link=this.value" /></div>' +
+      '<div class="form-group full"><label>Trecho do Hino</label><textarea rows="3" placeholder="Cole aqui um trecho da letra..." oninput="formLouvor.obs=this.value">' + esc(f.obs) + '</textarea></div>' +
+    '</div>' +
+    '<div class="form-actions">' +
+      '<button class="btn-primary" onclick="saveLouvor()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar") + '</button>' +
+      (editIndex!==null ? '<button class="btn-secondary" onclick="editIndex=null;formLouvor=emptyLouvor();render()">Cancelar</button>' : "") +
+    '</div>';
+  }
+
+  html += '<input class="search-input" placeholder="🔍 Buscar por nome, artista, tom (ex: F#) ou trecho do hino..." value="' + esc(buscaLouvor) + '" oninput="buscaLouvor=this.value;render()" />';
+
+  if (filtrados.length === 0) {
+    html += '<div class="empty">Nenhum louvor encontrado.</div>';
+  } else {
+    html += '<div class="cards-grid">' +
+      filtrados.map(function(l) {
+        var i = louvores.indexOf(l);
+        var ytId = getYoutubeId(l.link);
+        return '<div class="card">' +
+          '<div class="card-header">' +
+            '<span class="card-title">' + esc(l.titulo) + '</span>' +
+            (l.nota ? '<span class="badge badge-green">Tom: ' + esc(l.nota) + '</span>' : "") +
+          '</div>' +
+          (l.artista ? '<div class="card-sub">' + esc(l.artista) + '</div>' : "") +
+          (l.link ?
+            '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">' +
+              '<a href="' + esc(l.link) + '" target="_blank" class="card-link">🔗 Ver louvor</a>' +
+              (ytId ? '<button onclick="togglePreview(this,\'' + ytId + '\')" style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;padding:0">▶ Ouvir trecho</button>' : "") +
+            '</div>' +
+            '<div class="yt-preview" style="display:none;margin-top:8px"></div>'
+          : "") +
+          (l.obs ?
+            '<div style="margin-top:8px">' +
+              '<button onclick="var d=this.nextElementSibling;var open=d.style.display===\'block\';d.style.display=open?\'none\':\'block\';this.textContent=open?\'▼ Ver trecho do hino\':\'▲ Ocultar trecho\'" ' +
+              'style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;padding:0">▼ Ver trecho do hino</button>' +
+              '<div class="card-obs" style="display:none">' + esc(l.obs) + '</div>' +
+            '</div>'
+          : "") +
+          (isEditor ?
+            '<div class="card-actions">' +
+              '<button class="icon-btn" onclick="editLouvor(' + i + ')">✏️</button>' +
+              '<button class="icon-btn" onclick="delLouvor(' + i + ')">🗑️</button>' +
+            '</div>'
+          : "") +
+        '</div>';
+      }).join("") +
+    '</div>';
+  }
+  return html;
+}
 function saveLouvor() {
   if (!formLouvor.titulo.trim()) { alert("Preencha o título."); return; }
-  let arr = [...louvores];
-  if (editIndex!==null) { arr[editIndex]={...formLouvor}; editIndex=null; }
-  else arr.push({...formLouvor});
-  arr.sort((a,b)=>(a.titulo||"").localeCompare(b.titulo||""));
+  var arr = louvores.slice();
+  if (editIndex!==null) { arr[editIndex]=Object.assign({},formLouvor); editIndex=null; }
+  else arr.push(Object.assign({},formLouvor));
+  arr.sort(function(a,b){ return (a.titulo||"").localeCompare(b.titulo||""); });
   saveData("louvores", arr);
   formLouvor = emptyLouvor();
 }
-function editLouvor(i) { formLouvor={...louvores[i]}; editIndex=i; window.scrollTo(0,0); render(); }
-function delLouvor(i) { if(confirm("Remover?")){ let arr=[...louvores]; arr.splice(i,1); saveData("louvores",arr); } }
+function editLouvor(i) { formLouvor=Object.assign({},louvores[i]); editIndex=i; window.scrollTo(0,0); render(); }
+function delLouvor(i)  { if(confirm("Remover?")){ var arr=louvores.slice(); arr.splice(i,1); saveData("louvores",arr); } }
 
-// =====================================================
+// ============================
 // ANIVERSARIANTES
-// =====================================================
+// ============================
 function renderAniversariantes() {
-  const f = formAniv;
-  const hoje = new Date();
-  const mesAtual = hoje.getMonth()+1;
-  return `
-    <h2 class="section-title">Aniversariantes</h2>
-    ${isEditor ? `
-    <div class="form-box">
-      <div class="form-group full"><label>Nome *</label><input placeholder="Nome completo" value="${esc(f.nome)}" oninput="formAniv.nome=this.value" /></div>
-      <div class="form-group"><label>Dia *</label><input type="number" min="1" max="31" placeholder="Ex: 15" value="${f.dia||''}" oninput="formAniv.dia=this.value" /></div>
-      <div class="form-group"><label>Mês *</label>
-        <select onchange="formAniv.mes=this.value">
-          <option value="">Mês...</option>
-          ${MESES.map((m,i)=>`<option value="${i+1}" ${f.mes==i+1?"selected":""}>${m}</option>`).join("")}
-        </select>
-      </div>
-      <div class="form-group"><label>Função</label><input placeholder="Ex: Vocal" value="${esc(f.funcao)}" oninput="formAniv.funcao=this.value" /></div>
-      <div class="form-group"><label>Telefone</label><input placeholder="(99) 99999-9999" value="${esc(f.tel)}" oninput="formAniv.tel=this.value" /></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-primary" onclick="saveAniv()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar"}</button>
-      ${editIndex!==null?`<button class="btn-secondary" onclick="editIndex=null;formAniv={nome:'',dia:'',mes:'',funcao:'',tel:''};render()">Cancelar</button>`:""}
-    </div>` : ""}
-    ${aniversariantes.length===0 ? `<div class="empty">Nenhum aniversariante cadastrado.</div>` :
-      MESES.map((mes,mi) => {
-        const doMes = aniversariantes.filter(a=>parseInt(a.mes)===mi+1);
-        if (!doMes.length) return "";
-        return `<h3 class="mes-header ${mi+1===mesAtual?'mes-atual':''}">${mes} ${mi+1===mesAtual?"🎉":""}</h3>
-        <table class="table">
-          <thead><tr><th>Dia</th><th>Nome</th><th>Função</th><th>Telefone</th>${isEditor?"<th></th>":""}</tr></thead>
-          <tbody>
-            ${doMes.map(a => {
-              const i = aniversariantes.indexOf(a);
-              const d = mi+1===mesAtual && parseInt(a.dia)===hoje.getDate();
-              return `<tr class="${d?'row-destaque':''}">
-                <td><strong>${String(a.dia).padStart(2,"0")}</strong></td>
-                <td>${esc(a.nome)}</td>
-                <td><span class="badge">${esc(a.funcao)}</span></td>
-                <td>${esc(a.tel)}</td>
-                ${isEditor?`<td><button class="icon-btn" onclick="editAniv(${i})">✏️</button><button class="icon-btn" onclick="delAniv(${i})">🗑️</button></td>`:""}
-              </tr>`;
-            }).join("")}
-          </tbody>
-        </table>`;
-      }).join("")
-    }`;
+  var f = formAniv;
+  var hoje = new Date(), mesAtual = hoje.getMonth()+1;
+  var html = '<h2 class="section-title">Aniversariantes</h2>';
+  if (isEditor) {
+    html += '<div class="form-box">' +
+      '<div class="form-group full"><label>Nome *</label><input placeholder="Nome completo" value="' + esc(f.nome) + '" oninput="formAniv.nome=this.value" /></div>' +
+      '<div class="form-group"><label>Dia *</label><input type="number" min="1" max="31" placeholder="Ex: 15" value="' + esc(f.dia) + '" oninput="formAniv.dia=this.value" /></div>' +
+      '<div class="form-group"><label>Mês *</label>' +
+        '<select onchange="formAniv.mes=this.value">' +
+          '<option value="">Mês...</option>' +
+          MESES.map(function(m,i){ return '<option value="'+(i+1)+'"'+(f.mes==i+1?" selected":"")+'>' + m + '</option>'; }).join("") +
+        '</select></div>' +
+      '<div class="form-group"><label>Função</label><input placeholder="Ex: Vocal" value="' + esc(f.funcao) + '" oninput="formAniv.funcao=this.value" /></div>' +
+      '<div class="form-group"><label>Telefone</label><input placeholder="(99) 99999-9999" value="' + esc(f.tel) + '" oninput="formAniv.tel=this.value" /></div>' +
+    '</div>' +
+    '<div class="form-actions">' +
+      '<button class="btn-primary" onclick="saveAniv()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar") + '</button>' +
+      (editIndex!==null ? '<button class="btn-secondary" onclick="editIndex=null;formAniv={nome:\'\',dia:\'\',mes:\'\',funcao:\'\',tel:\'\'};render()">Cancelar</button>' : "") +
+    '</div>';
+  }
+  if (aniversariantes.length === 0) {
+    html += '<div class="empty">Nenhum aniversariante cadastrado.</div>';
+  } else {
+    MESES.forEach(function(mes, mi) {
+      var doMes = aniversariantes.filter(function(a){ return parseInt(a.mes)===mi+1; });
+      if (!doMes.length) return;
+      html += '<h3 class="mes-header ' + (mi+1===mesAtual?"mes-atual":"") + '">' + mes + (mi+1===mesAtual?" 🎉":"") + '</h3>' +
+        '<table class="table"><thead><tr><th>Dia</th><th>Nome</th><th>Função</th><th>Telefone</th>' + (isEditor?"<th></th>":"") + '</tr></thead><tbody>' +
+        doMes.map(function(a) {
+          var i = aniversariantes.indexOf(a);
+          var d = mi+1===mesAtual && parseInt(a.dia)===hoje.getDate();
+          return '<tr class="' + (d?"row-destaque":"") + '">' +
+            '<td><strong>' + String(a.dia).padStart(2,"0") + '</strong></td>' +
+            '<td>' + esc(a.nome) + '</td>' +
+            '<td><span class="badge">' + esc(a.funcao) + '</span></td>' +
+            '<td>' + esc(a.tel) + '</td>' +
+            (isEditor ? '<td><button class="icon-btn" onclick="editAniv('+i+')">✏️</button><button class="icon-btn" onclick="delAniv('+i+')">🗑️</button></td>' : "") +
+          '</tr>';
+        }).join("") +
+        '</tbody></table>';
+    });
+  }
+  return html;
 }
 function saveAniv() {
   if (!formAniv.nome.trim()||!formAniv.dia||!formAniv.mes) { alert("Preencha nome, dia e mês."); return; }
-  let arr=[...aniversariantes];
-  if (editIndex!==null) { arr[editIndex]={...formAniv}; editIndex=null; }
-  else arr.push({...formAniv});
-  arr.sort((a,b)=>(parseInt(a.mes)*100+parseInt(a.dia))-(parseInt(b.mes)*100+parseInt(b.dia)));
-  saveData("aniversariantes",arr);
-  formAniv={nome:"",dia:"",mes:"",funcao:"",tel:""};
+  var arr = aniversariantes.slice();
+  if (editIndex!==null) { arr[editIndex]=Object.assign({},formAniv); editIndex=null; }
+  else arr.push(Object.assign({},formAniv));
+  arr.sort(function(a,b){ return (parseInt(a.mes)*100+parseInt(a.dia))-(parseInt(b.mes)*100+parseInt(b.dia)); });
+  saveData("aniversariantes", arr);
+  formAniv = { nome:"", dia:"", mes:"", funcao:"", tel:"" };
 }
-function editAniv(i) { formAniv={...aniversariantes[i]}; editIndex=i; window.scrollTo(0,0); render(); }
-function delAniv(i) { if(confirm("Remover?")){ let arr=[...aniversariantes]; arr.splice(i,1); saveData("aniversariantes",arr); } }
+function editAniv(i) { formAniv=Object.assign({},aniversariantes[i]); editIndex=i; window.scrollTo(0,0); render(); }
+function delAniv(i)  { if(confirm("Remover?")){ var arr=aniversariantes.slice(); arr.splice(i,1); saveData("aniversariantes",arr); } }
 
-// =====================================================
+// ============================
 // CRONOGRAMA
-// =====================================================
+// ============================
 function renderCronograma() {
-  const f = formCron;
-  return `
-    <h2 class="section-title">Cronograma de Atividades</h2>
-    ${isEditor ? `
-    <div class="form-box">
-      <div class="form-group"><label>Data</label><input type="date" value="${f.data||''}" onchange="formCron.data=this.value" /></div>
-      <div class="form-group full"><label>Título *</label><input placeholder="Nome da atividade" value="${esc(f.titulo)}" oninput="formCron.titulo=this.value" /></div>
-      <div class="form-group"><label>Responsável</label><input placeholder="Quem vai fazer" value="${esc(f.responsavel)}" oninput="formCron.responsavel=this.value" /></div>
-      <div class="form-group"><label>Status</label>
-        <select onchange="formCron.status=this.value">
-          ${Object.entries(STATUS_LABELS).map(([v,l])=>`<option value="${v}" ${f.status===v?"selected":""}>${l}</option>`).join("")}
-        </select>
-      </div>
-      <div class="form-group full"><label>Descrição</label><textarea rows="2" oninput="formCron.descricao=this.value">${esc(f.descricao)}</textarea></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-primary" onclick="saveCron()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar"}</button>
-      ${editIndex!==null?`<button class="btn-secondary" onclick="editIndex=null;formCron={data:'',titulo:'',descricao:'',responsavel:'',status:'pendente'};render()">Cancelar</button>`:""}
-    </div>` : ""}
-    ${cronograma.length===0 ? `<div class="empty">Nenhuma atividade no cronograma.</div>` : `
-    <table class="table">
-      <thead><tr><th>Data</th><th>Atividade</th><th>Responsável</th><th>Status</th>${isEditor?"<th></th>":""}</tr></thead>
-      <tbody>
-        ${cronograma.map((c,i)=>`
-          <tr style="opacity:${c.status==='cancelado'?'0.5':'1'}">
-            <td>${c.data?fmtDate(c.data):"—"}</td>
-            <td><strong>${esc(c.titulo)}</strong>${c.descricao?`<div style="font-size:12px;color:#888;margin-top:2px">${esc(c.descricao)}</div>`:""}</td>
-            <td>${esc(c.responsavel)}</td>
-            <td>${isEditor?`<button class="status-btn" onclick="toggleStatus(${i})">${STATUS_LABELS[c.status||"pendente"]}</button>`:STATUS_LABELS[c.status||"pendente"]}</td>
-            ${isEditor?`<td><button class="icon-btn" onclick="editCron(${i})">✏️</button><button class="icon-btn" onclick="delCron(${i})">🗑️</button></td>`:""}
-          </tr>`).join("")}
-      </tbody>
-    </table>`}`;
+  var f = formCron;
+  var html = '<h2 class="section-title">Cronograma de Atividades</h2>';
+  if (isEditor) {
+    html += '<div class="form-box">' +
+      '<div class="form-group"><label>Data</label><input type="date" value="' + esc(f.data) + '" onchange="formCron.data=this.value" /></div>' +
+      '<div class="form-group full"><label>Título *</label><input placeholder="Nome da atividade" value="' + esc(f.titulo) + '" oninput="formCron.titulo=this.value" /></div>' +
+      '<div class="form-group"><label>Responsável</label><input placeholder="Quem vai fazer" value="' + esc(f.responsavel) + '" oninput="formCron.responsavel=this.value" /></div>' +
+      '<div class="form-group"><label>Status</label>' +
+        '<select onchange="formCron.status=this.value">' +
+          Object.entries(STATUS_LABELS).map(function(e){ return '<option value="'+e[0]+'"'+(f.status===e[0]?" selected":"")+'>' + e[1] + '</option>'; }).join("") +
+        '</select></div>' +
+      '<div class="form-group full"><label>Descrição</label><textarea rows="2" oninput="formCron.descricao=this.value">' + esc(f.descricao) + '</textarea></div>' +
+    '</div>' +
+    '<div class="form-actions">' +
+      '<button class="btn-primary" onclick="saveCron()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar") + '</button>' +
+      (editIndex!==null ? '<button class="btn-secondary" onclick="editIndex=null;formCron={data:\'\',titulo:\'\',descricao:\'\',responsavel:\'\',status:\'pendente\'};render()">Cancelar</button>' : "") +
+    '</div>';
+  }
+  if (cronograma.length === 0) {
+    html += '<div class="empty">Nenhuma atividade no cronograma.</div>';
+  } else {
+    html += '<table class="table"><thead><tr><th>Data</th><th>Atividade</th><th>Responsável</th><th>Status</th>' + (isEditor?"<th></th>":"") + '</tr></thead><tbody>' +
+      cronograma.map(function(c,i) {
+        return '<tr style="opacity:' + (c.status==="cancelado"?"0.5":"1") + '">' +
+          '<td>' + (c.data?fmtDate(c.data):"—") + '</td>' +
+          '<td><strong>' + esc(c.titulo) + '</strong>' + (c.descricao?'<div style="font-size:12px;color:#888;margin-top:2px">'+esc(c.descricao)+'</div>':"") + '</td>' +
+          '<td>' + esc(c.responsavel) + '</td>' +
+          '<td>' + (isEditor?'<button class="status-btn" onclick="toggleStatus('+i+')">' + STATUS_LABELS[c.status||"pendente"] + '</button>':STATUS_LABELS[c.status||"pendente"]) + '</td>' +
+          (isEditor?'<td><button class="icon-btn" onclick="editCron('+i+')">✏️</button><button class="icon-btn" onclick="delCron('+i+')">🗑️</button></td>':"") +
+        '</tr>';
+      }).join("") +
+    '</tbody></table>';
+  }
+  return html;
 }
 function saveCron() {
   if (!formCron.titulo.trim()) { alert("Preencha o título."); return; }
-  let arr=[...cronograma];
-  if (editIndex!==null) { arr[editIndex]={...formCron}; editIndex=null; }
-  else arr.push({...formCron});
-  arr.sort((a,b)=>(a.data||"").localeCompare(b.data||""));
-  saveData("cronograma",arr);
-  formCron={data:"",titulo:"",descricao:"",responsavel:"",status:"pendente"};
+  var arr = cronograma.slice();
+  if (editIndex!==null) { arr[editIndex]=Object.assign({},formCron); editIndex=null; }
+  else arr.push(Object.assign({},formCron));
+  arr.sort(function(a,b){ return (a.data||"").localeCompare(b.data||""); });
+  saveData("cronograma", arr);
+  formCron = { data:"", titulo:"", descricao:"", responsavel:"", status:"pendente" };
 }
 function toggleStatus(i) {
-  const order=["pendente","concluido","cancelado"];
-  const arr=[...cronograma];
-  arr[i].status=order[(order.indexOf(arr[i].status||"pendente")+1)%order.length];
+  var order=["pendente","concluido","cancelado"];
+  var arr=cronograma.slice();
+  arr[i] = Object.assign({}, arr[i], {status: order[(order.indexOf(arr[i].status||"pendente")+1)%order.length]});
   saveData("cronograma",arr);
 }
-function editCron(i) { formCron={...cronograma[i]}; editIndex=i; window.scrollTo(0,0); render(); }
-function delCron(i) { if(confirm("Remover?")){ let arr=[...cronograma]; arr.splice(i,1); saveData("cronograma",arr); } }
+function editCron(i) { formCron=Object.assign({},cronograma[i]); editIndex=i; window.scrollTo(0,0); render(); }
+function delCron(i)  { if(confirm("Remover?")){ var arr=cronograma.slice(); arr.splice(i,1); saveData("cronograma",arr); } }
 
-// =====================================================
+// ============================
 // REGRAS
-// =====================================================
+// ============================
 function renderRegras() {
-  const f = formRegra;
-  return `
-    <h2 class="section-title">Regras do Ministério</h2>
-    ${isEditor ? `
-    <div class="form-box">
-      <div class="form-group full"><label>Título da Regra *</label><input placeholder="Ex: Pontualidade" value="${esc(f.titulo)}" oninput="formRegra.titulo=this.value" /></div>
-      <div class="form-group full"><label>Descrição / Detalhamento</label><textarea rows="3" oninput="formRegra.descricao=this.value">${esc(f.descricao)}</textarea></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-primary" onclick="saveRegra()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar Regra"}</button>
-      ${editIndex!==null?`<button class="btn-secondary" onclick="editIndex=null;formRegra={titulo:'',descricao:''};render()">Cancelar</button>`:""}
-    </div>` : ""}
-    ${regras.length===0 ? `<div class="empty">Nenhuma regra cadastrada ainda.</div>` : `
-    <div class="regras-list">
-      ${regras.map((r,i)=>`
-        <div class="regra-card">
-          <div class="regra-num">${i+1}</div>
-          <div class="regra-body">
-            <div class="regra-titulo">${esc(r.titulo)}</div>
-            ${r.descricao?`<div class="regra-desc">${esc(r.descricao)}</div>`:""}
-          </div>
-          ${isEditor?`<div class="regra-actions">
-            <button class="icon-btn" onclick="moveRegra(${i},-1)">⬆️</button>
-            <button class="icon-btn" onclick="moveRegra(${i},1)">⬇️</button>
-            <button class="icon-btn" onclick="editRegra(${i})">✏️</button>
-            <button class="icon-btn" onclick="delRegra(${i})">🗑️</button>
-          </div>`:""}
-        </div>`).join("")}
-    </div>`}`;
+  var f = formRegra;
+  var html = '<h2 class="section-title">Regras do Ministério</h2>';
+  if (isEditor) {
+    html += '<div class="form-box">' +
+      '<div class="form-group full"><label>Título da Regra *</label><input placeholder="Ex: Pontualidade" value="' + esc(f.titulo) + '" oninput="formRegra.titulo=this.value" /></div>' +
+      '<div class="form-group full"><label>Descrição / Detalhamento</label><textarea rows="3" oninput="formRegra.descricao=this.value">' + esc(f.descricao) + '</textarea></div>' +
+    '</div>' +
+    '<div class="form-actions">' +
+      '<button class="btn-primary" onclick="saveRegra()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar Regra") + '</button>' +
+      (editIndex!==null ? '<button class="btn-secondary" onclick="editIndex=null;formRegra={titulo:\'\',descricao:\'\'};render()">Cancelar</button>' : "") +
+    '</div>';
+  }
+  if (regras.length === 0) {
+    html += '<div class="empty">Nenhuma regra cadastrada ainda.</div>';
+  } else {
+    html += '<div class="regras-list">' +
+      regras.map(function(r,i) {
+        return '<div class="regra-card">' +
+          '<div class="regra-num">' + (i+1) + '</div>' +
+          '<div class="regra-body">' +
+            '<div class="regra-titulo">' + esc(r.titulo) + '</div>' +
+            (r.descricao ? '<div class="regra-desc">' + esc(r.descricao) + '</div>' : "") +
+          '</div>' +
+          (isEditor ?
+            '<div class="regra-actions">' +
+              '<button class="icon-btn" onclick="moveRegra('+i+',-1)">⬆️</button>' +
+              '<button class="icon-btn" onclick="moveRegra('+i+',1)">⬇️</button>' +
+              '<button class="icon-btn" onclick="editRegra('+i+')">✏️</button>' +
+              '<button class="icon-btn" onclick="delRegra('+i+')">🗑️</button>' +
+            '</div>'
+          : "") +
+        '</div>';
+      }).join("") +
+    '</div>';
+  }
+  return html;
 }
 function saveRegra() {
   if (!formRegra.titulo.trim()) { alert("Preencha o título."); return; }
-  let arr=[...regras];
-  if (editIndex!==null) { arr[editIndex]={...formRegra}; editIndex=null; }
-  else arr.push({...formRegra});
+  var arr = regras.slice();
+  if (editIndex!==null) { arr[editIndex]=Object.assign({},formRegra); editIndex=null; }
+  else arr.push(Object.assign({},formRegra));
+  saveData("regras", arr);
+  formRegra = { titulo:"", descricao:"" };
+}
+function moveRegra(i, dir) {
+  var arr=regras.slice(), j=i+dir;
+  if (j<0||j>=arr.length) return;
+  var tmp=arr[i]; arr[i]=arr[j]; arr[j]=tmp;
   saveData("regras",arr);
-  formRegra={titulo:"",descricao:""};
 }
-function moveRegra(i,dir) {
-  const arr=[...regras]; const j=i+dir;
-  if(j<0||j>=arr.length) return;
-  [arr[i],arr[j]]=[arr[j],arr[i]]; saveData("regras",arr);
-}
-function editRegra(i) { formRegra={...regras[i]}; editIndex=i; window.scrollTo(0,0); render(); }
-function delRegra(i) { if(confirm("Remover?")){ let arr=[...regras]; arr.splice(i,1); saveData("regras",arr); } }
+function editRegra(i) { formRegra=Object.assign({},regras[i]); editIndex=i; window.scrollTo(0,0); render(); }
+function delRegra(i)  { if(confirm("Remover?")){ var arr=regras.slice(); arr.splice(i,1); saveData("regras",arr); } }
 
-// UTILS
-function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function fmtDate(d) { if(!d) return ""; const [y,m,day]=d.split("-"); return `${day}/${m}/${y}`; }
-
-// Render inicial imediato (sem esperar Firebase)
+// INIT
 render();
-
-// Timeout de segurança: se Firebase não responder em 8s, mostra aviso
-setTimeout(() => {
-  const loading = document.querySelector('.loading');
-  if (loading) {
-    loading.innerHTML = `
-      <div style="color:#ef4444;font-size:14px;padding:20px">
-        ⚠️ Não foi possível conectar ao banco de dados.<br>
-        <span style="font-size:12px;color:#888">Verifique sua conexão e recarregue a página.</span><br><br>
-        <button onclick="location.reload()" style="background:#7c3aed;color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer">🔄 Recarregar</button>
-      </div>`;
-  }
-}, 8000);
-
 initListeners();
 </script>
 </body>
 </html>
-
-
-
