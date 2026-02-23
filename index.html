@@ -188,6 +188,7 @@ function renderBirthdayPopup() {
 
 // RENDER
 function render() {
+  const scrollY = window.scrollY;
   document.getElementById("app").innerHTML = `
     ${renderBirthdayPopup()}
     ${showPasswordModal ? renderModal() : ""}
@@ -214,6 +215,13 @@ function render() {
       ${activeTab==="cronograma"     ? renderCronograma()     : ""}
       ${activeTab==="regras"         ? renderRegras()         : ""}
     </div>`;
+  window.scrollTo(0, scrollY);
+  // Restaura foco no campo de busca
+  if (activeTab === "louvores") {
+    const inp = document.querySelector('.search-input');
+    if (inp && buscaLouvor !== "") { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  }
+}
 }
 
 // MODAL
@@ -397,7 +405,9 @@ function renderLouvores() {
   const f = formLouvor;
   const filtrados = louvores.filter(l =>
     (l.titulo||"").toLowerCase().includes(buscaLouvor.toLowerCase()) ||
-    (l.artista||"").toLowerCase().includes(buscaLouvor.toLowerCase())
+    (l.artista||"").toLowerCase().includes(buscaLouvor.toLowerCase()) ||
+    (l.obs||"").toLowerCase().includes(buscaLouvor.toLowerCase()) ||
+    (l.nota||"").toLowerCase().includes(buscaLouvor.toLowerCase())
   );
   return `
     <h2 class="section-title">Lista de Louvores</h2>
@@ -418,7 +428,7 @@ function renderLouvores() {
       <button class="btn-primary" onclick="saveLouvor()">${editIndex!==null?"✏️ Atualizar":"➕ Adicionar"}</button>
       ${editIndex!==null?`<button class="btn-secondary" onclick="editIndex=null;formLouvor=emptyLouvor();render()">Cancelar</button>`:""}
     </div>` : ""}
-    <input class="search-input" placeholder="🔍 Buscar louvor..." value="${esc(buscaLouvor)}" oninput="buscaLouvor=this.value;render()" />
+    <input class="search-input" placeholder="🔍 Buscar por nome, artista, tom (ex: F#) ou trecho do hino..." value="${esc(buscaLouvor)}" oninput="buscaLouvor=this.value;render()" />
     ${filtrados.length===0 ? `<div class="empty">Nenhum louvor encontrado.</div>` : `
     <div class="cards-grid">
       ${filtrados.map(l => {
@@ -440,6 +450,23 @@ function renderLouvores() {
         </div>`;
       }).join("")}
     </div>`}`;
+}
+function getYoutubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
+  return m ? m[1] : null;
+}
+function togglePreview(btn, ytId) {
+  const preview = btn.parentElement.nextElementSibling;
+  if (preview.style.display === "none") {
+    preview.style.display = "block";
+    preview.innerHTML = `<iframe width="100%" height="150" src="https://www.youtube.com/embed/${ytId}?autoplay=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="border-radius:8px"></iframe>`;
+    btn.textContent = "⏹ Fechar player";
+  } else {
+    preview.style.display = "none";
+    preview.innerHTML = "";
+    btn.textContent = "▶ Ouvir trecho";
+  }
 }
 function saveLouvor() {
   if (!formLouvor.titulo.trim()) { alert("Preencha o título."); return; }
