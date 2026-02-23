@@ -652,9 +652,26 @@ function delRegra(i) { if(confirm("Remover?")){ let arr=[...regras]; arr.splice(
 function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function fmtDate(d) { if(!d) return ""; const [y,m,day]=d.split("-"); return `${day}/${m}/${y}`; }
 
+// Render inicial imediato (sem esperar Firebase)
+render();
+
+// Timeout de segurança: se Firebase não responder em 8s, mostra aviso
+setTimeout(() => {
+  const loading = document.querySelector('.loading');
+  if (loading) {
+    loading.innerHTML = `
+      <div style="color:#ef4444;font-size:14px;padding:20px">
+        ⚠️ Não foi possível conectar ao banco de dados.<br>
+        <span style="font-size:12px;color:#888">Verifique sua conexão e recarregue a página.</span><br><br>
+        <button onclick="location.reload()" style="background:#7c3aed;color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer">🔄 Recarregar</button>
+      </div>`;
+  }
+}, 8000);
+
 initListeners();
 </script>
 </body>
 </html>
+
 
 
