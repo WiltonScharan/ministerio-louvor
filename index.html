@@ -423,7 +423,7 @@ function renderLouvores() {
           '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">' +
             (l.link ? '<a href="' + esc(l.link) + '" target="_blank" class="card-link">🔗 Ver louvor</a>' : "") +
             (ytId ? '<button onclick="togglePreview(this,\'' + ytId + '\')" style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;padding:0">▶ Ouvir trecho</button>' : "") +
-            '<a href="https://www.cifraclubgospel.com/?s=' + encodeURIComponent((l.titulo||"")+" "+(l.artista||"")) + '" target="_blank" class="card-link">🎸 Buscar cifra</a>' +
+            '<a href="https://www.google.com/search?q=' + encodeURIComponent("cifra "+(l.titulo||"")+" "+(l.artista||"")+" site:cifraclub.com.br") + '" target="_blank" class="card-link">🎸 Buscar cifra</a>' +
             '<a href="https://www.google.com/search?q=' + encodeURIComponent("letra "+(l.titulo||"")+" "+(l.artista||"")+" site:letras.mus.br") + '" target="_blank" class="card-link">📝 Buscar letra</a>' +
           '</div>' +
           '<div class="yt-preview" style="display:none;margin-top:8px"></div>' +
