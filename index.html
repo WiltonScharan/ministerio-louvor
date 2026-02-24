@@ -198,7 +198,7 @@ let escalaMesFiltro = new Date().getMonth();
 let buscaLouvor = "";
 
 function emptyEscala() { return { data:"", culto:"", funcao:"", nome:"", obs:"", mes: new Date().getMonth() }; }
-function emptyLouvor() { return { titulo:"", artista:"", nota:"", link:"", obs:"" }; }
+function emptyLouvor() { return { titulo:"", artista:"", nota:"", link:"", obs:"", trecho:"" }; }
 let formEscala = emptyEscala();
 let formLouvor = emptyLouvor();
 let formAniv   = { nome:"", dia:"", mes:"", funcao:"", tel:"" };
@@ -500,7 +500,8 @@ function renderLouvores() {
     return (l.titulo||"").toLowerCase().includes(q) ||
            (l.artista||"").toLowerCase().includes(q) ||
            (l.obs||"").toLowerCase().includes(q) ||
-           (l.nota||"").toLowerCase().includes(q);
+           (l.nota||"").toLowerCase().includes(q) ||
+           (l.trecho||"").toLowerCase().includes(q);
   });
 
   var html = '<h2 class="section-title">Lista de Louvores</h2>';
@@ -515,6 +516,7 @@ function renderLouvores() {
           NOTAS.map(function(n){ return '<option value="'+n+'"'+(f.nota===n?" selected":"")+'>'+n+'</option>'; }).join("") +
         '</select></div>' +
       '<div class="form-group full"><label>Link (YouTube/Drive)</label><input placeholder="https://..." value="' + esc(f.link) + '" oninput="formLouvor.link=this.value" /></div>' +
+      '<div class="form-group full"><label>Trecho / Letra</label><textarea rows="3" placeholder="Cole aqui um trecho da letra para facilitar a busca..." oninput="formLouvor.trecho=this.value">' + esc(f.trecho||"") + '</textarea></div>' +
     '</div>' +
     '<div class="form-actions">' +
       '<button class="btn-primary" onclick="saveLouvor()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar") + '</button>' +
@@ -522,7 +524,10 @@ function renderLouvores() {
     '</div>';
   }
 
-  html += '<input class="search-input" placeholder="🔍 Buscar por nome, artista, tom (ex: F#) ou trecho do hino..." value="' + esc(buscaLouvor) + '" oninput="buscaLouvor=this.value;render()" />';
+  html += '<div style="display:flex;gap:8px;align-items:center;margin-top:16px">' +
+    '<input class="search-input" style="margin-top:0;flex:1" placeholder="🔍 Buscar por nome, artista, tom, trecho da letra..." value="' + esc(buscaLouvor) + '" oninput="buscaLouvor=this.value;render()" id="search-louvor"/>' +
+    '<button onclick="startVoiceSearch()" title="Busca por voz" style="background:var(--primary);border:none;color:white;width:40px;height:40px;border-radius:8px;font-size:18px;cursor:pointer;flex-shrink:0" id="btn-voice">🎤</button>' +
+  '</div>';
 
   if (filtrados.length === 0) {
     html += '<div class="empty">Nenhum louvor encontrado.</div>';
@@ -742,6 +747,30 @@ function moveRegra(i, dir) {
 }
 function editRegra(i) { formRegra=Object.assign({},regras[i]); editIndex=i; window.scrollTo(0,0); render(); }
 function delRegra(i)  { if(confirm("Remover?")){ var arr=regras.slice(); arr.splice(i,1); saveData("regras",arr); } }
+
+// BUSCA POR VOZ
+function startVoiceSearch() {
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { alert("Seu navegador não suporta busca por voz. Use o Chrome."); return; }
+  var rec = new SpeechRecognition();
+  rec.lang = "pt-BR";
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  var btn = document.getElementById("btn-voice");
+  if (btn) { btn.textContent = "⏺"; btn.style.background = "#ef4444"; }
+  rec.start();
+  rec.onresult = function(e) {
+    var texto = e.results[0][0].transcript;
+    buscaLouvor = texto;
+    render();
+  };
+  rec.onerror = function() {
+    if (btn) { btn.textContent = "🎤"; btn.style.background = "var(--primary)"; }
+  };
+  rec.onend = function() {
+    if (btn) { btn.textContent = "🎤"; btn.style.background = "var(--primary)"; }
+  };
+}
 
 // INIT
 render();
