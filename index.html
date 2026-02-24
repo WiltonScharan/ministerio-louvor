@@ -253,11 +253,37 @@ function togglePreview(btn, ytId) {
   }
 }
 
-// LOGO SVG da chama (estilo Hermom)
+// LOGO SVG da chama – Igreja Hermom (fiel ao original)
 function logoSVG() {
-  return '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:44px;height:44px;background:#E05530;border-radius:10px;padding:6px">' +
-    '<path d="M24 6C24 6 14 16 14 26C14 31.5 18.5 36 24 36C29.5 36 34 31.5 34 26C34 21 30 17 30 17C30 17 30 22 26 24C26 24 28 20 24 14C24 14 22 18 20 20C18 22 18 26 18 26C16.9 24.3 17 21 17 21C17 21 14 23 14 26C14 26 14 16 24 6Z" fill="#1f2937"/>' +
-    '<path d="M24 28C22.3 28 21 29.3 21 31C21 32.7 22.3 34 24 34C25.7 34 27 32.7 27 31C27 29.3 25.7 28 24 28Z" fill="#1f2937" opacity="0.6"/>' +
+  return '<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:48px;height:48px;border-radius:14px">' +
+    // Fundo laranja
+    '<rect width="200" height="200" rx="28" fill="#E05530"/>' +
+    // Chama externa – curl para a esquerda no topo, corpo largo na base
+    '<path d="' +
+      'M 100 178 ' +
+      'C 76 178 50 162 44 140 ' +
+      'C 38 118 50 100 44 82 ' +
+      'C 40 68 44 52 52 40 ' +
+      'C 48 54 52 64 62 62 ' +
+      'C 54 50 56 32 66 20 ' +
+      'C 60 36 66 46 76 44 ' +
+      'C 66 34 62 18 72 10 ' +
+      'C 70 24 80 34 92 30 ' +
+      'C 84 20 84 8 96 6 ' +
+      'C 92 18 98 28 108 26 ' +
+      'C 120 24 130 34 128 50 ' +
+      'C 126 64 114 72 118 84 ' +
+      'C 124 96 144 106 148 126 ' +
+      'C 152 148 138 178 100 178 Z' +
+    '" fill="#2d2926"/>' +
+    // Gota interna vazada (fundo laranja aparece)
+    '<path d="' +
+      'M 100 88 ' +
+      'C 96 98 82 114 82 132 ' +
+      'C 82 150 90 164 100 164 ' +
+      'C 110 164 118 150 118 132 ' +
+      'C 118 114 104 98 100 88 Z' +
+    '" fill="#E05530"/>' +
     '</svg>';
 }
 
