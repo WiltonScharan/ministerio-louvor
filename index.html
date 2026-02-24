@@ -8,190 +8,135 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
 :root {
-  --primary: #D84C28;
-  --primary-dark: #B83E20;
-  --primary-light: #E86040;
-  --primary-bg: #FFF0EC;
-  --primary-badge-bg: #FFE0D8;
-  --primary-badge-text: #C44520;
-  --bg: #f0f2f5;
-  --surface: #ffffff;
-  --surface2: #f9fafb;
-  --border: #e5e7eb;
-  --text: #1f2937;
-  --text-soft: #6b7280;
-  --text-muted: #9ca3af;
-  --tab-bg: #ffffff;
-  --table-head: #f9fafb;
-  --input-bg: #fafafa;
+  --primary: #D84C28; --primary-dark: #B83E20; --primary-light: #E86040;
+  --primary-bg: #FFF0EC; --primary-badge-bg: #FFE0D8; --primary-badge-text: #C44520;
+  --bg: #f0f2f5; --surface: #ffffff; --surface2: #f9fafb; --border: #e5e7eb;
+  --text: #1f2937; --text-soft: #6b7280; --text-muted: #9ca3af;
+  --tab-bg: #ffffff; --table-head: #f9fafb; --input-bg: #fafafa;
   --card-shadow: 0 1px 3px rgba(0,0,0,0.07);
-  --banner-bg: #fef9c3;
-  --banner-border: #fde68a;
-  --banner-text: #92400e;
+  --banner-bg: #fef9c3; --banner-border: #fde68a; --banner-text: #92400e;
 }
 [data-theme="dark"] {
-  --bg: #111827;
-  --surface: #1f2937;
-  --surface2: #374151;
-  --border: #374151;
-  --text: #f9fafb;
-  --text-soft: #9ca3af;
-  --text-muted: #6b7280;
-  --tab-bg: #1f2937;
-  --table-head: #374151;
-  --input-bg: #374151;
-  --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  --primary-bg: #2d1a14;
-  --primary-badge-bg: #4a2010;
-  --primary-badge-text: #F07050;
-  --banner-bg: #3b2f00;
-  --banner-border: #7a5a00;
-  --banner-text: #fde68a;
+  --bg:#111827; --surface:#1f2937; --surface2:#374151; --border:#374151;
+  --text:#f9fafb; --text-soft:#9ca3af; --text-muted:#6b7280;
+  --tab-bg:#1f2937; --table-head:#374151; --input-bg:#374151;
+  --card-shadow:0 1px 3px rgba(0,0,0,0.3);
+  --primary-bg:#2d1a14; --primary-badge-bg:#4a2010; --primary-badge-text:#F07050;
+  --banner-bg:#3b2f00; --banner-border:#7a5a00; --banner-text:#fde68a;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); transition: background 0.2s, color 0.2s; }
-
-/* HEADER */
-.header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 10px 24px; }
-.header-top { display: flex; align-items: center; gap: 14px; }
-.header-logo { width: 48px; height: 48px; flex-shrink: 0; }
-.header-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
-.header-titles { flex: 1; }
-.header-titles h1 { font-size: 20px; font-weight: 700; line-height: 1.2; }
-.header-titles .sub { font-size: 12px; opacity: 0.85; margin-top: 2px; }
-.header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-.mode-badge { background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.mode-badge.editor { background: rgba(255,220,50,0.35); }
-.btn-lock { background: rgba(255,255,255,0.15); border: none; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; }
-.btn-lock:hover { background: rgba(255,255,255,0.25); }
-.btn-theme { background: rgba(255,255,255,0.15); border: none; color: white; padding: 4px 10px; border-radius: 20px; font-size: 13px; cursor: pointer; display:flex;align-items:center;gap:4px; }
-.btn-theme:hover { background: rgba(255,255,255,0.25); }
-
-/* MODAL */
-.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.modal { background: var(--surface); border-radius: 16px; padding: 32px; width: 340px; text-align: center; }
-.modal h2 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
-.modal p { font-size: 13px; color: var(--text-soft); margin-bottom: 20px; }
-.modal input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; text-align: center; letter-spacing: 4px; outline: none; background: var(--input-bg); color: var(--text); }
-.modal input:focus { border-color: var(--primary); }
-.modal .error { color: #ef4444; font-size: 12px; margin-top: 8px; }
-.modal-btns { display: flex; gap: 8px; margin-top: 16px; }
-
-/* TABS */
-.tabs { background: var(--tab-bg); border-bottom: 1px solid var(--border); display: flex; overflow-x: auto; padding: 0 16px; }
-.tab { padding: 14px 16px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-soft); border-bottom: 3px solid transparent; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; transition: all 0.2s; }
-.tab:hover { color: var(--primary); }
-.tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-
-/* CONTENT */
-.content { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
-.section-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
-.view-only-banner { background: var(--banner-bg); border: 1px solid var(--banner-border); color: var(--banner-text); padding: 10px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
-.form-box { background: var(--surface); padding: 20px; border-radius: 12px; margin-bottom: 16px; box-shadow: var(--card-shadow); display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.form-group { display: flex; flex-direction: column; gap: 4px; }
-.form-group.full { grid-column: span 2; }
-.form-group label { font-size: 12px; font-weight: 600; color: var(--text-soft); }
-.form-group input, .form-group select, .form-group textarea { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); background: var(--input-bg); outline: none; font-family: inherit; }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); background: var(--surface); }
-.form-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-.btn-primary { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
-.btn-primary:hover { background: var(--primary-dark); }
-.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 10px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; }
-.btn-green { background: #059669; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
-.btn-green:hover { background: #047857; }
-.icon-btn { background: none; border: none; cursor: pointer; font-size: 15px; padding: 4px; opacity: 0.6; }
-.icon-btn:hover { opacity: 1; }
-.status-btn { background: none; border: none; cursor: pointer; font-size: 12px; white-space: nowrap; color: var(--text); }
-
-/* TABLE */
-.table { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--surface); border-radius: 12px; overflow: hidden; box-shadow: var(--card-shadow); font-size: 13px; }
-.table th { background: var(--table-head); padding: 11px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.table td { padding: 11px 14px; border-top: 1px solid var(--border); color: var(--text); }
-.table tr:hover td { background: var(--surface2); }
-
-/* BADGES */
-.badge { background: var(--primary-badge-bg); color: var(--primary-badge-text); padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.badge-green { background: #d1fae5; color: #059669; }
-[data-theme="dark"] .badge-green { background: #064e3b; color: #6ee7b7; }
-
-/* SEARCH */
-.search-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; margin-top: 16px; background: var(--surface); color: var(--text); outline: none; }
-.search-input:focus { border-color: var(--primary); }
-
-/* CARDS */
-.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 16px; }
-.card { background: var(--surface); border-radius: 12px; padding: 16px; box-shadow: var(--card-shadow); }
-.card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.card-title { font-weight: 700; font-size: 14px; color: var(--text); }
-.card-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-.card-obs { font-size: 12px; color: var(--text-soft); margin-top: 8px; background: var(--surface2); padding: 8px; border-radius: 6px; white-space: pre-wrap; }
-.card-link { display: inline-block; font-size: 12px; color: var(--primary); text-decoration: none; }
-.card-actions { display: flex; gap: 4px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-
-/* MES HEADER */
-.mes-header { font-size: 15px; font-weight: 700; color: var(--text); margin: 20px 0 8px; padding: 8px 12px; background: var(--surface); border-radius: 8px; }
-.mes-header.mes-atual { background: var(--primary-bg); color: var(--primary); }
-.row-destaque td { background: var(--primary-bg) !important; }
-
-/* REGRAS */
-.regras-list { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-.regra-card { background: var(--surface); border-radius: 12px; padding: 16px; box-shadow: var(--card-shadow); display: flex; gap: 16px; align-items: flex-start; }
-.regra-num { background: var(--primary); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
-.regra-body { flex: 1; }
-.regra-titulo { font-weight: 700; font-size: 14px; color: var(--text); }
-.regra-desc { font-size: 13px; color: var(--text-soft); margin-top: 6px; line-height: 1.5; }
-.regra-actions { display: flex; gap: 2px; flex-shrink: 0; }
-
-.empty { text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px; }
-
-/* ESCALA */
-.escala-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
-.escala-controls select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: var(--surface); color: var(--text); outline: none; }
-.print-wrap { margin-top: 20px; overflow-x: auto; }
-.print-table { border-collapse: collapse; font-size: 12px; min-width: 600px; background: white; box-shadow: var(--card-shadow); border-radius: 8px; overflow: hidden; }
-.print-table th { background: var(--primary); color: white; padding: 8px 12px; text-align: center; font-size: 11px; white-space: nowrap; border: 1px solid var(--primary-dark); }
-.print-table th.func-col { background: #374151; }
-.print-table td { padding: 7px 12px; border: 1px solid #e5e7eb; text-align: center; font-size: 12px; color: #1f2937; white-space: nowrap; }
-.print-table tr:nth-child(even) td { background: #f9fafb; }
-.print-table td.func-name { background: #1f2937 !important; color: white; font-weight: 700; text-align: left; }
-
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI',sans-serif; background:var(--bg); min-height:100vh; color:var(--text); transition:background 0.2s,color 0.2s; }
+.header { background:linear-gradient(135deg,var(--primary),var(--primary-light)); color:white; padding:10px 24px; }
+.header-top { display:flex; align-items:center; gap:14px; }
+.header-titles h1 { font-size:20px; font-weight:700; }
+.header-titles .sub { font-size:12px; opacity:.85; margin-top:2px; }
+.header-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.mode-badge { background:rgba(255,255,255,0.2); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+.mode-badge.editor { background:rgba(255,220,50,0.35); }
+.btn-lock { background:rgba(255,255,255,0.15); border:none; color:white; padding:4px 12px; border-radius:20px; font-size:11px; cursor:pointer; }
+.btn-lock:hover { background:rgba(255,255,255,0.25); }
+.btn-theme { background:rgba(255,255,255,0.15); border:none; color:white; padding:4px 10px; border-radius:20px; font-size:13px; cursor:pointer; }
+.btn-theme:hover { background:rgba(255,255,255,0.25); }
+.modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000; }
+.modal { background:var(--surface); border-radius:16px; padding:32px; width:340px; text-align:center; }
+.modal h2 { font-size:18px; color:var(--text); margin-bottom:8px; }
+.modal p { font-size:13px; color:var(--text-soft); margin-bottom:20px; }
+.modal input { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:8px; font-size:14px; text-align:center; letter-spacing:4px; outline:none; background:var(--input-bg); color:var(--text); }
+.modal input:focus { border-color:var(--primary); }
+.modal .error { color:#ef4444; font-size:12px; margin-top:8px; }
+.modal-btns { display:flex; gap:8px; margin-top:16px; }
+.tabs { background:var(--tab-bg); border-bottom:1px solid var(--border); display:flex; overflow-x:auto; padding:0 16px; }
+.tab { padding:14px 16px; cursor:pointer; font-size:13px; font-weight:500; color:var(--text-soft); border-bottom:3px solid transparent; white-space:nowrap; background:none; border-top:none; border-left:none; border-right:none; transition:all 0.2s; }
+.tab:hover { color:var(--primary); }
+.tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+.content { max-width:1100px; margin:0 auto; padding:24px 16px; }
+.section-title { font-size:20px; font-weight:700; color:var(--text); margin-bottom:20px; }
+.view-only-banner { background:var(--banner-bg); border:1px solid var(--banner-border); color:var(--banner-text); padding:10px 16px; border-radius:8px; font-size:13px; margin-bottom:16px; }
+.form-box { background:var(--surface); padding:20px; border-radius:12px; margin-bottom:16px; box-shadow:var(--card-shadow); display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group.full { grid-column:span 2; }
+.form-group label { font-size:12px; font-weight:600; color:var(--text-soft); }
+.form-group input,.form-group select,.form-group textarea { padding:8px 10px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--text); background:var(--input-bg); outline:none; font-family:inherit; }
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus { border-color:var(--primary); background:var(--surface); }
+.form-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.btn-primary { background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; }
+.btn-primary:hover { background:var(--primary-dark); }
+.btn-secondary { background:var(--surface2); color:var(--text); border:1px solid var(--border); padding:10px 16px; border-radius:8px; font-size:13px; cursor:pointer; }
+.btn-green { background:#059669; color:white; border:none; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; }
+.btn-green:hover { background:#047857; }
+.icon-btn { background:none; border:none; cursor:pointer; font-size:15px; padding:4px; opacity:.6; }
+.icon-btn:hover { opacity:1; }
+.status-btn { background:none; border:none; cursor:pointer; font-size:12px; white-space:nowrap; color:var(--text); }
+.table { width:100%; border-collapse:collapse; margin-top:20px; background:var(--surface); border-radius:12px; overflow:hidden; box-shadow:var(--card-shadow); font-size:13px; }
+.table th { background:var(--table-head); padding:11px 14px; text-align:left; font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; }
+.table td { padding:11px 14px; border-top:1px solid var(--border); color:var(--text); }
+.table tr:hover td { background:var(--surface2); }
+.badge { background:var(--primary-badge-bg); color:var(--primary-badge-text); padding:3px 8px; border-radius:20px; font-size:11px; font-weight:600; }
+.badge-green { background:#d1fae5; color:#059669; }
+.badge-blue { background:#dbeafe; color:#1d4ed8; }
+[data-theme="dark"] .badge-green { background:#064e3b; color:#6ee7b7; }
+[data-theme="dark"] .badge-blue { background:#1e3a5f; color:#93c5fd; }
+.search-input { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:8px; font-size:13px; margin-top:16px; background:var(--surface); color:var(--text); outline:none; }
+.search-input:focus { border-color:var(--primary); }
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:16px; }
+.card { background:var(--surface); border-radius:12px; padding:16px; box-shadow:var(--card-shadow); }
+.card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+.card-title { font-weight:700; font-size:14px; color:var(--text); }
+.card-sub { font-size:12px; color:var(--text-muted); margin-top:4px; }
+.card-obs { font-size:12px; color:var(--text-soft); margin-top:8px; background:var(--surface2); padding:8px; border-radius:6px; white-space:pre-wrap; }
+.card-link { display:inline-block; font-size:12px; color:var(--primary); text-decoration:none; }
+.card-actions { display:flex; gap:4px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+.mes-header { font-size:15px; font-weight:700; color:var(--text); margin:20px 0 8px; padding:8px 12px; background:var(--surface); border-radius:8px; }
+.mes-header.mes-atual { background:var(--primary-bg); color:var(--primary); }
+.row-destaque td { background:var(--primary-bg) !important; }
+.regras-list { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
+.regra-card { background:var(--surface); border-radius:12px; padding:16px; box-shadow:var(--card-shadow); display:flex; gap:16px; align-items:flex-start; }
+.regra-num { background:var(--primary); color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; margin-top:2px; }
+.regra-body { flex:1; }
+.regra-titulo { font-weight:700; font-size:14px; color:var(--text); }
+.regra-desc { font-size:13px; color:var(--text-soft); margin-top:6px; line-height:1.5; }
+.regra-actions { display:flex; gap:2px; flex-shrink:0; }
+.empty { text-align:center; padding:32px; color:var(--text-muted); font-size:14px; }
+.escala-controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+.escala-controls select { padding:8px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; background:var(--surface); color:var(--text); outline:none; }
+.print-wrap { margin-top:20px; overflow-x:auto; }
+.print-table { border-collapse:collapse; font-size:12px; min-width:600px; background:white; box-shadow:var(--card-shadow); border-radius:8px; overflow:hidden; }
+.print-table th { background:var(--primary); color:white; padding:8px 12px; text-align:center; font-size:11px; white-space:nowrap; border:1px solid var(--primary-dark); }
+.print-table th.func-col { background:#374151; }
+.print-table td { padding:7px 12px; border:1px solid #e5e7eb; text-align:center; font-size:12px; color:#1f2937; white-space:nowrap; }
+.print-table tr:nth-child(even) td { background:#f9fafb; }
+.print-table td.func-name { background:#1f2937 !important; color:white; font-weight:700; text-align:left; }
 @keyframes bar1 { 0%,100%{height:6px} 50%{height:16px} }
 @keyframes bar2 { 0%,100%{height:12px} 50%{height:20px} }
 @keyframes bar3 { 0%,100%{height:18px} 50%{height:6px} }
 @keyframes bar4 { 0%,100%{height:12px} 50%{height:20px} }
 @keyframes bar5 { 0%,100%{height:6px} 50%{height:14px} }
-.voice-bar { display:inline-block; width:3px; border-radius:2px; background:var(--primary); transition: height 0.1s; }
-.listening .voice-bar:nth-child(1) { animation: bar1 0.5s ease-in-out infinite; }
-.listening .voice-bar:nth-child(2) { animation: bar2 0.5s ease-in-out infinite 0.1s; }
-.listening .voice-bar:nth-child(3) { animation: bar3 0.5s ease-in-out infinite 0.2s; }
-.listening .voice-bar:nth-child(4) { animation: bar4 0.5s ease-in-out infinite 0.1s; }
-.listening .voice-bar:nth-child(5) { animation: bar5 0.5s ease-in-out infinite 0.05s; }
-@media print {
-  .no-print { display: none !important; }
-  body { background: white; }
-  .print-wrap { margin: 0; }
-}
-@media (max-width: 600px) {
-  .form-box { grid-template-columns: 1fr; }
-  .form-group.full { grid-column: span 1; }
-  .cards-grid { grid-template-columns: 1fr; }
-}
+.voice-bar { display:inline-block; width:3px; border-radius:2px; background:var(--primary); }
+.listening .voice-bar:nth-child(1) { animation:bar1 0.5s ease-in-out infinite; }
+.listening .voice-bar:nth-child(2) { animation:bar2 0.5s ease-in-out infinite 0.1s; }
+.listening .voice-bar:nth-child(3) { animation:bar3 0.5s ease-in-out infinite 0.2s; }
+.listening .voice-bar:nth-child(4) { animation:bar4 0.5s ease-in-out infinite 0.1s; }
+.listening .voice-bar:nth-child(5) { animation:bar5 0.5s ease-in-out infinite 0.05s; }
+/* METRONOMO */
+.metro-circle { width:120px; height:120px; border-radius:50%; border:6px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:800; color:var(--text); margin:0 auto; transition:background 0.05s,border-color 0.05s; }
+.metro-circle.beat { background:var(--primary); border-color:var(--primary); color:white; }
+@media print { .no-print{display:none!important} body{background:white} .print-wrap{margin:0} }
+@media (max-width:600px) { .form-box{grid-template-columns:1fr} .form-group.full{grid-column:span 1} .cards-grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 <div id="app"><div style="text-align:center;padding:60px;color:#888">Carregando...</div></div>
 <script>
 const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyCfj6HRNRmCsaU7lSZ84rJC2Qp18sNNFLk",
-  authDomain:        "ministerio-louvor---hermom.firebaseapp.com",
-  databaseURL:       "https://ministerio-louvor---hermom-default-rtdb.firebaseio.com",
-  projectId:         "ministerio-louvor---hermom",
-  storageBucket:     "ministerio-louvor---hermom.firebasestorage.app",
-  messagingSenderId: "1074507943287",
-  appId:             "1:1074507943287:web:ff3d404076242eef9f6572"
+  apiKey:"AIzaSyCfj6HRNRmCsaU7lSZ84rJC2Qp18sNNFLk",
+  authDomain:"ministerio-louvor---hermom.firebaseapp.com",
+  databaseURL:"https://ministerio-louvor---hermom-default-rtdb.firebaseio.com",
+  projectId:"ministerio-louvor---hermom",
+  storageBucket:"ministerio-louvor---hermom.firebasestorage.app",
+  messagingSenderId:"1074507943287",
+  appId:"1:1074507943287:web:ff3d404076242eef9f6572"
 };
 const EDITOR_PASSWORD = "DH#2026";
-
 firebase.initializeApp(FIREBASE_CONFIG);
 const db = firebase.database();
 
@@ -199,1186 +144,797 @@ const FUNCOES = ["Ministro","Backing 1","Backing 2","Backing 3","Backing 4","Bat
 const CULTOS  = ["Domingo","Quinta-feira","Vigília","Mulheres","Homens","Outro"];
 const MESES   = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const NOTAS   = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-const STATUS_LABELS = { pendente:"🟡 Pendente", concluido:"🟢 Concluído", cancelado:"🔴 Cancelado" };
+const STATUS_LABELS = {pendente:"🟡 Pendente",concluido:"🟢 Concluído",cancelado:"🔴 Cancelado"};
 
-let isEditor = false, activeTab = "escala", showPasswordModal = false, passwordError = "";
-let showBirthdayPopup = true, editIndex = null;
-let isDark = false;
-let escala = [], louvores = [], aniversariantes = [], cronograma = [], regras = [];
-let escalaMesFiltro = new Date().getMonth();
-let buscaLouvor = "";
-
-function emptyEscala() { return { data:"", culto:"", funcao:"", nome:"", obs:"", mes: new Date().getMonth() }; }
-function emptyLouvor() { return { titulo:"", artista:"", nota:"", link:"", obs:"", trecho:"" }; }
-let formEscala = emptyEscala();
-let formLouvor = emptyLouvor();
-let formAniv   = { nome:"", dia:"", mes:"", funcao:"", tel:"" };
-let formCron   = { data:"", titulo:"", descricao:"", responsavel:"", status:"pendente" };
-let formRegra  = { titulo:"", descricao:"" };
-
-function toggleTheme() {
-  isDark = !isDark;
-  document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-  render();
+// Círculo das quintas para calcular proximidade entre tons
+const CIRCLE_OF_FIFTHS = ["C","G","D","A","E","B","F#","C#","G#","D#","A#","F"];
+function toneDistance(a, b) {
+  if (!a || !b) return 99;
+  var flat = {"Db":"C#","Eb":"D#","Gb":"F#","Ab":"G#","Bb":"A#"};
+  a = flat[a]||a; b = flat[b]||b;
+  var ia = CIRCLE_OF_FIFTHS.indexOf(a), ib = CIRCLE_OF_FIFTHS.indexOf(b);
+  if (ia===-1||ib===-1) return 6;
+  var d = Math.abs(ia-ib); return Math.min(d,12-d);
 }
 
-function initListeners() {
-  ["escala","louvores","aniversariantes","cronograma","regras"].forEach(function(key) {
-    db.ref("ministerio/" + key).on("value", function(snap) {
-      var val = snap.val();
-      if (key === "escala")          escala          = val ? Object.values(val) : [];
-      if (key === "louvores")        louvores        = val ? Object.values(val) : [];
-      if (key === "aniversariantes") aniversariantes = val ? Object.values(val) : [];
-      if (key === "cronograma")      cronograma      = val ? Object.values(val) : [];
-      if (key === "regras")          regras          = val ? Object.values(val) : [];
+let isEditor=false, activeTab="escala", showPasswordModal=false, passwordError="";
+let showBirthdayPopup=true, editIndex=null, isDark=false;
+let escala=[],louvores=[],aniversariantes=[],cronograma=[],regras=[];
+let escalaMesFiltro=new Date().getMonth(), buscaLouvor="";
+
+// Ferramentas
+let ferraTab="transpositor";
+let transResult=null, transOrigem="", transDestino="", transCifra="";
+let medleyTipo="agitado", medleyResult=null;
+let vozLouvor="", vozResult=null;
+// Metrônomo
+let metroRunning=false, metroBPM=80, metroTimer=null, metroBeat=false, metroManualBPM="";
+
+function emptyEscala(){return{data:"",culto:"",funcao:"",nome:"",obs:"",mes:new Date().getMonth()};}
+function emptyLouvor(){return{titulo:"",artista:"",nota:"",bpm:"",link:"",trecho:""};}
+let formEscala=emptyEscala(), formLouvor=emptyLouvor();
+let formAniv={nome:"",dia:"",mes:"",funcao:"",tel:""};
+let formCron={data:"",titulo:"",descricao:"",responsavel:"",status:"pendente"};
+let formRegra={titulo:"",descricao:""};
+
+function toggleTheme(){isDark=!isDark;document.documentElement.setAttribute("data-theme",isDark?"dark":"light");render();}
+
+function initListeners(){
+  ["escala","louvores","aniversariantes","cronograma","regras"].forEach(function(key){
+    db.ref("ministerio/"+key).on("value",function(snap){
+      var val=snap.val();
+      if(key==="escala")          escala          =val?Object.values(val):[];
+      if(key==="louvores")        louvores        =val?Object.values(val):[];
+      if(key==="aniversariantes") aniversariantes =val?Object.values(val):[];
+      if(key==="cronograma")      cronograma      =val?Object.values(val):[];
+      if(key==="regras")          regras          =val?Object.values(val):[];
       render();
     });
   });
 }
-function saveData(key, arr) { db.ref("ministerio/" + key).set(arr); }
+function saveData(key,arr){db.ref("ministerio/"+key).set(arr);}
 
-function esc(s) {
-  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-function fmtDate(d) {
-  if (!d) return "";
-  var p = d.split("-");
-  return p[2] + "/" + p[1] + "/" + p[0];
-}
-function getYoutubeId(url) {
-  if (!url) return null;
-  var m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
-  return m ? m[1] : null;
-}
-function togglePreview(btn, ytId, link) {
-  var preview = btn.parentElement.nextElementSibling;
-  if (preview.style.display === "none") {
-    preview.style.display = "block";
-    if (ytId) {
-      preview.innerHTML =
-        '<iframe width="100%" height="160" src="https://www.youtube.com/embed/' + ytId + '?autoplay=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="border-radius:8px;display:block"></iframe>' +
-        '<a href="' + link + '" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;color:var(--primary);text-decoration:none">↗ Abrir no YouTube</a>';
-    } else if (link) {
-      preview.innerHTML = '<a href="' + link + '" target="_blank" style="font-size:13px;color:var(--primary)">↗ Abrir link externo</a>';
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function fmtDate(d){if(!d)return"";var p=d.split("-");return p[2]+"/"+p[1]+"/"+p[0];}
+function getYoutubeId(url){if(!url)return null;var m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);return m?m[1]:null;}
+
+function togglePreview(btn,ytId,link){
+  var preview=btn.parentElement.nextElementSibling;
+  if(preview.style.display==="none"){
+    preview.style.display="block";
+    if(ytId){
+      preview.innerHTML='<iframe width="100%" height="160" src="https://www.youtube.com/embed/'+ytId+'?autoplay=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="border-radius:8px;display:block"></iframe>'+
+        '<a href="'+link+'" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;color:var(--primary);text-decoration:none">↗ Abrir no YouTube</a>';
+    } else if(link){
+      preview.innerHTML='<a href="'+link+'" target="_blank" style="font-size:13px;color:var(--primary)">↗ Abrir link externo</a>';
     }
-    btn.textContent = "⏹ Fechar";
+    btn.textContent="⏹ Fechar";
   } else {
-    preview.style.display = "none";
-    preview.innerHTML = "";
-    btn.textContent = "▶ Ouvir / Ver";
+    preview.style.display="none"; preview.innerHTML=""; btn.textContent="▶ Ouvir / Ver";
   }
 }
 
-// LOGO SVG da chama – Igreja Hermom (fiel ao original)
-function logoSVG() {
-  return '<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:48px;height:48px;border-radius:14px">' +
-    // Fundo laranja
-    '<rect width="200" height="200" rx="28" fill="#E05530"/>' +
-    // Chama externa – curl para a esquerda no topo, corpo largo na base
-    '<path d="' +
-      'M 100 178 ' +
-      'C 76 178 50 162 44 140 ' +
-      'C 38 118 50 100 44 82 ' +
-      'C 40 68 44 52 52 40 ' +
-      'C 48 54 52 64 62 62 ' +
-      'C 54 50 56 32 66 20 ' +
-      'C 60 36 66 46 76 44 ' +
-      'C 66 34 62 18 72 10 ' +
-      'C 70 24 80 34 92 30 ' +
-      'C 84 20 84 8 96 6 ' +
-      'C 92 18 98 28 108 26 ' +
-      'C 120 24 130 34 128 50 ' +
-      'C 126 64 114 72 118 84 ' +
-      'C 124 96 144 106 148 126 ' +
-      'C 152 148 138 178 100 178 Z' +
-    '" fill="#2d2926"/>' +
-    // Gota interna vazada (fundo laranja aparece)
-    '<path d="' +
-      'M 100 88 ' +
-      'C 96 98 82 114 82 132 ' +
-      'C 82 150 90 164 100 164 ' +
-      'C 110 164 118 150 118 132 ' +
-      'C 118 114 104 98 100 88 Z' +
-    '" fill="#E05530"/>' +
-    '</svg>';
-}
-
-// RENDER PRINCIPAL
-function render() {
-  var scrollY = window.scrollY;
-  document.getElementById("app").innerHTML =
-    renderBirthdayPopup() +
-    (showPasswordModal ? renderModal() : "") +
-    '<div class="header">' +
-      '<div class="header-top">' +
-        '<div class="header-titles">' +
-          '<h1>Ministério de Louvor</h1>' +
-          '<div class="sub">Igreja Hermom</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="header-actions">' +
-        '<span class="mode-badge ' + (isEditor ? "editor" : "") + '">' + (isEditor ? "✏️ Modo Editor" : "👁️ Somente Visualização") + '</span>' +
-        (isEditor
-          ? '<button class="btn-lock" onclick="logout()">🔒 Sair do modo editor</button>'
-          : '<button class="btn-lock" onclick="openModal()">🔑 Entrar como editor</button>') +
-        '<button class="btn-theme" onclick="toggleTheme()">' + (isDark ? "☀️ Claro" : "🌙 Escuro") + '</button>' +
-      '</div>' +
-    '</div>' +
-    '<div class="tabs">' +
-      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"],["ferramentas","🎸 Ferramentas"]].map(function(t) {
-        return '<button class="tab ' + (activeTab===t[0]?"active":"") + '" onclick="setTab(\'' + t[0] + '\')">' + t[1] + '</button>';
-      }).join("") +
-    '</div>' +
-    '<div class="content">' +
-      (!isEditor ? '<div class="view-only-banner no-print">👁️ Modo visualização. Clique em "Entrar como editor" para editar.</div>' : "") +
-      (activeTab === "escala"          ? renderEscala()          : "") +
-      (activeTab === "louvores"        ? renderLouvores()        : "") +
-      (activeTab === "aniversariantes" ? renderAniversariantes() : "") +
-      (activeTab === "cronograma"      ? renderCronograma()      : "") +
-      (activeTab === "regras"          ? renderRegras()          : "") +
-      (activeTab === "ferramentas"     ? renderFerramentas()     : "") +
+function render(){
+  var scrollY=window.scrollY;
+  document.getElementById("app").innerHTML=
+    renderBirthdayPopup()+
+    (showPasswordModal?renderModal():"")+
+    '<div class="header">'+
+      '<div class="header-top">'+
+        '<img src="hermom.png" style="width:48px;height:48px;object-fit:contain;flex-shrink:0;mix-blend-mode:multiply" />'+
+        '<div class="header-titles"><h1>Ministério de Louvor</h1><div class="sub">Igreja Hermom</div></div>'+
+      '</div>'+
+      '<div class="header-actions">'+
+        '<span class="mode-badge '+(isEditor?"editor":"")+'">'+( isEditor?"✏️ Modo Editor":"👁️ Somente Visualização")+'</span>'+
+        (isEditor?'<button class="btn-lock" onclick="logout()">🔒 Sair do modo editor</button>':'<button class="btn-lock" onclick="openModal()">🔑 Entrar como editor</button>')+
+        '<button class="btn-theme" onclick="toggleTheme()">'+( isDark?"☀️ Claro":"🌙 Escuro")+'</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="tabs">'+
+      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"],["ferramentas","🎸 Ferramentas"]].map(function(t){
+        return '<button class="tab '+(activeTab===t[0]?"active":"")+'" onclick="setTab(\''+t[0]+'\')">'+t[1]+'</button>';
+      }).join("")+
+    '</div>'+
+    '<div class="content">'+
+      (!isEditor?'<div class="view-only-banner no-print">👁️ Modo visualização. Clique em "Entrar como editor" para editar.</div>':"")+
+      (activeTab==="escala"          ?renderEscala()         :"")+
+      (activeTab==="louvores"        ?renderLouvores()       :"")+
+      (activeTab==="aniversariantes" ?renderAniversariantes():"")+
+      (activeTab==="cronograma"      ?renderCronograma()     :"")+
+      (activeTab==="regras"          ?renderRegras()         :"")+
+      (activeTab==="ferramentas"     ?renderFerramentas()    :"")+
     '</div>';
-  window.scrollTo(0, scrollY);
-  if (activeTab === "louvores" && buscaLouvor !== "") {
-    var inp = document.querySelector(".search-input");
-    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
-  }
+  window.scrollTo(0,scrollY);
+  if(activeTab==="louvores"&&buscaLouvor!==""){var inp=document.querySelector(".search-input");if(inp){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}}
 }
 
-// BIRTHDAY POPUP
-function renderBirthdayPopup() {
-  if (!showBirthdayPopup) return "";
-  var hoje = new Date();
-  var dia = hoje.getDate(), mes = hoje.getMonth() + 1;
-  var hoje_aniv = aniversariantes.filter(function(a) { return parseInt(a.dia)===dia && parseInt(a.mes)===mes; });
-  if (!hoje_aniv.length) return "";
-  return '<div class="modal-bg" onclick="showBirthdayPopup=false;render()">' +
-    '<div class="modal" onclick="event.stopPropagation()" style="max-width:360px">' +
-      '<div style="font-size:48px;margin-bottom:8px">🎂</div>' +
-      '<h2 style="color:var(--primary)">Aniversário hoje!</h2>' +
-      '<div style="margin:16px 0;display:flex;flex-direction:column;gap:10px">' +
-        hoje_aniv.map(function(a) {
-          return '<div style="background:var(--primary-bg);border-radius:10px;padding:12px 16px;text-align:left">' +
-            '<div style="font-weight:700;font-size:15px;color:var(--text)">🎉 ' + esc(a.nome) + '</div>' +
-            (a.funcao ? '<div style="font-size:12px;color:var(--primary);margin-top:2px">' + esc(a.funcao) + '</div>' : "") +
-            (a.tel    ? '<div style="font-size:12px;color:var(--text-soft);margin-top:2px">📱 ' + esc(a.tel) + '</div>' : "") +
+// BIRTHDAY
+function renderBirthdayPopup(){
+  if(!showBirthdayPopup)return"";
+  var hoje=new Date(),dia=hoje.getDate(),mes=hoje.getMonth()+1;
+  var lista=aniversariantes.filter(function(a){return parseInt(a.dia)===dia&&parseInt(a.mes)===mes;});
+  if(!lista.length)return"";
+  return'<div class="modal-bg" onclick="showBirthdayPopup=false;render()">'+
+    '<div class="modal" onclick="event.stopPropagation()" style="max-width:360px">'+
+      '<div style="font-size:48px;margin-bottom:8px">🎂</div>'+
+      '<h2 style="color:var(--primary)">Aniversário hoje!</h2>'+
+      '<div style="margin:16px 0;display:flex;flex-direction:column;gap:10px">'+
+        lista.map(function(a){
+          return'<div style="background:var(--primary-bg);border-radius:10px;padding:12px 16px;text-align:left">'+
+            '<div style="font-weight:700;font-size:15px;color:var(--text)">🎉 '+esc(a.nome)+'</div>'+
+            (a.funcao?'<div style="font-size:12px;color:var(--primary);margin-top:2px">'+esc(a.funcao)+'</div>':"")+
+            (a.tel?'<div style="font-size:12px;color:var(--text-soft);margin-top:2px">📱 '+esc(a.tel)+'</div>':"")+
           '</div>';
-        }).join("") +
-      '</div>' +
-      '<button class="btn-primary" style="width:100%" onclick="showBirthdayPopup=false;render()">🙌 Que Deus abençoe!</button>' +
-    '</div>' +
+        }).join("")+
+      '</div>'+
+      '<button class="btn-primary" style="width:100%" onclick="showBirthdayPopup=false;render()">🙌 Que Deus abençoe!</button>'+
+    '</div>'+
   '</div>';
 }
 
 // MODAL SENHA
-function renderModal() {
-  return '<div class="modal-bg" onclick="closeModal(event)">' +
-    '<div class="modal" onclick="event.stopPropagation()">' +
-      '<h2>🔑 Modo Editor</h2>' +
-      '<p>Digite a senha para habilitar a edição</p>' +
-      '<input type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')checkPwd()" autofocus />' +
-      (passwordError ? '<div class="error">' + passwordError + '</div>' : "") +
-      '<div class="modal-btns">' +
-        '<button class="btn-secondary" style="flex:1" onclick="closeModal()">Cancelar</button>' +
-        '<button class="btn-primary" style="flex:1" onclick="checkPwd()">Entrar</button>' +
-      '</div>' +
-    '</div>' +
+function renderModal(){
+  return'<div class="modal-bg" onclick="closeModal(event)">'+
+    '<div class="modal" onclick="event.stopPropagation()">'+
+      '<h2>🔑 Modo Editor</h2><p>Digite a senha para habilitar a edição</p>'+
+      '<input type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')checkPwd()" autofocus />'+
+      (passwordError?'<div class="error">'+passwordError+'</div>':"")+
+      '<div class="modal-btns">'+
+        '<button class="btn-secondary" style="flex:1" onclick="closeModal()">Cancelar</button>'+
+        '<button class="btn-primary" style="flex:1" onclick="checkPwd()">Entrar</button>'+
+      '</div>'+
+    '</div>'+
   '</div>';
 }
-function openModal()  { showPasswordModal = true; passwordError = ""; render(); setTimeout(function(){ var el=document.getElementById("pwd-input"); if(el) el.focus(); }, 50); }
-function closeModal(e){ if (!e || e.target.classList.contains("modal-bg")) { showPasswordModal = false; render(); } }
-function checkPwd()   {
-  var v = (document.getElementById("pwd-input")||{}).value || "";
-  if (v === EDITOR_PASSWORD) { isEditor = true; showPasswordModal = false; render(); }
-  else { passwordError = "Senha incorreta."; render(); setTimeout(function(){ var el=document.getElementById("pwd-input"); if(el) el.focus(); }, 50); }
+function openModal(){showPasswordModal=true;passwordError="";render();setTimeout(function(){var el=document.getElementById("pwd-input");if(el)el.focus();},50);}
+function closeModal(e){if(!e||e.target.classList.contains("modal-bg")){showPasswordModal=false;render();}}
+function checkPwd(){
+  var v=(document.getElementById("pwd-input")||{}).value||"";
+  if(v===EDITOR_PASSWORD){isEditor=true;showPasswordModal=false;render();}
+  else{passwordError="Senha incorreta.";render();setTimeout(function(){var el=document.getElementById("pwd-input");if(el)el.focus();},50);}
 }
-function logout()  { isEditor = false; render(); }
-function setTab(t) { activeTab = t; editIndex = null; render(); }
+function logout(){isEditor=false;render();}
+function setTab(t){activeTab=t;editIndex=null;stopMetro();render();}
 
 // ============================
 // ESCALA
 // ============================
-function renderEscala() {
-  var f = formEscala;
-  var doMes = escala.filter(function(e) { return parseInt(e.mes) === escalaMesFiltro; });
-  var eventos = [], eventoKeys = {};
-  doMes.forEach(function(e) {
-    var k = e.data + "||" + e.culto;
-    if (!eventoKeys[k]) { eventoKeys[k] = true; eventos.push({ data: e.data, culto: e.culto }); }
-  });
-  eventos.sort(function(a,b) { return a.data.localeCompare(b.data); });
-
-  var html = '<h2 class="section-title">Escala do Ministério</h2>';
-
-  if (isEditor) {
-    html += '<div class="form-box">' +
-      '<div class="form-group"><label>Data *</label>' +
-        '<input type="date" value="' + esc(f.data) + '" onchange="formEscala.data=this.value" /></div>' +
-      '<div class="form-group"><label>Mês da Escala *</label>' +
-        '<select onchange="formEscala.mes=parseInt(this.value)">' +
-          MESES.map(function(m,i){ return '<option value="'+i+'"'+(f.mes===i?" selected":"")+'>'+m+'</option>'; }).join("") +
-        '</select></div>' +
-      '<div class="form-group"><label>Culto *</label>' +
-        '<select onchange="formEscala.culto=this.value">' +
-          '<option value="">Selecionar...</option>' +
-          CULTOS.map(function(c){ return '<option value="'+c+'"'+(f.culto===c?" selected":"")+'>' + c + '</option>'; }).join("") +
-        '</select></div>' +
-      '<div class="form-group"><label>Função *</label>' +
-        '<select onchange="formEscala.funcao=this.value">' +
-          '<option value="">Selecionar...</option>' +
-          FUNCOES.map(function(fn){ return '<option value="'+fn+'"'+(f.funcao===fn?" selected":"")+'>' + fn + '</option>'; }).join("") +
-        '</select></div>' +
-      '<div class="form-group"><label>Nome *</label>' +
-        '<input type="text" value="' + esc(f.nome) + '" oninput="formEscala.nome=this.value" placeholder="Nome do membro" /></div>' +
-      '<div class="form-group"><label>Obs</label>' +
-        '<input type="text" value="' + esc(f.obs) + '" oninput="formEscala.obs=this.value" placeholder="Observações" /></div>' +
-    '</div>' +
-    '<div class="form-actions no-print">' +
-      '<button class="btn-primary" onclick="saveEscala()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar") + '</button>' +
-      (editIndex!==null ? '<button class="btn-secondary" onclick="cancelEscala()">Cancelar</button>' : "") +
+function renderEscala(){
+  var f=formEscala;
+  var doMes=escala.filter(function(e){return parseInt(e.mes)===escalaMesFiltro;});
+  var eventos=[],eventoKeys={};
+  doMes.forEach(function(e){var k=e.data+"||"+e.culto;if(!eventoKeys[k]){eventoKeys[k]=true;eventos.push({data:e.data,culto:e.culto});}});
+  eventos.sort(function(a,b){return a.data.localeCompare(b.data);});
+  var html='<h2 class="section-title">Escala do Ministério</h2>';
+  if(isEditor){
+    html+='<div class="form-box">'+
+      '<div class="form-group"><label>Data *</label><input type="date" value="'+esc(f.data)+'" onchange="formEscala.data=this.value" /></div>'+
+      '<div class="form-group"><label>Mês da Escala *</label><select onchange="formEscala.mes=parseInt(this.value)">'+
+        MESES.map(function(m,i){return'<option value="'+i+'"'+(f.mes===i?" selected":"")+'>'+m+'</option>';}).join("")+
+      '</select></div>'+
+      '<div class="form-group"><label>Culto *</label><select onchange="formEscala.culto=this.value"><option value="">Selecionar...</option>'+
+        CULTOS.map(function(c){return'<option value="'+c+'"'+(f.culto===c?" selected":"")+'>'+c+'</option>';}).join("")+
+      '</select></div>'+
+      '<div class="form-group"><label>Função *</label><select onchange="formEscala.funcao=this.value"><option value="">Selecionar...</option>'+
+        FUNCOES.map(function(fn){return'<option value="'+fn+'"'+(f.funcao===fn?" selected":"")+'>'+fn+'</option>';}).join("")+
+      '</select></div>'+
+      '<div class="form-group"><label>Nome *</label><input type="text" value="'+esc(f.nome)+'" oninput="formEscala.nome=this.value" placeholder="Nome do membro" /></div>'+
+      '<div class="form-group"><label>Obs</label><input type="text" value="'+esc(f.obs)+'" oninput="formEscala.obs=this.value" placeholder="Observações" /></div>'+
+    '</div>'+
+    '<div class="form-actions no-print">'+
+      '<button class="btn-primary" onclick="saveEscala()">'+(editIndex!==null?"✏️ Atualizar":"➕ Adicionar")+'</button>'+
+      (editIndex!==null?'<button class="btn-secondary" onclick="cancelEscala()">Cancelar</button>':"")+
     '</div>';
   }
-
-  html += '<div class="escala-controls no-print">' +
-    '<label style="font-size:13px;font-weight:600;color:var(--text-soft)">Visualizar mês:</label>' +
-    '<select onchange="escalaMesFiltro=parseInt(this.value);render()">' +
-      MESES.map(function(m,i){ return '<option value="'+i+'"'+(escalaMesFiltro===i?" selected":"")+'>'+m+'</option>'; }).join("") +
-    '</select>' +
-    '<button class="btn-green" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>' +
+  html+='<div class="escala-controls no-print">'+
+    '<label style="font-size:13px;font-weight:600;color:var(--text-soft)">Visualizar mês:</label>'+
+    '<select onchange="escalaMesFiltro=parseInt(this.value);render()">'+
+      MESES.map(function(m,i){return'<option value="'+i+'"'+(escalaMesFiltro===i?" selected":"")+'>'+m+'</option>';}).join("")+
+    '</select>'+
+    '<button class="btn-green" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>'+
   '</div>';
-
-  html += '<div class="print-wrap">';
-  if (eventos.length === 0) {
-    html += '<div class="empty">Nenhuma escala para ' + MESES[escalaMesFiltro] + ' ainda.</div>';
-  } else {
-    html += '<table class="print-table"><thead><tr>' +
-      '<th class="func-col">' + MESES[escalaMesFiltro] + '</th>' +
-      eventos.map(function(ev){ return '<th><div>' + esc(ev.culto) + '</div><div style="font-weight:400;opacity:0.85;font-size:10px">' + fmtDate(ev.data) + '</div></th>'; }).join("") +
-      '</tr></thead><tbody>' +
-      FUNCOES.map(function(fn) {
-        var cells = eventos.map(function(ev) {
-          var entry = doMes.find(function(e){ return e.funcao===fn && e.data===ev.data && e.culto===ev.culto; });
-          return '<td>' + (entry ? esc(entry.nome) : "") + '</td>';
+  html+='<div class="print-wrap">';
+  if(eventos.length===0){html+='<div class="empty">Nenhuma escala para '+MESES[escalaMesFiltro]+' ainda.</div>';}
+  else{
+    html+='<table class="print-table"><thead><tr><th class="func-col">'+MESES[escalaMesFiltro]+'</th>'+
+      eventos.map(function(ev){return'<th><div>'+esc(ev.culto)+'</div><div style="font-weight:400;opacity:.85;font-size:10px">'+fmtDate(ev.data)+'</div></th>';}).join("")+
+    '</tr></thead><tbody>'+
+      FUNCOES.map(function(fn){
+        var cells=eventos.map(function(ev){
+          var entry=doMes.find(function(e){return e.funcao===fn&&e.data===ev.data&&e.culto===ev.culto;});
+          return'<td>'+(entry?esc(entry.nome):"")+'</td>';
         }).join("");
-        return '<tr><td class="func-name">' + fn + '</td>' + cells + '</tr>';
-      }).join("") +
-      '</tbody></table>';
+        return'<tr><td class="func-name">'+fn+'</td>'+cells+'</tr>';
+      }).join("")+
+    '</tbody></table>';
   }
-  html += '</div>';
-
-  if (isEditor && escala.length > 0) {
-    html += '<div class="no-print" style="margin-top:24px">' +
-      '<h3 style="font-size:14px;font-weight:700;color:var(--text-soft);margin-bottom:10px">TODOS OS REGISTROS</h3>' +
-      '<table class="table"><thead><tr><th>Data</th><th>Mês</th><th>Culto</th><th>Função</th><th>Nome</th><th>Obs</th><th></th></tr></thead><tbody>' +
-      escala.map(function(e,i) {
-        return '<tr>' +
-          '<td>' + fmtDate(e.data) + '</td>' +
-          '<td>' + (MESES[parseInt(e.mes)]||"") + '</td>' +
-          '<td><span class="badge">' + esc(e.culto) + '</span></td>' +
-          '<td>' + esc(e.funcao) + '</td>' +
-          '<td><strong>' + esc(e.nome) + '</strong></td>' +
-          '<td>' + esc(e.obs) + '</td>' +
-          '<td><button class="icon-btn" onclick="editEscala(' + i + ')">✏️</button>' +
-              '<button class="icon-btn" onclick="delEscala(' + i + ')">🗑️</button></td>' +
-        '</tr>';
-      }).join("") +
-      '</tbody></table></div>';
+  html+='</div>';
+  if(isEditor&&escala.length>0){
+    html+='<div class="no-print" style="margin-top:24px"><h3 style="font-size:14px;font-weight:700;color:var(--text-soft);margin-bottom:10px">TODOS OS REGISTROS</h3>'+
+      '<table class="table"><thead><tr><th>Data</th><th>Mês</th><th>Culto</th><th>Função</th><th>Nome</th><th>Obs</th><th></th></tr></thead><tbody>'+
+      escala.map(function(e,i){
+        return'<tr><td>'+fmtDate(e.data)+'</td><td>'+(MESES[parseInt(e.mes)]||"")+'</td><td><span class="badge">'+esc(e.culto)+'</span></td><td>'+esc(e.funcao)+'</td><td><strong>'+esc(e.nome)+'</strong></td><td>'+esc(e.obs)+'</td>'+
+          '<td><button class="icon-btn" onclick="editEscala('+i+')">✏️</button><button class="icon-btn" onclick="delEscala('+i+')">🗑️</button></td></tr>';
+      }).join("")+
+    '</tbody></table></div>';
   }
   return html;
 }
-function saveEscala() {
-  var f = formEscala;
-  if (!f.nome.trim()) { alert("Preencha o nome do membro."); return; }
-  if (!f.culto)       { alert("Selecione o culto."); return; }
-  if (!f.funcao)      { alert("Selecione a função."); return; }
-  if (!f.data)        { alert("Selecione a data."); return; }
-  var arr = escala.slice();
-  if (editIndex !== null) { arr[editIndex] = Object.assign({}, f); editIndex = null; }
-  else arr.push(Object.assign({}, f));
-  arr.sort(function(a,b){ return (a.data||"").localeCompare(b.data||""); });
-  saveData("escala", arr);
-  var mesSalvo = f.mes, dataSalva = f.data, cultoSalvo = f.culto;
-  formEscala = emptyEscala();
-  formEscala.mes = mesSalvo;
-  formEscala.data = dataSalva;
-  formEscala.culto = cultoSalvo;
-  escalaMesFiltro = mesSalvo;
+function saveEscala(){
+  var f=formEscala;
+  if(!f.nome.trim()){alert("Preencha o nome.");return;}
+  if(!f.culto){alert("Selecione o culto.");return;}
+  if(!f.funcao){alert("Selecione a função.");return;}
+  if(!f.data){alert("Selecione a data.");return;}
+  var arr=escala.slice();
+  if(editIndex!==null){arr[editIndex]=Object.assign({},f);editIndex=null;}else arr.push(Object.assign({},f));
+  arr.sort(function(a,b){return(a.data||"").localeCompare(b.data||"");});
+  saveData("escala",arr);
+  var ms=f.mes,ds=f.data,cs=f.culto;
+  formEscala=emptyEscala();formEscala.mes=ms;formEscala.data=ds;formEscala.culto=cs;
+  escalaMesFiltro=ms;
 }
-function cancelEscala() { editIndex = null; formEscala = emptyEscala(); render(); }
-function editEscala(i)  { formEscala = Object.assign({}, escala[i], {mes: parseInt(escala[i].mes)||0}); editIndex = i; escalaMesFiltro = formEscala.mes; window.scrollTo(0,0); render(); }
-function delEscala(i)   { if (confirm("Remover este registro?")) { var arr = escala.slice(); arr.splice(i,1); saveData("escala", arr); } }
+function cancelEscala(){editIndex=null;formEscala=emptyEscala();render();}
+function editEscala(i){formEscala=Object.assign({},escala[i],{mes:parseInt(escala[i].mes)||0});editIndex=i;escalaMesFiltro=formEscala.mes;window.scrollTo(0,0);render();}
+function delEscala(i){if(confirm("Remover?")){ var arr=escala.slice();arr.splice(i,1);saveData("escala",arr);}}
 
 // ============================
 // LOUVORES
 // ============================
-function renderLouvores() {
-  var f = formLouvor;
-  var filtrados = louvores.filter(function(l) {
-    var q = buscaLouvor.toLowerCase();
-    return (l.titulo||"").toLowerCase().includes(q) ||
-           (l.artista||"").toLowerCase().includes(q) ||
-           (l.obs||"").toLowerCase().includes(q) ||
-           (l.nota||"").toLowerCase().includes(q) ||
-           (l.trecho||"").toLowerCase().includes(q);
+function renderLouvores(){
+  var f=formLouvor;
+  var filtrados=louvores.filter(function(l){
+    var q=buscaLouvor.toLowerCase();
+    return(l.titulo||"").toLowerCase().includes(q)||(l.artista||"").toLowerCase().includes(q)||
+           (l.obs||"").toLowerCase().includes(q)||(l.nota||"").toLowerCase().includes(q)||(l.trecho||"").toLowerCase().includes(q);
   });
-
-  var html = '<h2 class="section-title">Lista de Louvores</h2>';
-
-  if (isEditor) {
-    html += '<div class="form-box">' +
-      '<div class="form-group full"><label>Título *</label><input placeholder="Nome do louvor" value="' + esc(f.titulo) + '" oninput="formLouvor.titulo=this.value" /></div>' +
-      '<div class="form-group"><label>Artista / Banda</label><input placeholder="Ex: Hillsong" value="' + esc(f.artista) + '" oninput="formLouvor.artista=this.value" /></div>' +
-      '<div class="form-group"><label>Tom</label>' +
-        '<select onchange="formLouvor.nota=this.value">' +
-          '<option value="">Selecionar...</option>' +
-          NOTAS.map(function(n){ return '<option value="'+n+'"'+(f.nota===n?" selected":"")+'>'+n+'</option>'; }).join("") +
-        '</select></div>' +
-      '<div class="form-group full"><label>Link (YouTube/Drive)</label><input placeholder="https://..." value="' + esc(f.link) + '" oninput="formLouvor.link=this.value" /></div>' +
-      '<div class="form-group full"><label>Trecho / Letra</label><textarea rows="3" placeholder="Cole aqui um trecho da letra para facilitar a busca..." oninput="formLouvor.trecho=this.value">' + esc(f.trecho||"") + '</textarea></div>' +
-    '</div>' +
-    '<div class="form-actions">' +
-      '<button class="btn-primary" onclick="saveLouvor()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar") + '</button>' +
-      (editIndex!==null ? '<button class="btn-secondary" onclick="editIndex=null;formLouvor=emptyLouvor();render()">Cancelar</button>' : "") +
+  var html='<h2 class="section-title">Lista de Louvores</h2>';
+  if(isEditor){
+    html+='<div class="form-box">'+
+      '<div class="form-group full"><label>Título *</label><input placeholder="Nome do louvor" value="'+esc(f.titulo)+'" oninput="formLouvor.titulo=this.value" /></div>'+
+      '<div class="form-group"><label>Artista / Banda</label><input placeholder="Ex: Hillsong" value="'+esc(f.artista)+'" oninput="formLouvor.artista=this.value" /></div>'+
+      '<div class="form-group"><label>Tom</label><select onchange="formLouvor.nota=this.value"><option value="">Selecionar...</option>'+
+        NOTAS.map(function(n){return'<option value="'+n+'"'+(f.nota===n?" selected":"")+'>'+n+'</option>';}).join("")+
+      '</select></div>'+
+      '<div class="form-group"><label>BPM (andamento)</label><input type="number" min="40" max="250" placeholder="Ex: 80" value="'+esc(f.bpm)+'" oninput="formLouvor.bpm=this.value" /></div>'+
+      '<div class="form-group"><label>Link (YouTube/Drive)</label><input placeholder="https://..." value="'+esc(f.link)+'" oninput="formLouvor.link=this.value" /></div>'+
+      '<div class="form-group full"><label>Trecho / Letra</label><textarea rows="3" placeholder="Cole aqui um trecho da letra para facilitar a busca..." oninput="formLouvor.trecho=this.value">'+esc(f.trecho||"")+'</textarea></div>'+
+    '</div>'+
+    '<div class="form-actions">'+
+      '<button class="btn-primary" onclick="saveLouvor()">'+(editIndex!==null?"✏️ Atualizar":"➕ Adicionar")+'</button>'+
+      (editIndex!==null?'<button class="btn-secondary" onclick="editIndex=null;formLouvor=emptyLouvor();render()">Cancelar</button>':"")+
     '</div>';
   }
-
-  html += '<div style="position:relative;margin-top:16px">' +
-    '<input class="search-input" style="margin-top:0;padding-right:52px" placeholder="Buscar por nome, artista, tom, trecho da letra..." value="' + esc(buscaLouvor) + '" oninput="buscaLouvor=this.value;render()" id="search-louvor"/>' +
-    '<button onclick="startVoiceSearch()" title="Busca por voz" id="btn-voice" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:2px;height:36px;transition:background 0.15s" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'none\'">' +
-      '<span class="voice-bar" style="height:6px"></span>' +
-      '<span class="voice-bar" style="height:12px"></span>' +
-      '<span class="voice-bar" style="height:18px"></span>' +
-      '<span class="voice-bar" style="height:12px"></span>' +
-      '<span class="voice-bar" style="height:6px"></span>' +
-    '</button>' +
+  html+='<div style="position:relative;margin-top:16px">'+
+    '<input class="search-input" style="margin-top:0;padding-right:52px" placeholder="Buscar por nome, artista, tom, trecho da letra..." value="'+esc(buscaLouvor)+'" oninput="buscaLouvor=this.value;render()" id="search-louvor"/>'+
+    '<button onclick="startVoiceSearch()" title="Busca por voz" id="btn-voice" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:2px;height:36px;" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'none\'">'+
+      '<span class="voice-bar" style="height:6px"></span><span class="voice-bar" style="height:12px"></span><span class="voice-bar" style="height:18px"></span><span class="voice-bar" style="height:12px"></span><span class="voice-bar" style="height:6px"></span>'+
+    '</button>'+
   '</div>';
-
-  if (filtrados.length === 0) {
-    html += '<div class="empty">Nenhum louvor encontrado.</div>';
-  } else {
-    html += '<div class="cards-grid">' +
-      filtrados.map(function(l) {
-        var i = louvores.indexOf(l);
-        var ytId = getYoutubeId(l.link);
-        return '<div class="card">' +
-          '<div class="card-header">' +
-            '<span class="card-title">' + esc(l.titulo) + '</span>' +
-            (l.nota ? '<span class="badge badge-green">Tom: ' + esc(l.nota) + '</span>' : "") +
-          '</div>' +
-          (l.artista ? '<div class="card-sub">' + esc(l.artista) + '</div>' : "") +
-          '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">' +
-            (l.link || ytId ?
-              '<button onclick="togglePreview(this,\'' + (ytId||"") + '\',\'' + esc(l.link||"") + '\')" style="background:var(--primary);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;padding:5px 12px;border-radius:6px">▶ Ouvir / Ver</button>'
-            : "") +
-            '<a href="https://www.google.com/search?q=' + encodeURIComponent("cifra "+(l.titulo||"")+" "+(l.artista||"")+" site:cifraclub.com.br") + '" target="_blank" class="card-link">🎸 Buscar cifra</a>' +
-            '<a href="https://www.google.com/search?q=' + encodeURIComponent("letra "+(l.titulo||"")+" "+(l.artista||"")+" site:letras.mus.br") + '" target="_blank" class="card-link">📝 Buscar letra</a>' +
-          '</div>' +
-          '<div class="yt-preview" style="display:none;margin-top:8px"></div>' +
-          (isEditor ?
-            '<div class="card-actions">' +
-              '<button class="icon-btn" onclick="editLouvor(' + i + ')">✏️</button>' +
-              '<button class="icon-btn" onclick="delLouvor(' + i + ')">🗑️</button>' +
-            '</div>'
-          : "") +
+  if(filtrados.length===0){html+='<div class="empty">Nenhum louvor encontrado.</div>';}
+  else{
+    html+='<div class="cards-grid">'+
+      filtrados.map(function(l){
+        var i=louvores.indexOf(l),ytId=getYoutubeId(l.link);
+        return'<div class="card">'+
+          '<div class="card-header"><span class="card-title">'+esc(l.titulo)+'</span>'+
+            '<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">'+
+              (l.nota?'<span class="badge badge-green">Tom: '+esc(l.nota)+'</span>':"")+
+              (l.bpm?'<span class="badge badge-blue">'+esc(l.bpm)+' BPM</span>':"")+
+            '</div>'+
+          '</div>'+
+          (l.artista?'<div class="card-sub">'+esc(l.artista)+'</div>':"")+
+          '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">'+
+            ((l.link||ytId)?'<button onclick="togglePreview(this,\''+(ytId||"")+'\',\''+esc(l.link||"")+'\''+')" style="background:var(--primary);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;padding:5px 12px;border-radius:6px">▶ Ouvir / Ver</button>':"" )+
+            (l.bpm?'<button onclick="setMetroBPM('+l.bpm+')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;padding:5px 10px;border-radius:6px">🥁 Click</button>':"")+
+            '<a href="https://www.google.com/search?q='+encodeURIComponent("cifra "+(l.titulo||"")+" "+(l.artista||"")+" site:cifraclub.com.br")+'" target="_blank" class="card-link">🎸 Cifra</a>'+
+            '<a href="https://www.google.com/search?q='+encodeURIComponent("letra "+(l.titulo||"")+" "+(l.artista||"")+" site:letras.mus.br")+'" target="_blank" class="card-link">📝 Letra</a>'+
+          '</div>'+
+          '<div class="yt-preview" style="display:none;margin-top:8px"></div>'+
+          (isEditor?'<div class="card-actions"><button class="icon-btn" onclick="editLouvor('+i+')">✏️</button><button class="icon-btn" onclick="delLouvor('+i+')">🗑️</button></div>':"" )+
         '</div>';
-      }).join("") +
+      }).join("")+
     '</div>';
   }
   return html;
 }
-function saveLouvor() {
-  if (!formLouvor.titulo.trim()) { alert("Preencha o título."); return; }
-  var arr = louvores.slice();
-  if (editIndex!==null) { arr[editIndex]=Object.assign({},formLouvor); editIndex=null; }
-  else arr.push(Object.assign({},formLouvor));
-  arr.sort(function(a,b){ return (a.titulo||"").localeCompare(b.titulo||""); });
-  saveData("louvores", arr);
-  formLouvor = emptyLouvor();
+function saveLouvor(){
+  if(!formLouvor.titulo.trim()){alert("Preencha o título.");return;}
+  var arr=louvores.slice();
+  if(editIndex!==null){arr[editIndex]=Object.assign({},formLouvor);editIndex=null;}else arr.push(Object.assign({},formLouvor));
+  arr.sort(function(a,b){return(a.titulo||"").localeCompare(b.titulo||"");});
+  saveData("louvores",arr);formLouvor=emptyLouvor();
 }
-function editLouvor(i) { formLouvor=Object.assign({},louvores[i]); editIndex=i; window.scrollTo(0,0); render(); }
-function delLouvor(i)  { if(confirm("Remover?")){ var arr=louvores.slice(); arr.splice(i,1); saveData("louvores",arr); } }
+function editLouvor(i){formLouvor=Object.assign({},louvores[i]);editIndex=i;window.scrollTo(0,0);render();}
+function delLouvor(i){if(confirm("Remover?")){var arr=louvores.slice();arr.splice(i,1);saveData("louvores",arr);}}
 
 // ============================
 // ANIVERSARIANTES
 // ============================
-function renderAniversariantes() {
-  var f = formAniv;
-  var hoje = new Date(), mesAtual = hoje.getMonth()+1;
-  var html = '<h2 class="section-title">Aniversariantes</h2>';
-  if (isEditor) {
-    html += '<div class="form-box">' +
-      '<div class="form-group full"><label>Nome *</label><input placeholder="Nome completo" value="' + esc(f.nome) + '" oninput="formAniv.nome=this.value" /></div>' +
-      '<div class="form-group"><label>Dia *</label><input type="number" min="1" max="31" placeholder="Ex: 15" value="' + esc(f.dia) + '" oninput="formAniv.dia=this.value" /></div>' +
-      '<div class="form-group"><label>Mês *</label>' +
-        '<select onchange="formAniv.mes=this.value">' +
-          '<option value="">Mês...</option>' +
-          MESES.map(function(m,i){ return '<option value="'+(i+1)+'"'+(f.mes==i+1?" selected":"")+'>' + m + '</option>'; }).join("") +
-        '</select></div>' +
-      '<div class="form-group"><label>Função</label><input placeholder="Ex: Vocal" value="' + esc(f.funcao) + '" oninput="formAniv.funcao=this.value" /></div>' +
-      '<div class="form-group"><label>Telefone</label><input placeholder="(99) 99999-9999" value="' + esc(f.tel) + '" oninput="formAniv.tel=this.value" /></div>' +
-    '</div>' +
-    '<div class="form-actions">' +
-      '<button class="btn-primary" onclick="saveAniv()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar") + '</button>' +
-      (editIndex!==null ? '<button class="btn-secondary" onclick="editIndex=null;formAniv={nome:\'\',dia:\'\',mes:\'\',funcao:\'\',tel:\'\'};render()">Cancelar</button>' : "") +
+function renderAniversariantes(){
+  var f=formAniv,hoje=new Date(),mesAtual=hoje.getMonth()+1;
+  var html='<h2 class="section-title">Aniversariantes</h2>';
+  if(isEditor){
+    html+='<div class="form-box">'+
+      '<div class="form-group full"><label>Nome *</label><input placeholder="Nome completo" value="'+esc(f.nome)+'" oninput="formAniv.nome=this.value" /></div>'+
+      '<div class="form-group"><label>Dia *</label><input type="number" min="1" max="31" placeholder="Ex: 15" value="'+esc(f.dia)+'" oninput="formAniv.dia=this.value" /></div>'+
+      '<div class="form-group"><label>Mês *</label><select onchange="formAniv.mes=this.value"><option value="">Mês...</option>'+
+        MESES.map(function(m,i){return'<option value="'+(i+1)+'"'+(f.mes==i+1?" selected":"")+'>' + m+'</option>';}).join("")+
+      '</select></div>'+
+      '<div class="form-group"><label>Função</label><input placeholder="Ex: Vocal" value="'+esc(f.funcao)+'" oninput="formAniv.funcao=this.value" /></div>'+
+      '<div class="form-group"><label>Telefone</label><input placeholder="(99) 99999-9999" value="'+esc(f.tel)+'" oninput="formAniv.tel=this.value" /></div>'+
+    '</div>'+
+    '<div class="form-actions">'+
+      '<button class="btn-primary" onclick="saveAniv()">'+(editIndex!==null?"✏️ Atualizar":"➕ Adicionar")+'</button>'+
+      (editIndex!==null?'<button class="btn-secondary" onclick="editIndex=null;formAniv={nome:\'\',dia:\'\',mes:\'\',funcao:\'\',tel:\'\'};render()">Cancelar</button>':"")+
     '</div>';
   }
-  if (aniversariantes.length === 0) {
-    html += '<div class="empty">Nenhum aniversariante cadastrado.</div>';
-  } else {
-    MESES.forEach(function(mes, mi) {
-      var doMes = aniversariantes.filter(function(a){ return parseInt(a.mes)===mi+1; });
-      if (!doMes.length) return;
-      html += '<h3 class="mes-header ' + (mi+1===mesAtual?"mes-atual":"") + '">' + mes + (mi+1===mesAtual?" 🎉":"") + '</h3>' +
-        '<table class="table"><thead><tr><th>Dia</th><th>Nome</th><th>Função</th><th>Telefone</th>' + (isEditor?"<th></th>":"") + '</tr></thead><tbody>' +
-        doMes.map(function(a) {
-          var i = aniversariantes.indexOf(a);
-          var d = mi+1===mesAtual && parseInt(a.dia)===hoje.getDate();
-          return '<tr class="' + (d?"row-destaque":"") + '">' +
-            '<td><strong>' + String(a.dia).padStart(2,"0") + '</strong></td>' +
-            '<td>' + esc(a.nome) + '</td>' +
-            '<td><span class="badge">' + esc(a.funcao) + '</span></td>' +
-            '<td>' + esc(a.tel) + '</td>' +
-            (isEditor ? '<td><button class="icon-btn" onclick="editAniv('+i+')">✏️</button><button class="icon-btn" onclick="delAniv('+i+')">🗑️</button></td>' : "") +
+  if(aniversariantes.length===0){html+='<div class="empty">Nenhum aniversariante cadastrado.</div>';}
+  else{
+    MESES.forEach(function(mes,mi){
+      var doMes=aniversariantes.filter(function(a){return parseInt(a.mes)===mi+1;});
+      if(!doMes.length)return;
+      html+='<h3 class="mes-header '+(mi+1===mesAtual?"mes-atual":"")+'">'+mes+(mi+1===mesAtual?" 🎉":"")+'</h3>'+
+        '<table class="table"><thead><tr><th>Dia</th><th>Nome</th><th>Função</th><th>Telefone</th>'+(isEditor?"<th></th>":"")+'</tr></thead><tbody>'+
+        doMes.map(function(a){
+          var i=aniversariantes.indexOf(a),d=mi+1===mesAtual&&parseInt(a.dia)===hoje.getDate();
+          return'<tr class="'+(d?"row-destaque":"")+'"><td><strong>'+String(a.dia).padStart(2,"0")+'</strong></td><td>'+esc(a.nome)+'</td>'+
+            '<td><span class="badge">'+esc(a.funcao)+'</span></td><td>'+esc(a.tel)+'</td>'+
+            (isEditor?'<td><button class="icon-btn" onclick="editAniv('+i+')">✏️</button><button class="icon-btn" onclick="delAniv('+i+')">🗑️</button></td>':"")+
           '</tr>';
-        }).join("") +
-        '</tbody></table>';
+        }).join("")+
+      '</tbody></table>';
     });
   }
   return html;
 }
-function saveAniv() {
-  if (!formAniv.nome.trim()||!formAniv.dia||!formAniv.mes) { alert("Preencha nome, dia e mês."); return; }
-  var arr = aniversariantes.slice();
-  if (editIndex!==null) { arr[editIndex]=Object.assign({},formAniv); editIndex=null; }
-  else arr.push(Object.assign({},formAniv));
-  arr.sort(function(a,b){ return (parseInt(a.mes)*100+parseInt(a.dia))-(parseInt(b.mes)*100+parseInt(b.dia)); });
-  saveData("aniversariantes", arr);
-  formAniv = { nome:"", dia:"", mes:"", funcao:"", tel:"" };
+function saveAniv(){
+  if(!formAniv.nome.trim()||!formAniv.dia||!formAniv.mes){alert("Preencha nome, dia e mês.");return;}
+  var arr=aniversariantes.slice();
+  if(editIndex!==null){arr[editIndex]=Object.assign({},formAniv);editIndex=null;}else arr.push(Object.assign({},formAniv));
+  arr.sort(function(a,b){return(parseInt(a.mes)*100+parseInt(a.dia))-(parseInt(b.mes)*100+parseInt(b.dia));});
+  saveData("aniversariantes",arr);formAniv={nome:"",dia:"",mes:"",funcao:"",tel:""};
 }
-function editAniv(i) { formAniv=Object.assign({},aniversariantes[i]); editIndex=i; window.scrollTo(0,0); render(); }
-function delAniv(i)  { if(confirm("Remover?")){ var arr=aniversariantes.slice(); arr.splice(i,1); saveData("aniversariantes",arr); } }
+function editAniv(i){formAniv=Object.assign({},aniversariantes[i]);editIndex=i;window.scrollTo(0,0);render();}
+function delAniv(i){if(confirm("Remover?")){var arr=aniversariantes.slice();arr.splice(i,1);saveData("aniversariantes",arr);}}
 
 // ============================
 // CRONOGRAMA
 // ============================
-function renderCronograma() {
-  var f = formCron;
-  var html = '<h2 class="section-title">Cronograma de Atividades</h2>';
-  if (isEditor) {
-    html += '<div class="form-box">' +
-      '<div class="form-group"><label>Data</label><input type="date" value="' + esc(f.data) + '" onchange="formCron.data=this.value" /></div>' +
-      '<div class="form-group full"><label>Título *</label><input placeholder="Nome da atividade" value="' + esc(f.titulo) + '" oninput="formCron.titulo=this.value" /></div>' +
-      '<div class="form-group"><label>Responsável</label><input placeholder="Quem vai fazer" value="' + esc(f.responsavel) + '" oninput="formCron.responsavel=this.value" /></div>' +
-      '<div class="form-group"><label>Status</label>' +
-        '<select onchange="formCron.status=this.value">' +
-          Object.entries(STATUS_LABELS).map(function(e){ return '<option value="'+e[0]+'"'+(f.status===e[0]?" selected":"")+'>' + e[1] + '</option>'; }).join("") +
-        '</select></div>' +
-      '<div class="form-group full"><label>Descrição</label><textarea rows="2" oninput="formCron.descricao=this.value">' + esc(f.descricao) + '</textarea></div>' +
-    '</div>' +
-    '<div class="form-actions">' +
-      '<button class="btn-primary" onclick="saveCron()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar") + '</button>' +
-      (editIndex!==null ? '<button class="btn-secondary" onclick="editIndex=null;formCron={data:\'\',titulo:\'\',descricao:\'\',responsavel:\'\',status:\'pendente\'};render()">Cancelar</button>' : "") +
+function renderCronograma(){
+  var f=formCron;
+  var html='<h2 class="section-title">Cronograma de Atividades</h2>';
+  if(isEditor){
+    html+='<div class="form-box">'+
+      '<div class="form-group"><label>Data</label><input type="date" value="'+esc(f.data)+'" onchange="formCron.data=this.value" /></div>'+
+      '<div class="form-group full"><label>Título *</label><input placeholder="Nome da atividade" value="'+esc(f.titulo)+'" oninput="formCron.titulo=this.value" /></div>'+
+      '<div class="form-group"><label>Responsável</label><input placeholder="Quem vai fazer" value="'+esc(f.responsavel)+'" oninput="formCron.responsavel=this.value" /></div>'+
+      '<div class="form-group"><label>Status</label><select onchange="formCron.status=this.value">'+
+        Object.entries(STATUS_LABELS).map(function(e){return'<option value="'+e[0]+'"'+(f.status===e[0]?" selected":"")+'>'+e[1]+'</option>';}).join("")+
+      '</select></div>'+
+      '<div class="form-group full"><label>Descrição</label><textarea rows="2" oninput="formCron.descricao=this.value">'+esc(f.descricao)+'</textarea></div>'+
+    '</div>'+
+    '<div class="form-actions">'+
+      '<button class="btn-primary" onclick="saveCron()">'+(editIndex!==null?"✏️ Atualizar":"➕ Adicionar")+'</button>'+
+      (editIndex!==null?'<button class="btn-secondary" onclick="editIndex=null;formCron={data:\'\',titulo:\'\',descricao:\'\',responsavel:\'\',status:\'pendente\'};render()">Cancelar</button>':"")+
     '</div>';
   }
-  if (cronograma.length === 0) {
-    html += '<div class="empty">Nenhuma atividade no cronograma.</div>';
-  } else {
-    html += '<table class="table"><thead><tr><th>Data</th><th>Atividade</th><th>Responsável</th><th>Status</th>' + (isEditor?"<th></th>":"") + '</tr></thead><tbody>' +
-      cronograma.map(function(c,i) {
-        return '<tr style="opacity:' + (c.status==="cancelado"?"0.5":"1") + '">' +
-          '<td>' + (c.data?fmtDate(c.data):"—") + '</td>' +
-          '<td><strong>' + esc(c.titulo) + '</strong>' + (c.descricao?'<div style="font-size:12px;color:var(--text-soft);margin-top:2px">'+esc(c.descricao)+'</div>':"") + '</td>' +
-          '<td>' + esc(c.responsavel) + '</td>' +
-          '<td>' + (isEditor?'<button class="status-btn" onclick="toggleStatus('+i+')">' + STATUS_LABELS[c.status||"pendente"] + '</button>':STATUS_LABELS[c.status||"pendente"]) + '</td>' +
-          (isEditor?'<td><button class="icon-btn" onclick="editCron('+i+')">✏️</button><button class="icon-btn" onclick="delCron('+i+')">🗑️</button></td>':"") +
+  if(cronograma.length===0){html+='<div class="empty">Nenhuma atividade no cronograma.</div>';}
+  else{
+    html+='<table class="table"><thead><tr><th>Data</th><th>Atividade</th><th>Responsável</th><th>Status</th>'+(isEditor?"<th></th>":"")+'</tr></thead><tbody>'+
+      cronograma.map(function(c,i){
+        return'<tr style="opacity:'+(c.status==="cancelado"?"0.5":"1")+'">'+
+          '<td>'+(c.data?fmtDate(c.data):"—")+'</td>'+
+          '<td><strong>'+esc(c.titulo)+'</strong>'+(c.descricao?'<div style="font-size:12px;color:var(--text-soft);margin-top:2px">'+esc(c.descricao)+'</div>':"")+
+          '</td><td>'+esc(c.responsavel)+'</td>'+
+          '<td>'+(isEditor?'<button class="status-btn" onclick="toggleStatus('+i+')">'+STATUS_LABELS[c.status||"pendente"]+'</button>':STATUS_LABELS[c.status||"pendente"])+'</td>'+
+          (isEditor?'<td><button class="icon-btn" onclick="editCron('+i+')">✏️</button><button class="icon-btn" onclick="delCron('+i+')">🗑️</button></td>':"")+
         '</tr>';
-      }).join("") +
+      }).join("")+
     '</tbody></table>';
   }
   return html;
 }
-function saveCron() {
-  if (!formCron.titulo.trim()) { alert("Preencha o título."); return; }
-  var arr = cronograma.slice();
-  if (editIndex!==null) { arr[editIndex]=Object.assign({},formCron); editIndex=null; }
-  else arr.push(Object.assign({},formCron));
-  arr.sort(function(a,b){ return (a.data||"").localeCompare(b.data||""); });
-  saveData("cronograma", arr);
-  formCron = { data:"", titulo:"", descricao:"", responsavel:"", status:"pendente" };
-}
-function toggleStatus(i) {
-  var order=["pendente","concluido","cancelado"];
+function saveCron(){
+  if(!formCron.titulo.trim()){alert("Preencha o título.");return;}
   var arr=cronograma.slice();
-  arr[i] = Object.assign({}, arr[i], {status: order[(order.indexOf(arr[i].status||"pendente")+1)%order.length]});
+  if(editIndex!==null){arr[editIndex]=Object.assign({},formCron);editIndex=null;}else arr.push(Object.assign({},formCron));
+  arr.sort(function(a,b){return(a.data||"").localeCompare(b.data||"");});
+  saveData("cronograma",arr);formCron={data:"",titulo:"",descricao:"",responsavel:"",status:"pendente"};
+}
+function toggleStatus(i){
+  var order=["pendente","concluido","cancelado"],arr=cronograma.slice();
+  arr[i]=Object.assign({},arr[i],{status:order[(order.indexOf(arr[i].status||"pendente")+1)%order.length]});
   saveData("cronograma",arr);
 }
-function editCron(i) { formCron=Object.assign({},cronograma[i]); editIndex=i; window.scrollTo(0,0); render(); }
-function delCron(i)  { if(confirm("Remover?")){ var arr=cronograma.slice(); arr.splice(i,1); saveData("cronograma",arr); } }
+function editCron(i){formCron=Object.assign({},cronograma[i]);editIndex=i;window.scrollTo(0,0);render();}
+function delCron(i){if(confirm("Remover?")){var arr=cronograma.slice();arr.splice(i,1);saveData("cronograma",arr);}}
 
 // ============================
 // REGRAS
 // ============================
-function renderRegras() {
-  var f = formRegra;
-  var html = '<h2 class="section-title">Regras do Ministério</h2>';
-  if (isEditor) {
-    html += '<div class="form-box">' +
-      '<div class="form-group full"><label>Título da Regra *</label><input placeholder="Ex: Pontualidade" value="' + esc(f.titulo) + '" oninput="formRegra.titulo=this.value" /></div>' +
-      '<div class="form-group full"><label>Descrição / Detalhamento</label><textarea rows="3" oninput="formRegra.descricao=this.value">' + esc(f.descricao) + '</textarea></div>' +
-    '</div>' +
-    '<div class="form-actions">' +
-      '<button class="btn-primary" onclick="saveRegra()">' + (editIndex!==null?"✏️ Atualizar":"➕ Adicionar Regra") + '</button>' +
-      (editIndex!==null ? '<button class="btn-secondary" onclick="editIndex=null;formRegra={titulo:\'\',descricao:\'\'};render()">Cancelar</button>' : "") +
+function renderRegras(){
+  var f=formRegra;
+  var html='<h2 class="section-title">Regras do Ministério</h2>';
+  if(isEditor){
+    html+='<div class="form-box">'+
+      '<div class="form-group full"><label>Título da Regra *</label><input placeholder="Ex: Pontualidade" value="'+esc(f.titulo)+'" oninput="formRegra.titulo=this.value" /></div>'+
+      '<div class="form-group full"><label>Descrição / Detalhamento</label><textarea rows="3" oninput="formRegra.descricao=this.value">'+esc(f.descricao)+'</textarea></div>'+
+    '</div>'+
+    '<div class="form-actions">'+
+      '<button class="btn-primary" onclick="saveRegra()">'+(editIndex!==null?"✏️ Atualizar":"➕ Adicionar Regra")+'</button>'+
+      (editIndex!==null?'<button class="btn-secondary" onclick="editIndex=null;formRegra={titulo:\'\',descricao:\'\'};render()">Cancelar</button>':"")+
     '</div>';
   }
-  if (regras.length === 0) {
-    html += '<div class="empty">Nenhuma regra cadastrada ainda.</div>';
-  } else {
-    html += '<div class="regras-list">' +
-      regras.map(function(r,i) {
-        return '<div class="regra-card">' +
-          '<div class="regra-num">' + (i+1) + '</div>' +
-          '<div class="regra-body">' +
-            '<div class="regra-titulo">' + esc(r.titulo) + '</div>' +
-            (r.descricao ? '<div class="regra-desc">' + esc(r.descricao) + '</div>' : "") +
-          '</div>' +
-          (isEditor ?
-            '<div class="regra-actions">' +
-              '<button class="icon-btn" onclick="moveRegra('+i+',-1)">⬆️</button>' +
-              '<button class="icon-btn" onclick="moveRegra('+i+',1)">⬇️</button>' +
-              '<button class="icon-btn" onclick="editRegra('+i+')">✏️</button>' +
-              '<button class="icon-btn" onclick="delRegra('+i+')">🗑️</button>' +
-            '</div>'
-          : "") +
+  if(regras.length===0){html+='<div class="empty">Nenhuma regra cadastrada ainda.</div>';}
+  else{
+    html+='<div class="regras-list">'+
+      regras.map(function(r,i){
+        return'<div class="regra-card">'+
+          '<div class="regra-num">'+(i+1)+'</div>'+
+          '<div class="regra-body"><div class="regra-titulo">'+esc(r.titulo)+'</div>'+(r.descricao?'<div class="regra-desc">'+esc(r.descricao)+'</div>':"")+
+          '</div>'+
+          (isEditor?'<div class="regra-actions">'+
+            '<button class="icon-btn" onclick="moveRegra('+i+',-1)">⬆️</button>'+
+            '<button class="icon-btn" onclick="moveRegra('+i+',1)">⬇️</button>'+
+            '<button class="icon-btn" onclick="editRegra('+i+')">✏️</button>'+
+            '<button class="icon-btn" onclick="delRegra('+i+')">🗑️</button></div>':"")+
         '</div>';
-      }).join("") +
+      }).join("")+
     '</div>';
   }
   return html;
 }
-function saveRegra() {
-  if (!formRegra.titulo.trim()) { alert("Preencha o título."); return; }
-  var arr = regras.slice();
-  if (editIndex!==null) { arr[editIndex]=Object.assign({},formRegra); editIndex=null; }
-  else arr.push(Object.assign({},formRegra));
-  saveData("regras", arr);
-  formRegra = { titulo:"", descricao:"" };
+function saveRegra(){
+  if(!formRegra.titulo.trim()){alert("Preencha o título.");return;}
+  var arr=regras.slice();
+  if(editIndex!==null){arr[editIndex]=Object.assign({},formRegra);editIndex=null;}else arr.push(Object.assign({},formRegra));
+  saveData("regras",arr);formRegra={titulo:"",descricao:""};
 }
-function moveRegra(i, dir) {
-  var arr=regras.slice(), j=i+dir;
-  if (j<0||j>=arr.length) return;
-  var tmp=arr[i]; arr[i]=arr[j]; arr[j]=tmp;
-  saveData("regras",arr);
-}
-function editRegra(i) { formRegra=Object.assign({},regras[i]); editIndex=i; window.scrollTo(0,0); render(); }
-function delRegra(i)  { if(confirm("Remover?")){ var arr=regras.slice(); arr.splice(i,1); saveData("regras",arr); } }
+function moveRegra(i,dir){var arr=regras.slice(),j=i+dir;if(j<0||j>=arr.length)return;var tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;saveData("regras",arr);}
+function editRegra(i){formRegra=Object.assign({},regras[i]);editIndex=i;window.scrollTo(0,0);render();}
+function delRegra(i){if(confirm("Remover?")){var arr=regras.slice();arr.splice(i,1);saveData("regras",arr);}}
 
 // ============================
-// IA MUSICAL
+// FERRAMENTAS
 // ============================
-var iaMessages = [];
-var iaLoading = false;
-var iaApiKey = "";
-
-var IA_SUGGESTIONS = [
-  "Monte um medley com os louvores cadastrados",
-  "Sugira uma sequência de louvores mais agitados",
-  "Sugira louvores só de adoração para culto",
-  "Me ajude a criar uma roupagem nova para um louvor",
-  "Transporte um louvor para outro tom e mostre a cifra",
-  "Transcreva a letra de um louvor para o back vocal decorar",
-  "Como dividir as vozes (soprano, contralto, tenor, 2ª voz) nesse louvor?"
-];
-
-function renderIA() {
-  var html = '<h2 class="section-title">✨ IA Musical</h2>';
-
-  // Bloco de configuração da chave
-  if (!iaApiKey) {
-    html += '<div style="background:var(--surface);border:2px dashed var(--primary);border-radius:14px;padding:24px;margin-bottom:20px;text-align:center">' +
-      '<div style="font-size:32px;margin-bottom:8px">🔑</div>' +
-      '<h3 style="font-size:16px;color:var(--text);margin-bottom:6px">Configure sua chave do Google Gemini</h3>' +
-      '<p style="font-size:13px;color:var(--text-soft);margin-bottom:4px;line-height:1.6">' +
-        '✅ <strong>100% gratuito</strong> — sem cartão, sem custo.<br>' +
-        '1. Acesse <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--primary);font-weight:600">aistudio.google.com/app/apikey</a><br>' +
-        '2. Clique em <strong>"Create API Key"</strong> e faça login com sua conta Google<br>' +
-        '3. Copie a chave e cole aqui abaixo 👇' +
-      '</p>' +
-      '<div style="display:flex;gap:8px;max-width:500px;margin:16px auto 0">' +
-        '<input id="ia-key-input" type="password" placeholder="AIza..." ' +
-          'style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:var(--input-bg);color:var(--text);outline:none" ' +
-          'onkeydown="if(event.key===\'Enter\')setApiKey()" />' +
-        '<button onclick="setApiKey()" style="background:var(--primary);color:white;border:none;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer">Salvar</button>' +
-      '</div>' +
-      '<p style="font-size:11px;color:var(--text-muted);margin-top:10px">🔒 A chave fica só na memória desta sessão e nunca é salva.</p>' +
-    '</div>';
-    return html;
-  }
-
-  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
-    '<div style="background:var(--primary-bg);border:1px solid var(--primary);border-radius:12px;padding:10px 16px;font-size:13px;color:var(--text);flex:1;margin-right:12px">' +
-      '🎵 Tenho acesso a todos os <strong>' + louvores.length + ' louvores</strong> cadastrados. Pergunte sobre sequências, medleys, roupagens e muito mais!' +
-    '</div>' +
-    '<button onclick="iaApiKey=\'\';render()" title="Trocar chave" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text-soft);cursor:pointer">🔑 Chave</button>' +
-  '</div>';
-
-  // Sugestões rápidas
-  if (iaMessages.length === 0) {
-    html += '<div style="margin-bottom:16px">' +
-      '<p style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px">💡 SUGESTÕES RÁPIDAS</p>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
-        IA_SUGGESTIONS.map(function(s) {
-          return '<button onclick="iaAsk(\'' + s.replace(/'/g,"\\'") + '\')" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:12px;color:var(--text);cursor:pointer">' + s + '</button>';
-        }).join("") +
-      '</div>' +
-    '</div>';
-  }
-
-  // Histórico de mensagens
-  html += '<div id="ia-chat" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">';
-  iaMessages.forEach(function(m) {
-    if (m.role === "user") {
-      html += '<div style="display:flex;justify-content:flex-end">' +
-        '<div style="background:var(--primary);color:white;border-radius:16px 16px 4px 16px;padding:10px 16px;font-size:13px;max-width:75%">' + esc(m.content) + '</div>' +
-      '</div>';
-    } else {
-      html += '<div style="display:flex;gap:10px;align-items:flex-start">' +
-        '<div style="background:var(--primary);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✨</div>' +
-        '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px 16px 16px 16px;padding:12px 16px;font-size:13px;line-height:1.6;color:var(--text);max-width:80%;white-space:pre-wrap">' + formatIAResponse(m.content) + '</div>' +
-      '</div>';
-    }
-  });
-  if (iaLoading) {
-    html += '<div style="display:flex;gap:10px;align-items:center">' +
-      '<div style="background:var(--primary);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px">✨</div>' +
-      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px 16px 16px 16px;padding:12px 16px;font-size:13px;color:var(--text-soft)">Pensando<span id="ia-dots">...</span></div>' +
-    '</div>';
-  }
-  html += '</div>';
-
-  // Input
-  html += '<div style="display:flex;gap:8px;align-items:flex-end">' +
-    '<textarea id="ia-input" rows="2" placeholder="Ex: Monte um medley com os louvores mais animados..." ' +
-      'style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:12px;font-size:13px;color:var(--text);background:var(--surface);outline:none;resize:none;font-family:inherit" ' +
-      'onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();iaSend()}"' +
-    '></textarea>' +
-    '<button onclick="iaSend()" style="background:var(--primary);color:white;border:none;border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;height:44px">' +
-      (iaLoading ? '⏳' : '➤') +
-    '</button>' +
-  '</div>';
-
-  if (iaMessages.length > 0) {
-    html += '<div style="margin-top:8px;text-align:right">' +
-      '<button onclick="iaMessages=[];render()" style="background:none;border:none;font-size:12px;color:var(--text-soft);cursor:pointer">🗑️ Limpar conversa</button>' +
-    '</div>';
-  }
-
-  return html;
+const CHROMATIC=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const FLAT_TO_SHARP={"Db":"C#","Eb":"D#","Gb":"F#","Ab":"G#","Bb":"A#","Cb":"B","Fb":"E"};
+function noteIndex(n){n=FLAT_TO_SHARP[n]||n;return CHROMATIC.indexOf(n);}
+function transposeNote(note,st){
+  var base=note.replace(/m|maj|dim|aug|sus\d?|add\d?|[0-9]|\/.*/g,"");
+  var suffix=note.slice(base.length);
+  var norm=FLAT_TO_SHARP[base]||base;
+  var idx=CHROMATIC.indexOf(norm);if(idx===-1)return note;
+  return CHROMATIC[(idx+st+12)%12]+suffix;
 }
-
-function iaAsk(texto) {
-  var ta = document.getElementById("ia-input");
-  if (ta) ta.value = texto;
-  iaSend(texto);
-}
-
-function setApiKey() {
-  var inp = document.getElementById("ia-key-input");
-  var val = inp ? inp.value.trim() : "";
-  if (!val || !val.startsWith("AIza")) {
-    alert("Chave inválida. Deve começar com 'AIza'"); return;
-  }
-  iaApiKey = val;
-  render();
-}
-
-async function iaSend(textoFixo) {
-  var ta = document.getElementById("ia-input");
-  var texto = textoFixo || (ta ? ta.value.trim() : "");
-  if (!texto || iaLoading) return;
-  if (ta) ta.value = "";
-
-  // Monta contexto dos louvores
-  var ctx = louvores.length > 0
-    ? "Louvores cadastrados no ministério:\n" + louvores.map(function(l, i) {
-        return (i+1) + ". " + (l.titulo||"") +
-          (l.artista ? " – " + l.artista : "") +
-          (l.nota ? " (Tom: " + l.nota + ")" : "") +
-          (l.trecho ? " | Trecho: " + l.trecho : "");
-      }).join("\n")
-    : "Nenhum louvor cadastrado ainda.";
-
-  var systemPrompt = "Você é um assistente musical especializado em ministérios de louvor evangélicos brasileiros. " +
-    "Ajude o líder de louvor com sequências de músicas, medleys, roupagens (mudança de estilo/batida), sugestões criativas e dicas musicais. " +
-    "Seja prático, direto e criativo. Use linguagem brasileira informal. " +
-    "Quando sugerir sequências, mostre o nome, tom e motivo da escolha. " +
-    "Quando falar de roupagem, sugira estilo, andamento, instrumentação e dinâmica. " +
-    "\n\nTRANSPOSIÇÃO DE TOM E CIFRAS:\n" +
-    "Quando o usuário pedir para transportar um louvor para outro tom, siga estas regras:\n" +
-    "1. Mostre o tom original e o tom novo.\n" +
-    "2. Liste TODOS os acordes originais e seus equivalentes no novo tom.\n" +
-    "3. Se o usuário fornecer a cifra completa (letra + acordes), reescreva a cifra inteira com os acordes já substituídos, posicionados acima das sílabas corretas.\n" +
-    "4. Se o usuário não fornecer a cifra, mostre a tabela de conversão de acordes e explique como aplicar.\n" +
-    "5. Explique variações: acorde maior, menor (m), com sétima (7), suspenso (sus), diminuto (dim), etc.\n" +
-    "6. Use a notação brasileira: use sustenido (#) e bemol (b).\n" +
-    "Tabela de semitons para referência:\n" +
-    "C, C#, D, D#, E, F, F#, G, G#, A, A#, B (12 semitons = 1 oitava)\n" +
-    "\n\nBACK VOCAL — LETRA E DIVISÃO DE VOZES:\n" +
-    "Quando o usuário pedir para transcrever a letra de um louvor para o back vocal decorar:\n" +
-    "1. Apresente a letra de forma limpa, organizada por seção (Verso 1, Pré-refrão, Refrão, Ponte, etc).\n" +
-    "2. Destaque repetições e variações entre seções.\n" +
-    "3. Indique dinâmicas sugeridas: piano (p), forte (f), crescendo, etc.\n" +
-    "4. Adicione dicas de respiração (/) nos pontos ideais.\n" +
-    "\nQuando o usuário pedir divisão de vozes, siga:\n" +
-    "1. Explique o papel de cada voz no contexto evangélico/gospel:\n" +
-    "   - Soprano: voz mais aguda feminina, geralmente a melodia principal ou harmonia acima.\n" +
-    "   - Contralto: voz mais grave feminina, harmonias abaixo da melodia.\n" +
-    "   - Tenor: voz aguda masculina, pode dobrar soprano uma oitava abaixo ou fazer harmonia.\n" +
-    "   - Falsete: extensão aguda masculina, muito usada em momentos de adoração e suavidade.\n" +
-    "   - 2ª voz: harmonia paralela à melodia (geralmente uma terça ou quinta abaixo/acima).\n" +
-    "2. Para cada seção do louvor (verso, refrão, ponte), descreva o que cada voz canta.\n" +
-    "3. Indique quando uma voz entra, sai ou faz um contracanto.\n" +
-    "4. Se o usuário fornecer a letra, mostre a divisão linha a linha.\n" +
-    "5. Sugira quais vozes são essenciais e quais são opcionais para grupos pequenos.\n" +
-    "\n\n" + ctx;
-
-  iaMessages.push({ role: "user", content: texto });
-  iaLoading = true;
-  render();
-
-  // Scroll para o final
-  setTimeout(function() {
-    var chat = document.getElementById("ia-chat");
-    if (chat) chat.scrollTop = chat.scrollHeight;
-  }, 50);
-
-  try {
-    var msgs = iaMessages.slice(-10).map(function(m) {
-      return { role: m.role, content: m.content };
-    });
-
-    var res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + iaApiKey, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: msgs.map(function(m) {
-          return { role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] };
-        }),
-        generationConfig: { maxOutputTokens: 1500 }
-      })
-    });
-    var data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    var resposta = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text;
-    if (!resposta) throw new Error("Sem resposta");
-    iaMessages.push({ role: "assistant", content: resposta });
-  } catch(e) {
-    iaMessages.push({ role: "assistant", content: "Erro ao conectar com a IA. Tente novamente." });
-  }
-
-  iaLoading = false;
-  render();
-  setTimeout(function() {
-    var chat = document.getElementById("ia-chat");
-    if (chat) chat.scrollTop = chat.scrollHeight;
-  }, 50);
-}
-
-function formatIAResponse(text) {
-  // Destaca acordes (padrão: letra maiúscula seguida de #/b/m/7/sus/dim etc no início ou após espaço)
-  var acorde = /\b([A-G][#b]?(?:m|maj|dim|aug|sus|add)?(?:7|9|11|13)?(?:\/[A-G][#b]?)?)\b/g;
-  // Linhas que parecem ser de acordes (maioria dos tokens são acordes)
-  var lines = text.split("\n");
-  var html = lines.map(function(line) {
-    // Detecta se a linha é predominantemente acordes
-    var tokens = line.trim().split(/\s+/);
-    var acordeCount = tokens.filter(function(t) { return acorde.test(t); }).length;
-    acorde.lastIndex = 0;
-    var isChordLine = tokens.length > 0 && acordeCount / tokens.length > 0.5;
-
-    if (isChordLine) {
-      // Linha de acordes: destaca cada acorde em laranja bold
-      var formatted = line.replace(acorde, function(match) {
-        return '<strong style="color:var(--primary);font-family:monospace;font-size:13px">' + esc(match) + '</strong>';
-      });
-      acorde.lastIndex = 0;
-      return '<span style="display:block;font-family:monospace;letter-spacing:1px">' + formatted + '</span>';
-    } else {
-      // Linha de letra ou texto normal
-      return '<span style="display:block">' + esc(line) + '</span>';
-    }
-  }).join("");
-  return html;
-}
-
-// ============================
-// FERRAMENTAS MUSICAIS
-// ============================
-var ferraTab = "transpositor";
-var transResult = null;
-var transOrigem = "", transDestino = "", transCifra = "";
-var medleyTipo = "agitado", medleyResult = null;
-var vozLouvor = "", vozResult = null;
-var roupStyle = "", roupAndamento = "", roupResult = null;
-
-var CHROMATIC    = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-var FLAT_TO_SHARP = {"Db":"C#","Eb":"D#","Gb":"F#","Ab":"G#","Bb":"A#","Cb":"B","Fb":"E"};
-
-function noteIndex(n) {
-  n = FLAT_TO_SHARP[n] || n;
-  return CHROMATIC.indexOf(n);
-}
-function transposeNote(note, semitones) {
-  var base = note.replace(/m|maj|dim|aug|sus\d?|add\d?|[0-9]|\/.*/g,"");
-  var suffix = note.slice(base.length);
-  var norm = FLAT_TO_SHARP[base] || base;
-  var idx = CHROMATIC.indexOf(norm);
-  if (idx === -1) return note;
-  var newIdx = (idx + semitones + 12) % 12;
-  return CHROMATIC[newIdx] + suffix;
-}
-function transposeChords(texto, semitones) {
-  return texto.replace(/\b([A-G][#b]?(?:m|maj|dim|aug|sus\d?|add\d?)?(?:[0-9]+)?(?:\/[A-G][#b]?)?)\b/g, function(match) {
-    var slash = match.indexOf("/");
-    if (slash !== -1) {
-      return transposeNote(match.slice(0,slash), semitones) + "/" + transposeNote(match.slice(slash+1), semitones);
-    }
-    return transposeNote(match, semitones);
+function transposeChords(texto,st){
+  return texto.replace(/\b([A-G][#b]?(?:m|maj|dim|aug|sus\d?|add\d?)?(?:[0-9]+)?(?:\/[A-G][#b]?)?)\b/g,function(match){
+    var sl=match.indexOf("/");
+    if(sl!==-1)return transposeNote(match.slice(0,sl),st)+"/"+transposeNote(match.slice(sl+1),st);
+    return transposeNote(match,st);
   });
 }
 
-function renderFerramentas() {
-  var tools = [["transpositor","🎼 Transpositor"],["medley","🎶 Sequência / Medley"],["vozes","🎤 Divisão de Vozes"],["roupagem","🥁 Roupagem"]];
-  var html = '<h2 class="section-title">🎸 Ferramentas Musicais</h2>';
-
-  // Sub-tabs
-  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">' +
-    tools.map(function(t) {
-      var ativo = ferraTab === t[0];
-      return '<button onclick="ferraTab=\'' + t[0] + '\';transResult=null;medleyResult=null;vozResult=null;roupResult=null;render()" ' +
-        'style="padding:9px 18px;border-radius:20px;border:2px solid var(--primary);font-size:13px;font-weight:600;cursor:pointer;' +
-        'background:' + (ativo?"var(--primary)":"var(--surface)") + ';color:' + (ativo?"white":"var(--primary)") + '">' +
-        t[1] + '</button>';
-    }).join("") +
+function renderFerramentas(){
+  var tools=[["transpositor","🎼 Transpositor"],["medley","🎶 Sequência / Medley"],["vozes","🎤 Divisão de Vozes"],["metronomo","🥁 Metrônomo"]];
+  var html='<h2 class="section-title">🎸 Ferramentas Musicais</h2>';
+  html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">'+
+    tools.map(function(t){
+      var a=ferraTab===t[0];
+      return'<button onclick="ferraTab=\''+t[0]+'\';transResult=null;medleyResult=null;vozResult=null;render()" '+
+        'style="padding:9px 18px;border-radius:20px;border:2px solid var(--primary);font-size:13px;font-weight:600;cursor:pointer;background:'+(a?"var(--primary)":"var(--surface)")+';color:'+(a?"white":"var(--primary)")+'">'+ t[1]+'</button>';
+    }).join("")+
   '</div>';
-
-  if (ferraTab === "transpositor") html += renderTranspositor();
-  if (ferraTab === "medley")       html += renderMedley();
-  if (ferraTab === "vozes")        html += renderVozes();
-  if (ferraTab === "roupagem")     html += renderRoupagem();
-
+  if(ferraTab==="transpositor") html+=renderTranspositor();
+  if(ferraTab==="medley")       html+=renderMedley();
+  if(ferraTab==="vozes")        html+=renderVozes();
+  if(ferraTab==="metronomo")    html+=renderMetronomo();
   return html;
 }
 
 // --- TRANSPOSITOR ---
-function renderTranspositor() {
-  var html = '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">' +
-    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Transponha qualquer louvor para outro tom e veja os acordes convertidos automaticamente.</p>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">' +
-      '<div class="form-group"><label>Tom Original</label>' +
-        '<select onchange="transOrigem=this.value"><option value="">Selecionar...</option>' +
-          CHROMATIC.map(function(n){ return '<option value="'+n+'"'+(transOrigem===n?" selected":"")+'>'+n+'</option>'; }).join("") +
-        '</select></div>' +
-      '<div class="form-group"><label>Tom Destino</label>' +
-        '<select onchange="transDestino=this.value"><option value="">Selecionar...</option>' +
-          CHROMATIC.map(function(n){ return '<option value="'+n+'"'+(transDestino===n?" selected":"")+'>'+n+'</option>'; }).join("") +
-        '</select></div>' +
-    '</div>' +
-    '<div class="form-group" style="margin-bottom:12px"><label>Cole a cifra aqui (opcional)</label>' +
-      '<textarea rows="6" placeholder="Ex:\nC  Am  F  G\nNa tua presença..." oninput="transCifra=this.value" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:monospace;background:var(--input-bg);color:var(--text);outline:none">' + esc(transCifra) + '</textarea></div>' +
-    '<button onclick="calcTranspositor()" class="btn-primary">🎼 Transpor</button>' +
+function renderTranspositor(){
+  var html='<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">'+
+    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Transponha qualquer louvor para outro tom. Cole a cifra e veja os acordes convertidos automaticamente.</p>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">'+
+      '<div class="form-group"><label>Tom Original</label><select onchange="transOrigem=this.value"><option value="">Selecionar...</option>'+
+        CHROMATIC.map(function(n){return'<option value="'+n+'"'+(transOrigem===n?" selected":"")+'>'+n+'</option>';}).join("")+
+      '</select></div>'+
+      '<div class="form-group"><label>Tom Destino</label><select onchange="transDestino=this.value"><option value="">Selecionar...</option>'+
+        CHROMATIC.map(function(n){return'<option value="'+n+'"'+(transDestino===n?" selected":"")+'>'+n+'</option>';}).join("")+
+      '</select></div>'+
+    '</div>'+
+    '<div class="form-group" style="margin-bottom:12px"><label>Cole a cifra aqui (opcional)</label>'+
+      '<textarea rows="6" placeholder="Ex:&#10;C  Am  F  G&#10;Na tua presença..." oninput="transCifra=this.value" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:monospace;background:var(--input-bg);color:var(--text);outline:none">'+esc(transCifra)+'</textarea></div>'+
+    '<button onclick="calcTranspositor()" class="btn-primary">🎼 Transpor</button>'+
   '</div>';
-
-  if (transResult) {
-    var semi = transResult.semitones;
-    html += '<div style="background:var(--surface);border-radius:14px;padding:20px;margin-top:16px;box-shadow:var(--card-shadow)">' +
-      '<h3 style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">Resultado: ' + transResult.origem + ' → ' + transResult.destino + ' (' + (semi>0?"+":"")+semi+' semiton'+(Math.abs(semi)!==1?"s":"")+')</h3>' +
-      '<p style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px">TABELA DE ACORDES</p>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">' +
-        transResult.tabela.map(function(t) {
-          return '<div style="background:var(--primary-bg);border-radius:8px;padding:6px 12px;font-size:13px;text-align:center">' +
-            '<span style="color:var(--text-soft);font-size:11px">'+t.de+'</span><br>' +
-            '<strong style="color:var(--primary)">'+t.para+'</strong></div>';
-        }).join("") +
-      '</div>' +
-      (transResult.cifraTransposta ?
-        '<p style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px">CIFRA TRANSPOSTA</p>' +
-        '<pre style="background:var(--surface2);border-radius:8px;padding:14px;font-size:13px;font-family:monospace;color:var(--text);overflow-x:auto;white-space:pre-wrap">' + esc(transResult.cifraTransposta) + '</pre>'
-      : "") +
+  if(transResult){
+    html+='<div style="background:var(--surface);border-radius:14px;padding:20px;margin-top:16px;box-shadow:var(--card-shadow)">'+
+      '<h3 style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">'+transResult.origem+' → '+transResult.destino+' ('+(transResult.semitones>0?"+":"")+transResult.semitones+' semiton'+(Math.abs(transResult.semitones)!==1?"s":"")+')</h3>'+
+      '<p style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px">TABELA DE ACORDES</p>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">'+
+        transResult.tabela.map(function(t){
+          return'<div style="background:var(--primary-bg);border-radius:8px;padding:6px 12px;font-size:13px;text-align:center">'+
+            '<span style="color:var(--text-soft);font-size:11px">'+t.de+'</span><br><strong style="color:var(--primary)">'+t.para+'</strong></div>';
+        }).join("")+
+      '</div>'+
+      (transResult.cifraTransposta?'<p style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px">CIFRA TRANSPOSTA</p>'+
+        '<pre style="background:var(--surface2);border-radius:8px;padding:14px;font-size:13px;font-family:monospace;color:var(--text);overflow-x:auto;white-space:pre-wrap">'+esc(transResult.cifraTransposta)+'</pre>':"")+
     '</div>';
   }
   return html;
 }
-function calcTranspositor() {
-  if (!transOrigem || !transDestino) { alert("Selecione o tom original e o destino."); return; }
-  var semi = (noteIndex(transDestino) - noteIndex(transOrigem) + 12) % 12;
-  if (semi > 6) semi -= 12;
-  // Monta tabela com os acordes mais comuns do tom
-  var graus = [0,2,4,5,7,9,11];
-  var tabela = graus.map(function(g) {
-    var orig = CHROMATIC[(noteIndex(transOrigem)+g+12)%12];
-    var dest = CHROMATIC[(noteIndex(transOrigem)+g+semi+12)%12];
-    return { de: orig, para: dest };
+function calcTranspositor(){
+  if(!transOrigem||!transDestino){alert("Selecione os tons.");return;}
+  var st=(noteIndex(transDestino)-noteIndex(transOrigem)+12)%12;
+  if(st>6)st-=12;
+  var graus=[0,2,4,5,7,9,11];
+  var tabela=graus.map(function(g){
+    var orig=CHROMATIC[(noteIndex(transOrigem)+g+12)%12];
+    var dest=CHROMATIC[(noteIndex(transOrigem)+g+st+12)%12];
+    return{de:orig,para:dest};
   });
-  // Adiciona menores
-  var menores = [0,2,5,7,9];
-  menores.forEach(function(g) {
-    var orig = CHROMATIC[(noteIndex(transOrigem)+g+12)%12]+"m";
-    var dest = CHROMATIC[(noteIndex(transOrigem)+g+semi+12)%12]+"m";
-    tabela.push({ de: orig, para: dest });
+  [0,2,5,7,9].forEach(function(g){
+    tabela.push({de:CHROMATIC[(noteIndex(transOrigem)+g+12)%12]+"m",para:CHROMATIC[(noteIndex(transOrigem)+g+st+12)%12]+"m"});
   });
-  var cifraTransposta = transCifra ? transposeChords(transCifra, semi) : null;
-  transResult = { origem: transOrigem, destino: transDestino, semitones: semi, tabela: tabela, cifraTransposta: cifraTransposta };
+  transResult={origem:transOrigem,destino:transDestino,semitones:st,tabela:tabela,cifraTransposta:transCifra?transposeChords(transCifra,st):null};
   render();
 }
 
-// --- MEDLEY / SEQUÊNCIA ---
-function renderMedley() {
-  var html = '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:16px">' +
-    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Monte uma sequência ou medley com os louvores cadastrados.</p>' +
-    '<div class="form-group" style="margin-bottom:12px"><label>Tipo de sequência</label>' +
-      '<select onchange="medleyTipo=this.value">' +
-        ['agitado','adoracao','misto','vigilia','mulheres'].map(function(t){
-          var labels = {agitado:"🔥 Mais agitados / animados", adoracao:"🕊️ Somente adoração / lentos", misto:"🎵 Misturado (agitado → adoração)", vigilia:"🌙 Vigília / oração", mulheres:"🌸 Culto de Mulheres"};
-          return '<option value="'+t+'"'+(medleyTipo===t?" selected":"")+'>' + labels[t] + '</option>';
-        }).join("") +
-      '</select></div>' +
-    '<button onclick="calcMedley()" class="btn-primary">🎶 Montar Sequência</button>' +
+// --- MEDLEY / SEQUÊNCIA (com lógica de transposição por proximidade de tons) ---
+function renderMedley(){
+  var tipos=[
+    {v:"agitado",l:"🔥 Mais agitados / animados"},
+    {v:"adoracao",l:"🕊️ Somente adoração / lentos"},
+    {v:"misto",l:"🎵 Misturado (agitado → adoração)"},
+    {v:"vigilia",l:"🌙 Vigília / oração"},
+    {v:"mulheres",l:"🌸 Culto de Mulheres"}
+  ];
+  var html='<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:16px">'+
+    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:4px">Monte uma sequência com os louvores cadastrados.</p>'+
+    '<p style="font-size:12px;color:var(--primary);margin-bottom:16px">🎯 A sequência leva em conta a proximidade dos tons para facilitar as transições ao vivo!</p>'+
+    '<div class="form-group" style="margin-bottom:12px"><label>Tipo de sequência</label><select onchange="medleyTipo=this.value">'+
+      tipos.map(function(t){return'<option value="'+t.v+'"'+(medleyTipo===t.v?" selected":"")+'>'+t.l+'</option>';}).join("")+
+    '</select></div>'+
+    '<button onclick="calcMedley()" class="btn-primary">🎶 Montar Sequência</button>'+
   '</div>';
 
-  if (medleyResult) {
-    html += '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">' +
-      '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)">' + medleyResult.titulo + '</h3>' +
-      '<p style="font-size:12px;color:var(--text-soft);margin-bottom:16px">' + medleyResult.descricao + '</p>' +
-      medleyResult.sequencia.map(function(item, i) {
-        return '<div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)">' +
-          '<div style="background:var(--primary);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">' + (i+1) + '</div>' +
-          '<div style="flex:1">' +
-            '<div style="font-weight:700;font-size:14px;color:var(--text)">' + esc(item.titulo) + '</div>' +
-            (item.artista ? '<div style="font-size:12px;color:var(--text-muted)">' + esc(item.artista) + '</div>' : "") +
-            '<div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">' +
-              (item.nota ? '<span class="badge badge-green">Tom: ' + item.nota + '</span>' : "") +
-              '<span style="font-size:12px;color:var(--text-soft)">' + item.dica + '</span>' +
-            '</div>' +
-          '</div>' +
+  if(medleyResult){
+    html+='<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">'+
+      '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)">'+medleyResult.titulo+'</h3>'+
+      '<p style="font-size:12px;color:var(--text-soft);margin-bottom:16px">'+medleyResult.descricao+'</p>'+
+      medleyResult.sequencia.map(function(item,i){
+        var proxTom=i<medleyResult.sequencia.length-1?medleyResult.sequencia[i+1].nota:"";
+        var dist=toneDistance(item.nota,proxTom);
+        var trans=i<medleyResult.sequencia.length-1?(dist===0?"→ Mesmo tom, sem transposição":(dist<=2?"→ "+proxTom+" (transição fácil, "+dist+" semitom"+(dist>1?"s":"")+")"  :"→ "+proxTom+" (atenção: "+dist+" semitons)")):"";
+        var corTrans=dist===0?"#059669":dist<=2?"#2563eb":"#dc2626";
+        return'<div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border)">'+
+          '<div style="background:var(--primary);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">'+(i+1)+'</div>'+
+          '<div style="flex:1">'+
+            '<div style="font-weight:700;font-size:14px;color:var(--text)">'+esc(item.titulo)+'</div>'+
+            (item.artista?'<div style="font-size:12px;color:var(--text-muted)">'+esc(item.artista)+'</div>':"")+
+            '<div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center">'+
+              (item.nota?'<span class="badge badge-green">Tom: '+item.nota+'</span>':"")+
+              (item.bpm?'<span class="badge badge-blue">'+item.bpm+' BPM</span>':"")+
+              (trans?'<span style="font-size:11px;color:'+corTrans+';font-weight:600">'+trans+'</span>':"")+
+            '</div>'+
+            '<div style="font-size:12px;color:var(--text-soft);margin-top:4px">'+item.dica+'</div>'+
+          '</div>'+
         '</div>';
-      }).join("") +
-      (medleyResult.dicas ? '<div style="margin-top:16px;background:var(--primary-bg);border-radius:8px;padding:12px;font-size:13px;color:var(--text)">' + medleyResult.dicas + '</div>' : "") +
+      }).join("")+
+      '<div style="margin-top:16px;background:var(--primary-bg);border-radius:8px;padding:12px;font-size:13px;color:var(--text)">'+medleyResult.dica_geral+'</div>'+
     '</div>';
   }
   return html;
 }
-function calcMedley() {
-  if (louvores.length === 0) { alert("Nenhum louvor cadastrado ainda!"); return; }
-  var lista = louvores.slice();
-  var titulo, descricao, dicas, sequencia;
+function calcMedley(){
+  if(louvores.length===0){alert("Nenhum louvor cadastrado ainda!");return;}
+  var lista=louvores.slice();
+  var titulo,descricao,dica_geral,dicas;
 
-  var configs = {
-    agitado: { titulo:"🔥 Sequência Agitada", descricao:"Ordem sugerida do mais animado ao médio para manter a energia.", dica_geral:"💡 Mantenha o BPM alto nas primeiras músicas. Faça transições rápidas sem parar.", mapDica: function(i){ return ["Abra com energia total! Tom de entrada.","Mantenha a empolgação, mesmo andamento.","Pode variar o estilo mas mantém o ritmo.","Começa a desacelerar um pouco.","Faça a transição para um momento mais reflexivo."][Math.min(i,4)]; } },
-    adoracao: { titulo:"🕊️ Sequência de Adoração", descricao:"Ordem sugerida do médio para o mais contemplativo.", dica_geral:"💡 Reduza o volume gradativamente. Deixe espaços de silêncio. Priorize instrumentos suaves.", mapDica: function(i){ return ["Inicie com algo que convida à adoração.","Aprofunde o momento espiritual.","Vá para algo mais íntimo e delicado.","Reduza a dinâmica ao máximo aqui.","Encerre com um momento de silêncio e oração."][Math.min(i,4)]; } },
-    misto:    { titulo:"🎵 Sequência Mista", descricao:"Começa agitado e termina em adoração — ideal para cultos completos.", dica_geral:"💡 Clássico do ministério: sobe a energia e desce suavemente até a adoração.", mapDica: function(i, total){ var meio = Math.floor(total/2); return i < meio ? "Momento de celebração." : "Momento de adoração."; } },
-    vigilia:  { titulo:"🌙 Sequência para Vigília", descricao:"Músicas para madrugada: intercalando clama e adoração.", dica_geral:"💡 Alterne momentos de clamor intenso com adoração suave. Deixe o Espírito conduzir.", mapDica: function(i){ return ["Clamor de abertura.","Adoração íntima.","Intercessão musical.","Momento de espera no Senhor.","Encerramento com louvor."][Math.min(i,4)]; } },
-    mulheres: { titulo:"🌸 Sequência para Culto de Mulheres", descricao:"Seleção acolhedora e expressiva.", dica_geral:"💡 Valorize as vozes femininas. Use backing harmônico. Crie um ambiente de acolhimento.", mapDica: function(i){ return ["Boas-vindas musicais.","Momento de louvor expressivo.","Adoração profunda.","Ministração suave.","Encerramento com graça."][Math.min(i,4)]; } }
+  var cfgs={
+    agitado:{titulo:"🔥 Sequência Agitada",descricao:"Ordenada por proximidade de tons para transições suaves.",dica_geral:"💡 Mantenha o BPM alto. Faça transições rápidas sem parar. Tons próximos = menos reapinação!",dicas:["Abra com tudo! Tom de entrada.","Mesma energia, transição suave.","Mantém o ritmo, varia o estilo.","Começa a desacelerar um pouco.","Fecha a fase agitada aqui."]},
+    adoracao:{titulo:"🕊️ Sequência de Adoração",descricao:"Progressão suave entre tons próximos para adoração contínua.",dica_geral:"💡 Reduza o volume gradualmente. Deixe espaços. Tons próximos permitem modular sem quebrar o momento.",dicas:["Convide à adoração com suavidade.","Aprofunde o momento espiritual.","Vá para algo mais íntimo.","Reduza a dinâmica ao máximo.","Silence e oração."]},
+    misto:{titulo:"🎵 Sequência Mista",descricao:"Começa agitado e termina em adoração, com transições cuidadosas.",dica_geral:"💡 Sobe a energia e desce suavemente. Os tons foram escolhidos para facilitar a transição entre os momentos.",dicas:["Celebração — energia total!","Mantém a animação.","Começa a transição.","Momento mais reflexivo.","Adoração profunda."]},
+    vigilia:{titulo:"🌙 Sequência para Vigília",descricao:"Tons compatíveis para uma noite de clamor e adoração.",dica_geral:"💡 Alterne clamor e adoração. Com tons próximos, você pode medleyar sem parar.",dicas:["Clamor de abertura.","Adoração íntima.","Intercessão musical.","Espera no Senhor.","Encerramento."]},
+    mulheres:{titulo:"🌸 Culto de Mulheres",descricao:"Seleção acolhedora com progressão harmônica suave.",dica_geral:"💡 Valorize as vozes femininas. Tons próximos facilitam a transição sem quebrar a atmosfera.",dicas:["Boas-vindas musicais.","Louvor expressivo.","Adoração profunda.","Ministração suave.","Encerramento com graça."]}
   };
+  var cfg=cfgs[medleyTipo];
 
-  var cfg = configs[medleyTipo];
-  var total = Math.min(lista.length, 5);
-  sequencia = lista.slice(0, total).map(function(l, i) {
-    return { titulo: l.titulo, artista: l.artista, nota: l.nota, dica: cfg.mapDica(i, total) };
+  // Ordenar por proximidade de tons (greedy nearest neighbor)
+  var disponivel=lista.slice();
+  var ordenado=[];
+  // Começa com qualquer (primeiro da lista)
+  ordenado.push(disponivel.splice(0,1)[0]);
+  while(disponivel.length>0){
+    var ultimo=ordenado[ordenado.length-1];
+    var melhorIdx=0, melhorDist=99;
+    for(var i=0;i<disponivel.length;i++){
+      var d=toneDistance(ultimo.nota,disponivel[i].nota);
+      if(d<melhorDist){melhorDist=d;melhorIdx=i;}
+    }
+    ordenado.push(disponivel.splice(melhorIdx,1)[0]);
+  }
+
+  var total=Math.min(ordenado.length,6);
+  var sequencia=ordenado.slice(0,total).map(function(l,i){
+    return{titulo:l.titulo,artista:l.artista,nota:l.nota,bpm:l.bpm,dica:cfg.dicas[Math.min(i,cfg.dicas.length-1)]};
   });
-
-  medleyResult = { titulo: cfg.titulo, descricao: cfg.descricao, sequencia: sequencia, dicas: cfg.dica_geral };
+  medleyResult={titulo:cfg.titulo,descricao:cfg.descricao,sequencia:sequencia,dica_geral:cfg.dica_geral};
   render();
 }
 
 // --- DIVISÃO DE VOZES ---
-function renderVozes() {
-  var html = '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:16px">' +
-    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Veja como dividir as vozes do back vocal para um louvor.</p>' +
-    '<div class="form-group" style="margin-bottom:12px"><label>Escolha o louvor</label>' +
-      '<select onchange="vozLouvor=this.value">' +
-        '<option value="">Selecionar...</option>' +
-        louvores.map(function(l){ return '<option value="'+esc(l.titulo)+'"'+(vozLouvor===l.titulo?" selected":"")+'>'+esc(l.titulo)+(l.nota?" (Tom: "+l.nota+")":"")+'</option>'; }).join("") +
-      '</select></div>' +
-    '<button onclick="calcVozes()" class="btn-primary">🎤 Ver Divisão de Vozes</button>' +
+function renderVozes(){
+  var html='<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:16px">'+
+    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Veja como dividir as vozes do back vocal para um louvor cadastrado.</p>'+
+    '<div class="form-group" style="margin-bottom:12px"><label>Escolha o louvor</label>'+
+      '<select onchange="vozLouvor=this.value"><option value="">Selecionar...</option>'+
+        louvores.map(function(l){return'<option value="'+esc(l.titulo)+'"'+(vozLouvor===l.titulo?" selected":"")+'>'+esc(l.titulo)+(l.nota?" (Tom: "+l.nota+")":"")+'</option>';}).join("")+
+      '</select></div>'+
+    '<button onclick="calcVozes()" class="btn-primary">🎤 Ver Divisão de Vozes</button>'+
   '</div>';
-
-  if (vozResult) {
-    var vozes = [
-      { nome:"Soprano", emoji:"🎵", cor:"#e11d48", desc: vozResult.soprano },
-      { nome:"Contralto", emoji:"🎶", cor:"#7c3aed", desc: vozResult.contralto },
-      { nome:"Tenor", emoji:"🎼", cor:"#2563eb", desc: vozResult.tenor },
-      { nome:"Falsete", emoji:"✨", cor:"#0891b2", desc: vozResult.falsete },
-      { nome:"2ª Voz", emoji:"🎤", cor:"#059669", desc: vozResult.segunda }
+  if(vozResult){
+    var vozes=[
+      {nome:"Soprano",emoji:"🎵",cor:"#e11d48",desc:vozResult.soprano},
+      {nome:"Contralto",emoji:"🎶",cor:"#7c3aed",desc:vozResult.contralto},
+      {nome:"Tenor",emoji:"🎼",cor:"#2563eb",desc:vozResult.tenor},
+      {nome:"Falsete",emoji:"✨",cor:"#0891b2",desc:vozResult.falsete},
+      {nome:"2ª Voz",emoji:"🎤",cor:"#059669",desc:vozResult.segunda}
     ];
-    html += '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">' +
-      '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)">' + esc(vozResult.louvor) + '</h3>' +
-      (vozResult.tom ? '<p style="font-size:12px;color:var(--text-soft);margin-bottom:16px">Tom: ' + vozResult.tom + '</p>' : '<div style="margin-bottom:16px"></div>') +
-      vozes.map(function(v) {
-        return '<div style="display:flex;gap:14px;padding:14px;background:var(--surface2);border-radius:10px;margin-bottom:10px">' +
-          '<div style="width:36px;height:36px;border-radius:50%;background:' + v.cor + ';color:white;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">' + v.emoji + '</div>' +
-          '<div>' +
-            '<div style="font-weight:700;font-size:14px;color:' + v.cor + '">' + v.nome + '</div>' +
-            '<div style="font-size:13px;color:var(--text);margin-top:2px;line-height:1.5">' + v.desc + '</div>' +
-          '</div>' +
+    html+='<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">'+
+      '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)">'+esc(vozResult.louvor)+'</h3>'+
+      (vozResult.tom?'<p style="font-size:12px;color:var(--text-soft);margin-bottom:16px">Tom: '+vozResult.tom+'</p>':'<div style="margin-bottom:16px"></div>')+
+      vozes.map(function(v){
+        return'<div style="display:flex;gap:14px;padding:14px;background:var(--surface2);border-radius:10px;margin-bottom:10px">'+
+          '<div style="width:36px;height:36px;border-radius:50%;background:'+v.cor+';color:white;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">'+v.emoji+'</div>'+
+          '<div><div style="font-weight:700;font-size:14px;color:'+v.cor+'">'+v.nome+'</div>'+
+          '<div style="font-size:13px;color:var(--text);margin-top:2px;line-height:1.5">'+v.desc+'</div></div>'+
         '</div>';
-      }).join("") +
-      '<div style="margin-top:12px;background:var(--primary-bg);border-radius:8px;padding:12px;font-size:13px;color:var(--text)">💡 ' + vozResult.dica + '</div>' +
+      }).join("")+
+      '<div style="margin-top:12px;background:var(--primary-bg);border-radius:8px;padding:12px;font-size:13px;color:var(--text)">💡 '+vozResult.dica+'</div>'+
     '</div>';
   }
   return html;
 }
-function calcVozes() {
-  if (!vozLouvor) { alert("Selecione um louvor."); return; }
-  var louvor = louvores.find(function(l){ return l.titulo === vozLouvor; });
-  vozResult = {
-    louvor: vozLouvor,
-    tom: louvor ? louvor.nota : "",
-    soprano:  "Canta a melodia principal nas partes mais agudas. No refrão, pode subir uma terça acima da melodia para enriquecer o arranjo.",
-    contralto:"Harmoniza abaixo da melodia principal. Geralmente canta uma terça ou quinta abaixo. É o alicerce do back vocal feminino.",
-    tenor:    "Voz masculina mais aguda. Pode dobrar a melodia uma oitava abaixo ou fazer a 2ª voz masculina. Muito importante nos momentos de clamor.",
-    falsete:  "Usado em momentos suaves de adoração. O falsete masculino cria uma textura etérea e delicada, especialmente nas pontes e momentos mais íntimos.",
-    segunda:  "Canta em terça ou quarta paralela à melodia. Pode ser masculina ou feminina. Essencial para grupos pequenos — com melodia + 2ª voz já soa completo.",
-    dica:     "Para um back de 3 pessoas: priorize Melodia (Soprano), 2ª Voz e Tenor/Falsete. Para 2 pessoas: Melodia + 2ª Voz já funciona muito bem!"
+function calcVozes(){
+  if(!vozLouvor){alert("Selecione um louvor.");return;}
+  var l=louvores.find(function(x){return x.titulo===vozLouvor;})||{};
+  vozResult={
+    louvor:vozLouvor,tom:l.nota||"",
+    soprano:"Canta a melodia principal nas partes mais agudas. No refrão pode subir uma terça acima para enriquecer o arranjo.",
+    contralto:"Harmoniza abaixo da melodia. Geralmente uma terça ou quinta abaixo. É o alicerce do back vocal feminino.",
+    tenor:"Voz masculina mais aguda. Pode dobrar a melodia uma oitava abaixo ou fazer 2ª voz masculina. Essencial no clamor.",
+    falsete:"Usado em momentos suaves de adoração. Cria textura etérea e delicada nas pontes e momentos íntimos.",
+    segunda:"Canta em terça ou quarta paralela à melodia. Com melodia + 2ª voz já soa completo para grupos pequenos.",
+    dica:"Para 3 pessoas: Melodia (Soprano) + 2ª Voz + Tenor/Falsete. Para 2 pessoas: Melodia + 2ª Voz já funciona muito bem!"
   };
   render();
 }
 
-// --- ROUPAGEM ---
-function renderRoupagem() {
-  var estilos = ["Gospel Contemporâneo","Funk Gospel","Reggae Gospel","Pop Balada","Rock Cristão","Sertanejo Gospel","Acústico/Intimista","Orquestral"];
-  var andamentos = ["Lento (60-75 BPM)","Médio (76-100 BPM)","Animado (101-120 BPM)","Agitado (121+ BPM)"];
-
-  var html = '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:16px">' +
-    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Explore como ficaria um louvor em um estilo ou batida diferente.</p>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">' +
-      '<div class="form-group"><label>Estilo / Batida</label>' +
-        '<select onchange="roupStyle=this.value">' +
-          '<option value="">Selecionar...</option>' +
-          estilos.map(function(e){ return '<option value="'+e+'"'+(roupStyle===e?" selected":"")+'>' + e + '</option>'; }).join("") +
-        '</select></div>' +
-      '<div class="form-group"><label>Andamento</label>' +
-        '<select onchange="roupAndamento=this.value">' +
-          '<option value="">Selecionar...</option>' +
-          andamentos.map(function(a){ return '<option value="'+a+'"'+(roupAndamento===a?" selected":"")+'>' + a + '</option>'; }).join("") +
-        '</select></div>' +
-    '</div>' +
-    '<button onclick="calcRoupagem()" class="btn-primary">🥁 Ver Roupagem</button>' +
+// --- METRÔNOMO ---
+function setMetroBPM(bpm){
+  metroBPM=parseInt(bpm)||80;
+  ferraTab="metronomo";
+  stopMetro();
+  render();
+  // Auto-inicia após renderizar
+  setTimeout(function(){startMetro();},100);
+}
+function renderMetronomo(){
+  var bpmOptions=[60,70,80,90,100,110,120,130,140];
+  var html='<div style="background:var(--surface);border-radius:14px;padding:28px 20px;box-shadow:var(--card-shadow);text-align:center">'+
+    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:24px">Use o metrônomo para manter o andamento durante o ensaio ou culto.</p>'+
+    // Círculo visual
+    '<div class="metro-circle '+(metroRunning&&metroBeat?"beat":"")+'">'+metroBPM+'</div>'+
+    '<p style="font-size:12px;color:var(--text-soft);margin-top:8px;margin-bottom:24px">BPM</p>'+
+    // Slider
+    '<div style="max-width:340px;margin:0 auto 20px">'+
+      '<input type="range" min="40" max="220" value="'+metroBPM+'" oninput="metroBPM=parseInt(this.value);document.getElementById(\'bpm-num\').textContent=this.value;document.querySelector(\'.metro-circle\').textContent=this.value;if(metroRunning)restartMetro()" '+
+        'style="width:100%;accent-color:var(--primary)">'+
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)"><span>40</span><span>220</span></div>'+
+    '</div>'+
+    // Input manual
+    '<div style="display:flex;gap:8px;justify-content:center;align-items:center;margin-bottom:20px">'+
+      '<input type="number" min="40" max="220" value="'+metroBPM+'" id="bpm-num" '+
+        'onchange="metroBPM=Math.min(220,Math.max(40,parseInt(this.value)||80));if(metroRunning)restartMetro();render()" '+
+        'style="width:80px;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:18px;font-weight:700;text-align:center;background:var(--input-bg);color:var(--text);outline:none">'+
+      '<span style="font-size:14px;color:var(--text-soft)">BPM</span>'+
+    '</div>'+
+    // BPM rápidos
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:24px">'+
+      bpmOptions.map(function(b){
+        return'<button onclick="metroBPM='+b+';if(metroRunning)restartMetro();render()" '+
+          'style="padding:5px 12px;border-radius:16px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:'+(metroBPM===b?"var(--primary)":"var(--surface2)")+';color:'+(metroBPM===b?"white":"var(--text)")+'">'+ b+'</button>';
+      }).join("")+
+    '</div>'+
+    // Referências de BPM
+    '<div style="background:var(--surface2);border-radius:10px;padding:12px 16px;margin-bottom:24px;text-align:left;max-width:340px;margin-left:auto;margin-right:auto">'+
+      '<p style="font-size:11px;font-weight:700;color:var(--text-soft);margin-bottom:8px">REFERÊNCIAS</p>'+
+      [["Lento / Adoração","50–75"],["Médio / Balada","76–100"],["Animado","101–120"],["Agitado / Gospel","121–150"]].map(function(r){
+        return'<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text);padding:3px 0">'+
+          '<span>'+r[0]+'</span><span style="font-weight:600;color:var(--primary)">'+r[1]+' BPM</span></div>';
+      }).join("")+
+    '</div>'+
+    // Botões
+    '<div style="display:flex;gap:12px;justify-content:center">'+
+      '<button onclick="'+(metroRunning?"stopMetro":"startMetro")+'()" '+
+        'style="background:'+(metroRunning?"#ef4444":"var(--primary)")+';color:white;border:none;border-radius:12px;padding:12px 32px;font-size:16px;font-weight:700;cursor:pointer">'+
+        (metroRunning?"⏹ Parar":"▶ Iniciar")+
+      '</button>'+
+    '</div>'+
+    // Louvores com BPM cadastrado
+    (louvores.filter(function(l){return l.bpm;}).length>0?
+      '<div style="margin-top:28px;text-align:left"><p style="font-size:12px;font-weight:700;color:var(--text-soft);margin-bottom:10px">LOUVORES CADASTRADOS COM BPM</p>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:8px">'+
+        louvores.filter(function(l){return l.bpm;}).map(function(l){
+          return'<button onclick="metroBPM='+parseInt(l.bpm)+';if(metroRunning)restartMetro();render()" '+
+            'style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:12px;cursor:pointer;text-align:left">'+
+            '<div style="font-weight:600;color:var(--text)">'+esc(l.titulo)+'</div>'+
+            '<div style="color:var(--primary);font-weight:700">'+l.bpm+' BPM'+(l.nota?" · Tom "+l.nota:"")+'</div>'+
+          '</button>';
+        }).join("")+
+      '</div></div>'
+    :"")+
   '</div>';
-
-  if (roupResult) {
-    html += '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">' +
-      '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)">' + esc(roupResult.estilo) + ' · ' + esc(roupResult.andamento) + '</h3>' +
-      '<p style="font-size:12px;color:var(--text-soft);margin-bottom:16px">Sugestão de como adaptar qualquer louvor nesta roupagem</p>' +
-      roupResult.blocos.map(function(b) {
-        return '<div style="margin-bottom:14px">' +
-          '<div style="font-size:12px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">' + b.titulo + '</div>' +
-          '<div style="font-size:13px;color:var(--text);line-height:1.6;background:var(--surface2);padding:10px 14px;border-radius:8px">' + b.texto + '</div>' +
-        '</div>';
-      }).join("") +
-    '</div>';
-  }
   return html;
 }
-function calcRoupagem() {
-  if (!roupStyle || !roupAndamento) { alert("Selecione o estilo e o andamento."); return; }
-  var configs = {
-    "Gospel Contemporâneo": {
-      bateria:"Bumbo no 1 e 3, caixa no 2 e 4. Prato aberto nos tempos fortes. Adicione pratos de condução abertos para dar amplitude.",
-      baixo:"Groove sincopado, antecipando o tempo. Siga o bumbo com notas longas e slides suaves entre as mudanças de acorde.",
-      guitarra:"Power chords suaves com chorus leve. Arpejos nos versos e palhetadas nos refrões. Delay no lead.",
-      teclado:"Pad de cordas suave no fundo. Nos refrões, adicione um piano Rhodes com acordes abertos.",
-      vocal:"Back vocal em terças paralelas. Harmonias abertas e ricas. No refrão, todo o back junto em dinâmica forte."
-    },
-    "Funk Gospel": {
-      bateria:"Bumbo syncopado (ex: 1-e-e-4). Caixa com ghost notes. Hi-hat em semicolcheias constantes.",
-      baixo:"Linha de baixo bem groovada com slap. Antecipe os tempos e use pausas estratégicas.",
-      guitarra:"Guitarra rítmica em colcheias com mute. Acordes curtos e secos. Adicione riffs de resposta ao vocal.",
-      teclado:"Rhodes ou Clavinet dando groove. Acordes curtos no ritmo da guitarra. Adicione horns (metais) se possível.",
-      vocal:"O back vocal pode fazer linhas de resposta (call & response) ao vocal principal. Muito swing nas sílabas."
-    },
-    "Reggae Gospel": {
-      bateria:"Bumbo no 1 e 3, caixa no 2 e 4 (skank). Hi-hat aberto no contratempo.",
-      baixo:"Linha de baixo reggae: notas longas e graves, acentuando o tempo forte de cada compasso.",
-      guitarra:"Acorde no contratempo (offs). Guitarra leve com wah ou flanger suave.",
-      teclado:"Organ com acorde no contratempo. Piano acústico marcando a harmonia nos tempos.",
-      vocal:"Back vocal em blocos de harmonia no estilo roots. Vozes relaxadas e bem afinadas."
-    },
-    "Pop Balada": {
-      bateria:"Ritmo simples e limpo. Caixa na metade do tempo. Pratos de condução suaves. Menos é mais.",
-      baixo:"Notas longas, seguindo a harmonia. Sem muita variação, sustente as fundamentais.",
-      guitarra:"Arpejos limpos (sem distorção). Violão pode substituir a guitarra com grande efeito.",
-      teclado:"Piano acústico com toque delicado. Pad de strings no fundo para preencher o espaço.",
-      vocal:"Back vocal suave, entrando só no refrão. Harmonia simples em terças. Breathiness (ar na voz)."
-    },
-    "Rock Cristão": {
-      bateria:"Bumbo em colcheias duplas. Caixa potente no 2 e 4. Prato crash nos refrões. Muita energia.",
-      baixo:"Distorção leve no baixo. Siga a guitarra no ritmo. Oitavas e power bass nos momentos fortes.",
-      guitarra:"Power chords distorcidos. Palm mute nos versos, abertas nos refrões. Solo simples na ponte.",
-      teclado:"Pode ficar mais discreto ou usar synth. Pad de distorção leve para preencher o espaço de orquestra.",
-      vocal:"Back vocal potente e agressivo nos refrões. Vozes em uníssono para máximo impacto. Dinâmica extrema."
-    },
-    "Sertanejo Gospel": {
-      bateria:"Baião ou xote adaptado. Bumbo mais marcado. Caixa com bitola grande. Triângulo opcional.",
-      baixo:"Linha de baixo sertaneja: sobe e desce seguindo a melodia. Grave e presente.",
-      guitarra:"Viola caipira ou guitarra com dedilhado. Acordes abertos. Muito charme na virada.",
-      teclado:"Acordeom ou sons de sanfona no teclado. Pads simples e cheios de alma.",
-      vocal:"Segunda voz em paralela, estilo sertanejo. Vozes juntas em uníssono na maioria do tempo."
-    },
-    "Acústico/Intimista": {
-      bateria:"Apenas cajon ou shaker. Sem bateria completa. Leveza total. Ou dispense a percussão.",
-      baixo:"Baixo acústico ou elétrico com cordas flatwound (som mais suave). Poucas notas, muito espaço.",
-      guitarra:"Violão com dedilhado delicado. Sem amplificador ou com cabinet pequeno. Captação de sala.",
-      teclado:"Piano de cauda ou elétrico com toque suave. Sem pad, deixe o espaço respirar.",
-      vocal:"Back vocal a capella em alguns momentos. Harmonias próximas. O silêncio é parte do arranjo."
-    },
-    "Orquestral": {
-      bateria:"Tímpanos e pratos orquestrais. Sem bateria pop. Crescendos nas entradas de seção.",
-      baixo:"Contrabaixo acústico ou elétrico simulando orquestra. Pizzicato nos versos, arco nos refrões.",
-      guitarra:"Substitua por violinos e violas. Se tiver guitarra, use com bow (arco) ou delays longos.",
-      teclado:"Orquestra completa: cordas, madeiras, metais. Use samples de qualidade. O teclado lidera o arranjo.",
-      vocal:"Coral em blocos de 4 vozes (SATB). Soprano, Contralto, Tenor, Baixo. Máxima grandiosidade."
-    }
-  };
-  var cfg = configs[roupStyle] || configs["Gospel Contemporâneo"];
-  roupResult = {
-    estilo: roupStyle,
-    andamento: roupAndamento,
-    blocos: [
-      { titulo:"🥁 Bateria / Percussão", texto: cfg.bateria },
-      { titulo:"🎸 Baixo", texto: cfg.baixo },
-      { titulo:"🎸 Guitarra / Violão", texto: cfg.guitarra },
-      { titulo:"🎹 Teclado / Piano", texto: cfg.teclado },
-      { titulo:"🎤 Vocal / Back Vocal", texto: cfg.vocal },
-      { titulo:"⚡ Andamento", texto: "Com o andamento " + roupAndamento + ", os arranjos acima devem ser adaptados: andamentos lentos pedem mais sustain e espaço; andamentos agitados pedem mais ataque e energia em cada instrumento." }
-    ]
-  };
-  render();
+
+var metroAudio=null;
+function getAudioCtx(){if(!metroAudio)metroAudio=new(window.AudioContext||window.webkitAudioContext)();return metroAudio;}
+function playClick(accent){
+  var ctx=getAudioCtx();
+  var osc=ctx.createOscillator();
+  var gain=ctx.createGain();
+  osc.connect(gain);gain.connect(ctx.destination);
+  osc.frequency.value=accent?1200:800;
+  gain.gain.setValueAtTime(0.8,ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.05);
+  osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.05);
 }
+var metroBeatCount=0;
+function startMetro(){
+  if(metroRunning)return;
+  metroRunning=true;metroBeatCount=0;
+  var interval=60000/metroBPM;
+  metroTimer=setInterval(function(){
+    metroBeatCount++;
+    var accent=metroBeatCount%4===1;
+    playClick(accent);
+    metroBeat=true;
+    var circ=document.querySelector(".metro-circle");
+    if(circ){circ.classList.add("beat");}
+    setTimeout(function(){
+      metroBeat=false;
+      var c=document.querySelector(".metro-circle");
+      if(c){c.classList.remove("beat");}
+    },80);
+  },interval);
+  // Re-render só o círculo sem rerender tudo
+  var circ=document.querySelector(".metro-circle");
+  if(circ){
+    var btn=document.querySelector("[onclick*='stopMetro']")||document.querySelector("[onclick*='startMetro']");
+    if(btn){btn.textContent="⏹ Parar";btn.style.background="#ef4444";}
+  }
+}
+function stopMetro(){
+  if(metroTimer){clearInterval(metroTimer);metroTimer=null;}
+  metroRunning=false;metroBeat=false;metroBeatCount=0;
+}
+function restartMetro(){stopMetro();setTimeout(function(){startMetro();},50);}
 
 // BUSCA POR VOZ
-function startVoiceSearch() {
-  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) { alert("Seu navegador não suporta busca por voz. Use o Chrome."); return; }
-  var rec = new SpeechRecognition();
-  rec.lang = "pt-BR";
-  rec.interimResults = false;
-  rec.maxAlternatives = 1;
-  var btn = document.getElementById("btn-voice");
-  if (btn) { btn.classList.add("listening"); btn.style.background = "var(--primary-bg)"; }
+function startVoiceSearch(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert("Seu navegador não suporta busca por voz. Use o Chrome.");return;}
+  var rec=new SR();rec.lang="pt-BR";rec.interimResults=false;rec.maxAlternatives=1;
+  var btn=document.getElementById("btn-voice");
+  if(btn){btn.classList.add("listening");}
   rec.start();
-  rec.onresult = function(e) {
-    var texto = e.results[0][0].transcript;
-    buscaLouvor = texto;
-    render();
-  };
-  rec.onerror = function() {
-    if (btn) { btn.classList.remove("listening"); btn.style.background = "none"; }
-  };
-  rec.onend = function() {
-    if (btn) { btn.classList.remove("listening"); btn.style.background = "none"; }
-  };
+  rec.onresult=function(e){buscaLouvor=e.results[0][0].transcript;render();};
+  rec.onerror=function(){if(btn)btn.classList.remove("listening");};
+  rec.onend=function(){if(btn)btn.classList.remove("listening");};
 }
 
 // INIT
