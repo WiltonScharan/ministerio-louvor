@@ -325,7 +325,7 @@ function render() {
       '</div>' +
     '</div>' +
     '<div class="tabs">' +
-      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"]].map(function(t) {
+      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"],["ia","✨ IA Musical"]].map(function(t) {
         return '<button class="tab ' + (activeTab===t[0]?"active":"") + '" onclick="setTab(\'' + t[0] + '\')">' + t[1] + '</button>';
       }).join("") +
     '</div>' +
@@ -336,6 +336,7 @@ function render() {
       (activeTab === "aniversariantes" ? renderAniversariantes() : "") +
       (activeTab === "cronograma"      ? renderCronograma()      : "") +
       (activeTab === "regras"          ? renderRegras()          : "") +
+      (activeTab === "ia"              ? renderIA()              : "") +
     '</div>';
   window.scrollTo(0, scrollY);
   if (activeTab === "louvores" && buscaLouvor !== "") {
@@ -771,6 +772,205 @@ function moveRegra(i, dir) {
 }
 function editRegra(i) { formRegra=Object.assign({},regras[i]); editIndex=i; window.scrollTo(0,0); render(); }
 function delRegra(i)  { if(confirm("Remover?")){ var arr=regras.slice(); arr.splice(i,1); saveData("regras",arr); } }
+
+// ============================
+// IA MUSICAL
+// ============================
+var iaMessages = [];
+var iaLoading = false;
+
+var IA_SUGGESTIONS = [
+  "Monte um medley com os louvores cadastrados",
+  "Sugira uma sequência de louvores mais agitados",
+  "Sugira louvores só de adoração para culto",
+  "Me ajude a criar uma roupagem nova para um louvor",
+  "Transporte um louvor para outro tom e mostre a cifra",
+  "Transcreva a letra de um louvor para o back vocal decorar",
+  "Como dividir as vozes (soprano, contralto, tenor, 2ª voz) nesse louvor?"
+];
+
+function renderIA() {
+  var html = '<h2 class="section-title">✨ IA Musical</h2>';
+  html += '<div style="background:var(--primary-bg);border:1px solid var(--primary);border-radius:12px;padding:14px 16px;margin-bottom:20px;font-size:13px;color:var(--text)">' +
+    '🎵 Tenho acesso a todos os <strong>' + louvores.length + ' louvores</strong> cadastrados. Pergunte sobre sequências, medleys, roupagens e muito mais!' +
+  '</div>';
+
+  // Sugestões rápidas
+  if (iaMessages.length === 0) {
+    html += '<div style="margin-bottom:16px">' +
+      '<p style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px">💡 SUGESTÕES RÁPIDAS</p>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
+        IA_SUGGESTIONS.map(function(s) {
+          return '<button onclick="iaAsk(\'' + s.replace(/'/g,"\\'") + '\')" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:12px;color:var(--text);cursor:pointer">' + s + '</button>';
+        }).join("") +
+      '</div>' +
+    '</div>';
+  }
+
+  // Histórico de mensagens
+  html += '<div id="ia-chat" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">';
+  iaMessages.forEach(function(m) {
+    if (m.role === "user") {
+      html += '<div style="display:flex;justify-content:flex-end">' +
+        '<div style="background:var(--primary);color:white;border-radius:16px 16px 4px 16px;padding:10px 16px;font-size:13px;max-width:75%">' + esc(m.content) + '</div>' +
+      '</div>';
+    } else {
+      html += '<div style="display:flex;gap:10px;align-items:flex-start">' +
+        '<div style="background:var(--primary);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✨</div>' +
+        '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px 16px 16px 16px;padding:12px 16px;font-size:13px;line-height:1.6;color:var(--text);max-width:80%;white-space:pre-wrap">' + formatIAResponse(m.content) + '</div>' +
+      '</div>';
+    }
+  });
+  if (iaLoading) {
+    html += '<div style="display:flex;gap:10px;align-items:center">' +
+      '<div style="background:var(--primary);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px">✨</div>' +
+      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px 16px 16px 16px;padding:12px 16px;font-size:13px;color:var(--text-soft)">Pensando<span id="ia-dots">...</span></div>' +
+    '</div>';
+  }
+  html += '</div>';
+
+  // Input
+  html += '<div style="display:flex;gap:8px;align-items:flex-end">' +
+    '<textarea id="ia-input" rows="2" placeholder="Ex: Monte um medley com os louvores mais animados..." ' +
+      'style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:12px;font-size:13px;color:var(--text);background:var(--surface);outline:none;resize:none;font-family:inherit" ' +
+      'onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();iaSend()}"' +
+    '></textarea>' +
+    '<button onclick="iaSend()" style="background:var(--primary);color:white;border:none;border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;height:44px">' +
+      (iaLoading ? '⏳' : '➤') +
+    '</button>' +
+  '</div>';
+
+  if (iaMessages.length > 0) {
+    html += '<div style="margin-top:8px;text-align:right">' +
+      '<button onclick="iaMessages=[];render()" style="background:none;border:none;font-size:12px;color:var(--text-soft);cursor:pointer">🗑️ Limpar conversa</button>' +
+    '</div>';
+  }
+
+  return html;
+}
+
+function iaAsk(texto) {
+  var ta = document.getElementById("ia-input");
+  if (ta) ta.value = texto;
+  iaSend(texto);
+}
+
+async function iaSend(textoFixo) {
+  var ta = document.getElementById("ia-input");
+  var texto = textoFixo || (ta ? ta.value.trim() : "");
+  if (!texto || iaLoading) return;
+  if (ta) ta.value = "";
+
+  // Monta contexto dos louvores
+  var ctx = louvores.length > 0
+    ? "Louvores cadastrados no ministério:\n" + louvores.map(function(l, i) {
+        return (i+1) + ". " + (l.titulo||"") +
+          (l.artista ? " – " + l.artista : "") +
+          (l.nota ? " (Tom: " + l.nota + ")" : "") +
+          (l.trecho ? " | Trecho: " + l.trecho : "");
+      }).join("\n")
+    : "Nenhum louvor cadastrado ainda.";
+
+  var systemPrompt = "Você é um assistente musical especializado em ministérios de louvor evangélicos brasileiros. " +
+    "Ajude o líder de louvor com sequências de músicas, medleys, roupagens (mudança de estilo/batida), sugestões criativas e dicas musicais. " +
+    "Seja prático, direto e criativo. Use linguagem brasileira informal. " +
+    "Quando sugerir sequências, mostre o nome, tom e motivo da escolha. " +
+    "Quando falar de roupagem, sugira estilo, andamento, instrumentação e dinâmica. " +
+    "\n\nTRANSPOSIÇÃO DE TOM E CIFRAS:\n" +
+    "Quando o usuário pedir para transportar um louvor para outro tom, siga estas regras:\n" +
+    "1. Mostre o tom original e o tom novo.\n" +
+    "2. Liste TODOS os acordes originais e seus equivalentes no novo tom.\n" +
+    "3. Se o usuário fornecer a cifra completa (letra + acordes), reescreva a cifra inteira com os acordes já substituídos, posicionados acima das sílabas corretas.\n" +
+    "4. Se o usuário não fornecer a cifra, mostre a tabela de conversão de acordes e explique como aplicar.\n" +
+    "5. Explique variações: acorde maior, menor (m), com sétima (7), suspenso (sus), diminuto (dim), etc.\n" +
+    "6. Use a notação brasileira: use sustenido (#) e bemol (b).\n" +
+    "Tabela de semitons para referência:\n" +
+    "C, C#, D, D#, E, F, F#, G, G#, A, A#, B (12 semitons = 1 oitava)\n" +
+    "\n\nBACK VOCAL — LETRA E DIVISÃO DE VOZES:\n" +
+    "Quando o usuário pedir para transcrever a letra de um louvor para o back vocal decorar:\n" +
+    "1. Apresente a letra de forma limpa, organizada por seção (Verso 1, Pré-refrão, Refrão, Ponte, etc).\n" +
+    "2. Destaque repetições e variações entre seções.\n" +
+    "3. Indique dinâmicas sugeridas: piano (p), forte (f), crescendo, etc.\n" +
+    "4. Adicione dicas de respiração (/) nos pontos ideais.\n" +
+    "\nQuando o usuário pedir divisão de vozes, siga:\n" +
+    "1. Explique o papel de cada voz no contexto evangélico/gospel:\n" +
+    "   - Soprano: voz mais aguda feminina, geralmente a melodia principal ou harmonia acima.\n" +
+    "   - Contralto: voz mais grave feminina, harmonias abaixo da melodia.\n" +
+    "   - Tenor: voz aguda masculina, pode dobrar soprano uma oitava abaixo ou fazer harmonia.\n" +
+    "   - Falsete: extensão aguda masculina, muito usada em momentos de adoração e suavidade.\n" +
+    "   - 2ª voz: harmonia paralela à melodia (geralmente uma terça ou quinta abaixo/acima).\n" +
+    "2. Para cada seção do louvor (verso, refrão, ponte), descreva o que cada voz canta.\n" +
+    "3. Indique quando uma voz entra, sai ou faz um contracanto.\n" +
+    "4. Se o usuário fornecer a letra, mostre a divisão linha a linha.\n" +
+    "5. Sugira quais vozes são essenciais e quais são opcionais para grupos pequenos.\n" +
+    "\n\n" + ctx;
+
+  iaMessages.push({ role: "user", content: texto });
+  iaLoading = true;
+  render();
+
+  // Scroll para o final
+  setTimeout(function() {
+    var chat = document.getElementById("ia-chat");
+    if (chat) chat.scrollTop = chat.scrollHeight;
+  }, 50);
+
+  try {
+    var msgs = iaMessages.slice(-10).map(function(m) {
+      return { role: m.role, content: m.content };
+    });
+
+    var res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: msgs
+      })
+    });
+    var data = await res.json();
+    var resposta = (data.content && data.content[0] && data.content[0].text) || "Não consegui responder agora.";
+    iaMessages.push({ role: "assistant", content: resposta });
+  } catch(e) {
+    iaMessages.push({ role: "assistant", content: "Erro ao conectar com a IA. Tente novamente." });
+  }
+
+  iaLoading = false;
+  render();
+  setTimeout(function() {
+    var chat = document.getElementById("ia-chat");
+    if (chat) chat.scrollTop = chat.scrollHeight;
+  }, 50);
+}
+
+function formatIAResponse(text) {
+  // Destaca acordes (padrão: letra maiúscula seguida de #/b/m/7/sus/dim etc no início ou após espaço)
+  var acorde = /\b([A-G][#b]?(?:m|maj|dim|aug|sus|add)?(?:7|9|11|13)?(?:\/[A-G][#b]?)?)\b/g;
+  // Linhas que parecem ser de acordes (maioria dos tokens são acordes)
+  var lines = text.split("\n");
+  var html = lines.map(function(line) {
+    // Detecta se a linha é predominantemente acordes
+    var tokens = line.trim().split(/\s+/);
+    var acordeCount = tokens.filter(function(t) { return acorde.test(t); }).length;
+    acorde.lastIndex = 0;
+    var isChordLine = tokens.length > 0 && acordeCount / tokens.length > 0.5;
+
+    if (isChordLine) {
+      // Linha de acordes: destaca cada acorde em laranja bold
+      var formatted = line.replace(acorde, function(match) {
+        return '<strong style="color:var(--primary);font-family:monospace;font-size:13px">' + esc(match) + '</strong>';
+      });
+      acorde.lastIndex = 0;
+      return '<span style="display:block;font-family:monospace;letter-spacing:1px">' + formatted + '</span>';
+    } else {
+      // Linha de letra ou texto normal
+      return '<span style="display:block">' + esc(line) + '</span>';
+    }
+  }).join("");
+  return html;
+}
 
 // BUSCA POR VOZ
 function startVoiceSearch() {
