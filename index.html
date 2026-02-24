@@ -325,7 +325,7 @@ function render() {
       '</div>' +
     '</div>' +
     '<div class="tabs">' +
-      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"]].map(function(t) {
+      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"],["ferramentas","🎸 Ferramentas"]].map(function(t) {
         return '<button class="tab ' + (activeTab===t[0]?"active":"") + '" onclick="setTab(\'' + t[0] + '\')">' + t[1] + '</button>';
       }).join("") +
     '</div>' +
@@ -336,6 +336,7 @@ function render() {
       (activeTab === "aniversariantes" ? renderAniversariantes() : "") +
       (activeTab === "cronograma"      ? renderCronograma()      : "") +
       (activeTab === "regras"          ? renderRegras()          : "") +
+      (activeTab === "ferramentas"     ? renderFerramentas()     : "") +
     '</div>';
   window.scrollTo(0, scrollY);
   if (activeTab === "louvores" && buscaLouvor !== "") {
@@ -1009,6 +1010,351 @@ function formatIAResponse(text) {
     }
   }).join("");
   return html;
+}
+
+// ============================
+// FERRAMENTAS MUSICAIS
+// ============================
+var ferraTab = "transpositor";
+var transResult = null;
+var transOrigem = "", transDestino = "", transCifra = "";
+var medleyTipo = "agitado", medleyResult = null;
+var vozLouvor = "", vozResult = null;
+var roupStyle = "", roupAndamento = "", roupResult = null;
+
+var CHROMATIC    = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+var FLAT_TO_SHARP = {"Db":"C#","Eb":"D#","Gb":"F#","Ab":"G#","Bb":"A#","Cb":"B","Fb":"E"};
+
+function noteIndex(n) {
+  n = FLAT_TO_SHARP[n] || n;
+  return CHROMATIC.indexOf(n);
+}
+function transposeNote(note, semitones) {
+  var base = note.replace(/m|maj|dim|aug|sus\d?|add\d?|[0-9]|\/.*/g,"");
+  var suffix = note.slice(base.length);
+  var norm = FLAT_TO_SHARP[base] || base;
+  var idx = CHROMATIC.indexOf(norm);
+  if (idx === -1) return note;
+  var newIdx = (idx + semitones + 12) % 12;
+  return CHROMATIC[newIdx] + suffix;
+}
+function transposeChords(texto, semitones) {
+  return texto.replace(/\b([A-G][#b]?(?:m|maj|dim|aug|sus\d?|add\d?)?(?:[0-9]+)?(?:\/[A-G][#b]?)?)\b/g, function(match) {
+    var slash = match.indexOf("/");
+    if (slash !== -1) {
+      return transposeNote(match.slice(0,slash), semitones) + "/" + transposeNote(match.slice(slash+1), semitones);
+    }
+    return transposeNote(match, semitones);
+  });
+}
+
+function renderFerramentas() {
+  var tools = [["transpositor","🎼 Transpositor"],["medley","🎶 Sequência / Medley"],["vozes","🎤 Divisão de Vozes"],["roupagem","🥁 Roupagem"]];
+  var html = '<h2 class="section-title">🎸 Ferramentas Musicais</h2>';
+
+  // Sub-tabs
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">' +
+    tools.map(function(t) {
+      var ativo = ferraTab === t[0];
+      return '<button onclick="ferraTab=\'' + t[0] + '\';transResult=null;medleyResult=null;vozResult=null;roupResult=null;render()" ' +
+        'style="padding:9px 18px;border-radius:20px;border:2px solid var(--primary);font-size:13px;font-weight:600;cursor:pointer;' +
+        'background:' + (ativo?"var(--primary)":"var(--surface)") + ';color:' + (ativo?"white":"var(--primary)") + '">' +
+        t[1] + '</button>';
+    }).join("") +
+  '</div>';
+
+  if (ferraTab === "transpositor") html += renderTranspositor();
+  if (ferraTab === "medley")       html += renderMedley();
+  if (ferraTab === "vozes")        html += renderVozes();
+  if (ferraTab === "roupagem")     html += renderRoupagem();
+
+  return html;
+}
+
+// --- TRANSPOSITOR ---
+function renderTranspositor() {
+  var html = '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">' +
+    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Transponha qualquer louvor para outro tom e veja os acordes convertidos automaticamente.</p>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">' +
+      '<div class="form-group"><label>Tom Original</label>' +
+        '<select onchange="transOrigem=this.value"><option value="">Selecionar...</option>' +
+          CHROMATIC.map(function(n){ return '<option value="'+n+'"'+(transOrigem===n?" selected":"")+'>'+n+'</option>'; }).join("") +
+        '</select></div>' +
+      '<div class="form-group"><label>Tom Destino</label>' +
+        '<select onchange="transDestino=this.value"><option value="">Selecionar...</option>' +
+          CHROMATIC.map(function(n){ return '<option value="'+n+'"'+(transDestino===n?" selected":"")+'>'+n+'</option>'; }).join("") +
+        '</select></div>' +
+    '</div>' +
+    '<div class="form-group" style="margin-bottom:12px"><label>Cole a cifra aqui (opcional)</label>' +
+      '<textarea rows="6" placeholder="Ex:\nC  Am  F  G\nNa tua presença..." oninput="transCifra=this.value" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:monospace;background:var(--input-bg);color:var(--text);outline:none">' + esc(transCifra) + '</textarea></div>' +
+    '<button onclick="calcTranspositor()" class="btn-primary">🎼 Transpor</button>' +
+  '</div>';
+
+  if (transResult) {
+    var semi = transResult.semitones;
+    html += '<div style="background:var(--surface);border-radius:14px;padding:20px;margin-top:16px;box-shadow:var(--card-shadow)">' +
+      '<h3 style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">Resultado: ' + transResult.origem + ' → ' + transResult.destino + ' (' + (semi>0?"+":"")+semi+' semiton'+(Math.abs(semi)!==1?"s":"")+')</h3>' +
+      '<p style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px">TABELA DE ACORDES</p>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">' +
+        transResult.tabela.map(function(t) {
+          return '<div style="background:var(--primary-bg);border-radius:8px;padding:6px 12px;font-size:13px;text-align:center">' +
+            '<span style="color:var(--text-soft);font-size:11px">'+t.de+'</span><br>' +
+            '<strong style="color:var(--primary)">'+t.para+'</strong></div>';
+        }).join("") +
+      '</div>' +
+      (transResult.cifraTransposta ?
+        '<p style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:8px">CIFRA TRANSPOSTA</p>' +
+        '<pre style="background:var(--surface2);border-radius:8px;padding:14px;font-size:13px;font-family:monospace;color:var(--text);overflow-x:auto;white-space:pre-wrap">' + esc(transResult.cifraTransposta) + '</pre>'
+      : "") +
+    '</div>';
+  }
+  return html;
+}
+function calcTranspositor() {
+  if (!transOrigem || !transDestino) { alert("Selecione o tom original e o destino."); return; }
+  var semi = (noteIndex(transDestino) - noteIndex(transOrigem) + 12) % 12;
+  if (semi > 6) semi -= 12;
+  // Monta tabela com os acordes mais comuns do tom
+  var graus = [0,2,4,5,7,9,11];
+  var tabela = graus.map(function(g) {
+    var orig = CHROMATIC[(noteIndex(transOrigem)+g+12)%12];
+    var dest = CHROMATIC[(noteIndex(transOrigem)+g+semi+12)%12];
+    return { de: orig, para: dest };
+  });
+  // Adiciona menores
+  var menores = [0,2,5,7,9];
+  menores.forEach(function(g) {
+    var orig = CHROMATIC[(noteIndex(transOrigem)+g+12)%12]+"m";
+    var dest = CHROMATIC[(noteIndex(transOrigem)+g+semi+12)%12]+"m";
+    tabela.push({ de: orig, para: dest });
+  });
+  var cifraTransposta = transCifra ? transposeChords(transCifra, semi) : null;
+  transResult = { origem: transOrigem, destino: transDestino, semitones: semi, tabela: tabela, cifraTransposta: cifraTransposta };
+  render();
+}
+
+// --- MEDLEY / SEQUÊNCIA ---
+function renderMedley() {
+  var html = '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:16px">' +
+    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Monte uma sequência ou medley com os louvores cadastrados.</p>' +
+    '<div class="form-group" style="margin-bottom:12px"><label>Tipo de sequência</label>' +
+      '<select onchange="medleyTipo=this.value">' +
+        ['agitado','adoracao','misto','vigilia','mulheres'].map(function(t){
+          var labels = {agitado:"🔥 Mais agitados / animados", adoracao:"🕊️ Somente adoração / lentos", misto:"🎵 Misturado (agitado → adoração)", vigilia:"🌙 Vigília / oração", mulheres:"🌸 Culto de Mulheres"};
+          return '<option value="'+t+'"'+(medleyTipo===t?" selected":"")+'>' + labels[t] + '</option>';
+        }).join("") +
+      '</select></div>' +
+    '<button onclick="calcMedley()" class="btn-primary">🎶 Montar Sequência</button>' +
+  '</div>';
+
+  if (medleyResult) {
+    html += '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">' +
+      '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)">' + medleyResult.titulo + '</h3>' +
+      '<p style="font-size:12px;color:var(--text-soft);margin-bottom:16px">' + medleyResult.descricao + '</p>' +
+      medleyResult.sequencia.map(function(item, i) {
+        return '<div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)">' +
+          '<div style="background:var(--primary);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">' + (i+1) + '</div>' +
+          '<div style="flex:1">' +
+            '<div style="font-weight:700;font-size:14px;color:var(--text)">' + esc(item.titulo) + '</div>' +
+            (item.artista ? '<div style="font-size:12px;color:var(--text-muted)">' + esc(item.artista) + '</div>' : "") +
+            '<div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">' +
+              (item.nota ? '<span class="badge badge-green">Tom: ' + item.nota + '</span>' : "") +
+              '<span style="font-size:12px;color:var(--text-soft)">' + item.dica + '</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join("") +
+      (medleyResult.dicas ? '<div style="margin-top:16px;background:var(--primary-bg);border-radius:8px;padding:12px;font-size:13px;color:var(--text)">' + medleyResult.dicas + '</div>' : "") +
+    '</div>';
+  }
+  return html;
+}
+function calcMedley() {
+  if (louvores.length === 0) { alert("Nenhum louvor cadastrado ainda!"); return; }
+  var lista = louvores.slice();
+  var titulo, descricao, dicas, sequencia;
+
+  var configs = {
+    agitado: { titulo:"🔥 Sequência Agitada", descricao:"Ordem sugerida do mais animado ao médio para manter a energia.", dica_geral:"💡 Mantenha o BPM alto nas primeiras músicas. Faça transições rápidas sem parar.", mapDica: function(i){ return ["Abra com energia total! Tom de entrada.","Mantenha a empolgação, mesmo andamento.","Pode variar o estilo mas mantém o ritmo.","Começa a desacelerar um pouco.","Faça a transição para um momento mais reflexivo."][Math.min(i,4)]; } },
+    adoracao: { titulo:"🕊️ Sequência de Adoração", descricao:"Ordem sugerida do médio para o mais contemplativo.", dica_geral:"💡 Reduza o volume gradativamente. Deixe espaços de silêncio. Priorize instrumentos suaves.", mapDica: function(i){ return ["Inicie com algo que convida à adoração.","Aprofunde o momento espiritual.","Vá para algo mais íntimo e delicado.","Reduza a dinâmica ao máximo aqui.","Encerre com um momento de silêncio e oração."][Math.min(i,4)]; } },
+    misto:    { titulo:"🎵 Sequência Mista", descricao:"Começa agitado e termina em adoração — ideal para cultos completos.", dica_geral:"💡 Clássico do ministério: sobe a energia e desce suavemente até a adoração.", mapDica: function(i, total){ var meio = Math.floor(total/2); return i < meio ? "Momento de celebração." : "Momento de adoração."; } },
+    vigilia:  { titulo:"🌙 Sequência para Vigília", descricao:"Músicas para madrugada: intercalando clama e adoração.", dica_geral:"💡 Alterne momentos de clamor intenso com adoração suave. Deixe o Espírito conduzir.", mapDica: function(i){ return ["Clamor de abertura.","Adoração íntima.","Intercessão musical.","Momento de espera no Senhor.","Encerramento com louvor."][Math.min(i,4)]; } },
+    mulheres: { titulo:"🌸 Sequência para Culto de Mulheres", descricao:"Seleção acolhedora e expressiva.", dica_geral:"💡 Valorize as vozes femininas. Use backing harmônico. Crie um ambiente de acolhimento.", mapDica: function(i){ return ["Boas-vindas musicais.","Momento de louvor expressivo.","Adoração profunda.","Ministração suave.","Encerramento com graça."][Math.min(i,4)]; } }
+  };
+
+  var cfg = configs[medleyTipo];
+  var total = Math.min(lista.length, 5);
+  sequencia = lista.slice(0, total).map(function(l, i) {
+    return { titulo: l.titulo, artista: l.artista, nota: l.nota, dica: cfg.mapDica(i, total) };
+  });
+
+  medleyResult = { titulo: cfg.titulo, descricao: cfg.descricao, sequencia: sequencia, dicas: cfg.dica_geral };
+  render();
+}
+
+// --- DIVISÃO DE VOZES ---
+function renderVozes() {
+  var html = '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:16px">' +
+    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Veja como dividir as vozes do back vocal para um louvor.</p>' +
+    '<div class="form-group" style="margin-bottom:12px"><label>Escolha o louvor</label>' +
+      '<select onchange="vozLouvor=this.value">' +
+        '<option value="">Selecionar...</option>' +
+        louvores.map(function(l){ return '<option value="'+esc(l.titulo)+'"'+(vozLouvor===l.titulo?" selected":"")+'>'+esc(l.titulo)+(l.nota?" (Tom: "+l.nota+")":"")+'</option>'; }).join("") +
+      '</select></div>' +
+    '<button onclick="calcVozes()" class="btn-primary">🎤 Ver Divisão de Vozes</button>' +
+  '</div>';
+
+  if (vozResult) {
+    var vozes = [
+      { nome:"Soprano", emoji:"🎵", cor:"#e11d48", desc: vozResult.soprano },
+      { nome:"Contralto", emoji:"🎶", cor:"#7c3aed", desc: vozResult.contralto },
+      { nome:"Tenor", emoji:"🎼", cor:"#2563eb", desc: vozResult.tenor },
+      { nome:"Falsete", emoji:"✨", cor:"#0891b2", desc: vozResult.falsete },
+      { nome:"2ª Voz", emoji:"🎤", cor:"#059669", desc: vozResult.segunda }
+    ];
+    html += '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">' +
+      '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)">' + esc(vozResult.louvor) + '</h3>' +
+      (vozResult.tom ? '<p style="font-size:12px;color:var(--text-soft);margin-bottom:16px">Tom: ' + vozResult.tom + '</p>' : '<div style="margin-bottom:16px"></div>') +
+      vozes.map(function(v) {
+        return '<div style="display:flex;gap:14px;padding:14px;background:var(--surface2);border-radius:10px;margin-bottom:10px">' +
+          '<div style="width:36px;height:36px;border-radius:50%;background:' + v.cor + ';color:white;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">' + v.emoji + '</div>' +
+          '<div>' +
+            '<div style="font-weight:700;font-size:14px;color:' + v.cor + '">' + v.nome + '</div>' +
+            '<div style="font-size:13px;color:var(--text);margin-top:2px;line-height:1.5">' + v.desc + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join("") +
+      '<div style="margin-top:12px;background:var(--primary-bg);border-radius:8px;padding:12px;font-size:13px;color:var(--text)">💡 ' + vozResult.dica + '</div>' +
+    '</div>';
+  }
+  return html;
+}
+function calcVozes() {
+  if (!vozLouvor) { alert("Selecione um louvor."); return; }
+  var louvor = louvores.find(function(l){ return l.titulo === vozLouvor; });
+  vozResult = {
+    louvor: vozLouvor,
+    tom: louvor ? louvor.nota : "",
+    soprano:  "Canta a melodia principal nas partes mais agudas. No refrão, pode subir uma terça acima da melodia para enriquecer o arranjo.",
+    contralto:"Harmoniza abaixo da melodia principal. Geralmente canta uma terça ou quinta abaixo. É o alicerce do back vocal feminino.",
+    tenor:    "Voz masculina mais aguda. Pode dobrar a melodia uma oitava abaixo ou fazer a 2ª voz masculina. Muito importante nos momentos de clamor.",
+    falsete:  "Usado em momentos suaves de adoração. O falsete masculino cria uma textura etérea e delicada, especialmente nas pontes e momentos mais íntimos.",
+    segunda:  "Canta em terça ou quarta paralela à melodia. Pode ser masculina ou feminina. Essencial para grupos pequenos — com melodia + 2ª voz já soa completo.",
+    dica:     "Para um back de 3 pessoas: priorize Melodia (Soprano), 2ª Voz e Tenor/Falsete. Para 2 pessoas: Melodia + 2ª Voz já funciona muito bem!"
+  };
+  render();
+}
+
+// --- ROUPAGEM ---
+function renderRoupagem() {
+  var estilos = ["Gospel Contemporâneo","Funk Gospel","Reggae Gospel","Pop Balada","Rock Cristão","Sertanejo Gospel","Acústico/Intimista","Orquestral"];
+  var andamentos = ["Lento (60-75 BPM)","Médio (76-100 BPM)","Animado (101-120 BPM)","Agitado (121+ BPM)"];
+
+  var html = '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:16px">' +
+    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Explore como ficaria um louvor em um estilo ou batida diferente.</p>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">' +
+      '<div class="form-group"><label>Estilo / Batida</label>' +
+        '<select onchange="roupStyle=this.value">' +
+          '<option value="">Selecionar...</option>' +
+          estilos.map(function(e){ return '<option value="'+e+'"'+(roupStyle===e?" selected":"")+'>' + e + '</option>'; }).join("") +
+        '</select></div>' +
+      '<div class="form-group"><label>Andamento</label>' +
+        '<select onchange="roupAndamento=this.value">' +
+          '<option value="">Selecionar...</option>' +
+          andamentos.map(function(a){ return '<option value="'+a+'"'+(roupAndamento===a?" selected":"")+'>' + a + '</option>'; }).join("") +
+        '</select></div>' +
+    '</div>' +
+    '<button onclick="calcRoupagem()" class="btn-primary">🥁 Ver Roupagem</button>' +
+  '</div>';
+
+  if (roupResult) {
+    html += '<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">' +
+      '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)">' + esc(roupResult.estilo) + ' · ' + esc(roupResult.andamento) + '</h3>' +
+      '<p style="font-size:12px;color:var(--text-soft);margin-bottom:16px">Sugestão de como adaptar qualquer louvor nesta roupagem</p>' +
+      roupResult.blocos.map(function(b) {
+        return '<div style="margin-bottom:14px">' +
+          '<div style="font-size:12px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">' + b.titulo + '</div>' +
+          '<div style="font-size:13px;color:var(--text);line-height:1.6;background:var(--surface2);padding:10px 14px;border-radius:8px">' + b.texto + '</div>' +
+        '</div>';
+      }).join("") +
+    '</div>';
+  }
+  return html;
+}
+function calcRoupagem() {
+  if (!roupStyle || !roupAndamento) { alert("Selecione o estilo e o andamento."); return; }
+  var configs = {
+    "Gospel Contemporâneo": {
+      bateria:"Bumbo no 1 e 3, caixa no 2 e 4. Prato aberto nos tempos fortes. Adicione pratos de condução abertos para dar amplitude.",
+      baixo:"Groove sincopado, antecipando o tempo. Siga o bumbo com notas longas e slides suaves entre as mudanças de acorde.",
+      guitarra:"Power chords suaves com chorus leve. Arpejos nos versos e palhetadas nos refrões. Delay no lead.",
+      teclado:"Pad de cordas suave no fundo. Nos refrões, adicione um piano Rhodes com acordes abertos.",
+      vocal:"Back vocal em terças paralelas. Harmonias abertas e ricas. No refrão, todo o back junto em dinâmica forte."
+    },
+    "Funk Gospel": {
+      bateria:"Bumbo syncopado (ex: 1-e-e-4). Caixa com ghost notes. Hi-hat em semicolcheias constantes.",
+      baixo:"Linha de baixo bem groovada com slap. Antecipe os tempos e use pausas estratégicas.",
+      guitarra:"Guitarra rítmica em colcheias com mute. Acordes curtos e secos. Adicione riffs de resposta ao vocal.",
+      teclado:"Rhodes ou Clavinet dando groove. Acordes curtos no ritmo da guitarra. Adicione horns (metais) se possível.",
+      vocal:"O back vocal pode fazer linhas de resposta (call & response) ao vocal principal. Muito swing nas sílabas."
+    },
+    "Reggae Gospel": {
+      bateria:"Bumbo no 1 e 3, caixa no 2 e 4 (skank). Hi-hat aberto no contratempo.",
+      baixo:"Linha de baixo reggae: notas longas e graves, acentuando o tempo forte de cada compasso.",
+      guitarra:"Acorde no contratempo (offs). Guitarra leve com wah ou flanger suave.",
+      teclado:"Organ com acorde no contratempo. Piano acústico marcando a harmonia nos tempos.",
+      vocal:"Back vocal em blocos de harmonia no estilo roots. Vozes relaxadas e bem afinadas."
+    },
+    "Pop Balada": {
+      bateria:"Ritmo simples e limpo. Caixa na metade do tempo. Pratos de condução suaves. Menos é mais.",
+      baixo:"Notas longas, seguindo a harmonia. Sem muita variação, sustente as fundamentais.",
+      guitarra:"Arpejos limpos (sem distorção). Violão pode substituir a guitarra com grande efeito.",
+      teclado:"Piano acústico com toque delicado. Pad de strings no fundo para preencher o espaço.",
+      vocal:"Back vocal suave, entrando só no refrão. Harmonia simples em terças. Breathiness (ar na voz)."
+    },
+    "Rock Cristão": {
+      bateria:"Bumbo em colcheias duplas. Caixa potente no 2 e 4. Prato crash nos refrões. Muita energia.",
+      baixo:"Distorção leve no baixo. Siga a guitarra no ritmo. Oitavas e power bass nos momentos fortes.",
+      guitarra:"Power chords distorcidos. Palm mute nos versos, abertas nos refrões. Solo simples na ponte.",
+      teclado:"Pode ficar mais discreto ou usar synth. Pad de distorção leve para preencher o espaço de orquestra.",
+      vocal:"Back vocal potente e agressivo nos refrões. Vozes em uníssono para máximo impacto. Dinâmica extrema."
+    },
+    "Sertanejo Gospel": {
+      bateria:"Baião ou xote adaptado. Bumbo mais marcado. Caixa com bitola grande. Triângulo opcional.",
+      baixo:"Linha de baixo sertaneja: sobe e desce seguindo a melodia. Grave e presente.",
+      guitarra:"Viola caipira ou guitarra com dedilhado. Acordes abertos. Muito charme na virada.",
+      teclado:"Acordeom ou sons de sanfona no teclado. Pads simples e cheios de alma.",
+      vocal:"Segunda voz em paralela, estilo sertanejo. Vozes juntas em uníssono na maioria do tempo."
+    },
+    "Acústico/Intimista": {
+      bateria:"Apenas cajon ou shaker. Sem bateria completa. Leveza total. Ou dispense a percussão.",
+      baixo:"Baixo acústico ou elétrico com cordas flatwound (som mais suave). Poucas notas, muito espaço.",
+      guitarra:"Violão com dedilhado delicado. Sem amplificador ou com cabinet pequeno. Captação de sala.",
+      teclado:"Piano de cauda ou elétrico com toque suave. Sem pad, deixe o espaço respirar.",
+      vocal:"Back vocal a capella em alguns momentos. Harmonias próximas. O silêncio é parte do arranjo."
+    },
+    "Orquestral": {
+      bateria:"Tímpanos e pratos orquestrais. Sem bateria pop. Crescendos nas entradas de seção.",
+      baixo:"Contrabaixo acústico ou elétrico simulando orquestra. Pizzicato nos versos, arco nos refrões.",
+      guitarra:"Substitua por violinos e violas. Se tiver guitarra, use com bow (arco) ou delays longos.",
+      teclado:"Orquestra completa: cordas, madeiras, metais. Use samples de qualidade. O teclado lidera o arranjo.",
+      vocal:"Coral em blocos de 4 vozes (SATB). Soprano, Contralto, Tenor, Baixo. Máxima grandiosidade."
+    }
+  };
+  var cfg = configs[roupStyle] || configs["Gospel Contemporâneo"];
+  roupResult = {
+    estilo: roupStyle,
+    andamento: roupAndamento,
+    blocos: [
+      { titulo:"🥁 Bateria / Percussão", texto: cfg.bateria },
+      { titulo:"🎸 Baixo", texto: cfg.baixo },
+      { titulo:"🎸 Guitarra / Violão", texto: cfg.guitarra },
+      { titulo:"🎹 Teclado / Piano", texto: cfg.teclado },
+      { titulo:"🎤 Vocal / Back Vocal", texto: cfg.vocal },
+      { titulo:"⚡ Andamento", texto: "Com o andamento " + roupAndamento + ", os arranjos acima devem ser adaptados: andamentos lentos pedem mais sustain e espaço; andamentos agitados pedem mais ataque e energia em cada instrumento." }
+    ]
+  };
+  render();
 }
 
 // BUSCA POR VOZ
