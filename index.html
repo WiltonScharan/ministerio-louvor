@@ -52,7 +52,7 @@
 body { font-family: 'Segoe UI', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); transition: background 0.2s, color 0.2s; }
 
 /* HEADER */
-.header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 16px 24px; }
+.header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 10px 24px; }
 .header-top { display: flex; align-items: center; gap: 14px; }
 .header-logo { width: 48px; height: 48px; flex-shrink: 0; }
 .header-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
@@ -294,7 +294,6 @@ function render() {
     (showPasswordModal ? renderModal() : "") +
     '<div class="header">' +
       '<div class="header-top">' +
-        '<img src="hermom.png" style="width:130px;height:130px;object-fit:contain;flex-shrink:0;mix-blend-mode:multiply" />' +
         '<div class="header-titles">' +
           '<h1>Ministério de Louvor</h1>' +
           '<div class="sub">Igreja Hermom</div>' +
