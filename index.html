@@ -325,7 +325,7 @@ function render() {
       '</div>' +
     '</div>' +
     '<div class="tabs">' +
-      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"],["ia","✨ IA Musical"]].map(function(t) {
+      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"]].map(function(t) {
         return '<button class="tab ' + (activeTab===t[0]?"active":"") + '" onclick="setTab(\'' + t[0] + '\')">' + t[1] + '</button>';
       }).join("") +
     '</div>' +
@@ -336,7 +336,6 @@ function render() {
       (activeTab === "aniversariantes" ? renderAniversariantes() : "") +
       (activeTab === "cronograma"      ? renderCronograma()      : "") +
       (activeTab === "regras"          ? renderRegras()          : "") +
-      (activeTab === "ia"              ? renderIA()              : "") +
     '</div>';
   window.scrollTo(0, scrollY);
   if (activeTab === "louvores" && buscaLouvor !== "") {
