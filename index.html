@@ -531,8 +531,16 @@ function renderLouvores() {
   }
 
   html += '<div style="position:relative;margin-top:16px">' +
-    '<input class="search-input" style="margin-top:0;padding-right:44px" placeholder="🔍 Buscar por nome, artista, tom, trecho da letra..." value="' + esc(buscaLouvor) + '" oninput="buscaLouvor=this.value;render()" id="search-louvor"/>' +
-    '<button onclick="startVoiceSearch()" title="Busca por voz" id="btn-voice" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-soft);padding:4px;display:flex;align-items:center">🎤</button>' +
+    '<input class="search-input" style="margin-top:0;padding-right:52px" placeholder="Buscar por nome, artista, tom, trecho da letra..." value="' + esc(buscaLouvor) + '" oninput="buscaLouvor=this.value;render()" id="search-louvor"/>' +
+    '<button onclick="startVoiceSearch()" title="Busca por voz" id="btn-voice" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background 0.15s" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'none\'">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+        '<rect x="1" y="9" width="2.5" height="6" rx="1.25" fill="var(--text-soft)"/>' +
+        '<rect x="5" y="5" width="2.5" height="14" rx="1.25" fill="var(--text-soft)"/>' +
+        '<rect x="9" y="3" width="2.5" height="18" rx="1.25" fill="var(--text-soft)"/>' +
+        '<rect x="13" y="5" width="2.5" height="14" rx="1.25" fill="var(--text-soft)"/>' +
+        '<rect x="17" y="9" width="2.5" height="6" rx="1.25" fill="var(--text-soft)"/>' +
+      '</svg>' +
+    '</button>' +
   '</div>';
 
   if (filtrados.length === 0) {
@@ -764,7 +772,7 @@ function startVoiceSearch() {
   rec.interimResults = false;
   rec.maxAlternatives = 1;
   var btn = document.getElementById("btn-voice");
-  if (btn) { btn.textContent = "⏺"; btn.style.background = "#ef4444"; }
+  if (btn) { btn.style.opacity = "0.4"; btn.style.animation = "pulse 0.8s infinite alternate"; }
   rec.start();
   rec.onresult = function(e) {
     var texto = e.results[0][0].transcript;
@@ -772,10 +780,10 @@ function startVoiceSearch() {
     render();
   };
   rec.onerror = function() {
-    if (btn) { btn.textContent = "🎤"; btn.style.background = "var(--primary)"; }
+    if (btn) { btn.style.opacity = "1"; btn.style.animation = "none"; }
   };
   rec.onend = function() {
-    if (btn) { btn.textContent = "🎤"; btn.style.background = "var(--primary)"; }
+    if (btn) { btn.style.opacity = "1"; btn.style.animation = "none"; }
   };
 }
 
