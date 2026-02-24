@@ -221,7 +221,6 @@ function render(){
     (showPasswordModal?renderModal():"")+
     '<div class="header">'+
       '<div class="header-top">'+
-        '<img src="hermom.png" style="width:48px;height:48px;object-fit:contain;flex-shrink:0;mix-blend-mode:multiply" />'+
         '<div class="header-titles"><h1>Ministério de Louvor</h1><div class="sub">Igreja Hermom</div></div>'+
       '</div>'+
       '<div class="header-actions">'+
@@ -859,7 +858,7 @@ function renderMetronomo(){
     '</div>'+
     // Botões
     '<div style="display:flex;gap:12px;justify-content:center">'+
-      '<button onclick="'+(metroRunning?"stopMetro":"startMetro")+'()" '+
+      '<button onclick="toggleMetro()" id="btn-metro" '+
         'style="background:'+(metroRunning?"#ef4444":"var(--primary)")+';color:white;border:none;border-radius:12px;padding:12px 32px;font-size:16px;font-weight:700;cursor:pointer">'+
         (metroRunning?"⏹ Parar":"▶ Iniciar")+
       '</button>'+
@@ -881,7 +880,11 @@ function renderMetronomo(){
   return html;
 }
 
-var metroAudio=null;
+function toggleMetro(){
+  if(metroRunning){stopMetro();}else{startMetro();}
+  var btn=document.getElementById("btn-metro");
+  if(btn){btn.textContent=metroRunning?"⏹ Parar":"▶ Iniciar";btn.style.background=metroRunning?"#ef4444":"var(--primary)";}
+}
 function getAudioCtx(){if(!metroAudio)metroAudio=new(window.AudioContext||window.webkitAudioContext)();return metroAudio;}
 function playClick(accent){
   var ctx=getAudioCtx();
