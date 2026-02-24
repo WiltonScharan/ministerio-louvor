@@ -778,6 +778,7 @@ function delRegra(i)  { if(confirm("Remover?")){ var arr=regras.slice(); arr.spl
 // ============================
 var iaMessages = [];
 var iaLoading = false;
+var iaApiKey = "";
 
 var IA_SUGGESTIONS = [
   "Monte um medley com os louvores cadastrados",
@@ -791,8 +792,34 @@ var IA_SUGGESTIONS = [
 
 function renderIA() {
   var html = '<h2 class="section-title">✨ IA Musical</h2>';
-  html += '<div style="background:var(--primary-bg);border:1px solid var(--primary);border-radius:12px;padding:14px 16px;margin-bottom:20px;font-size:13px;color:var(--text)">' +
-    '🎵 Tenho acesso a todos os <strong>' + louvores.length + ' louvores</strong> cadastrados. Pergunte sobre sequências, medleys, roupagens e muito mais!' +
+
+  // Bloco de configuração da chave
+  if (!iaApiKey) {
+    html += '<div style="background:var(--surface);border:2px dashed var(--primary);border-radius:14px;padding:24px;margin-bottom:20px;text-align:center">' +
+      '<div style="font-size:32px;margin-bottom:8px">🔑</div>' +
+      '<h3 style="font-size:16px;color:var(--text);margin-bottom:6px">Configure sua chave do Google Gemini</h3>' +
+      '<p style="font-size:13px;color:var(--text-soft);margin-bottom:4px;line-height:1.6">' +
+        '✅ <strong>100% gratuito</strong> — sem cartão, sem custo.<br>' +
+        '1. Acesse <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--primary);font-weight:600">aistudio.google.com/app/apikey</a><br>' +
+        '2. Clique em <strong>"Create API Key"</strong> e faça login com sua conta Google<br>' +
+        '3. Copie a chave e cole aqui abaixo 👇' +
+      '</p>' +
+      '<div style="display:flex;gap:8px;max-width:500px;margin:16px auto 0">' +
+        '<input id="ia-key-input" type="password" placeholder="AIza..." ' +
+          'style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:var(--input-bg);color:var(--text);outline:none" ' +
+          'onkeydown="if(event.key===\'Enter\')setApiKey()" />' +
+        '<button onclick="setApiKey()" style="background:var(--primary);color:white;border:none;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer">Salvar</button>' +
+      '</div>' +
+      '<p style="font-size:11px;color:var(--text-muted);margin-top:10px">🔒 A chave fica só na memória desta sessão e nunca é salva.</p>' +
+    '</div>';
+    return html;
+  }
+
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
+    '<div style="background:var(--primary-bg);border:1px solid var(--primary);border-radius:12px;padding:10px 16px;font-size:13px;color:var(--text);flex:1;margin-right:12px">' +
+      '🎵 Tenho acesso a todos os <strong>' + louvores.length + ' louvores</strong> cadastrados. Pergunte sobre sequências, medleys, roupagens e muito mais!' +
+    '</div>' +
+    '<button onclick="iaApiKey=\'\';render()" title="Trocar chave" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text-soft);cursor:pointer">🔑 Chave</button>' +
   '</div>';
 
   // Sugestões rápidas
@@ -853,6 +880,16 @@ function iaAsk(texto) {
   var ta = document.getElementById("ia-input");
   if (ta) ta.value = texto;
   iaSend(texto);
+}
+
+function setApiKey() {
+  var inp = document.getElementById("ia-key-input");
+  var val = inp ? inp.value.trim() : "";
+  if (!val || !val.startsWith("AIza")) {
+    alert("Chave inválida. Deve começar com 'AIza'"); return;
+  }
+  iaApiKey = val;
+  render();
 }
 
 async function iaSend(textoFixo) {
@@ -920,21 +957,21 @@ async function iaSend(textoFixo) {
       return { role: m.role, content: m.content };
     });
 
-    var res = await fetch("https://api.anthropic.com/v1/messages", {
+    var res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + iaApiKey, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "anthropic-dangerous-direct-browser-access": "true"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: msgs
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: msgs.map(function(m) {
+          return { role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] };
+        }),
+        generationConfig: { maxOutputTokens: 1500 }
       })
     });
     var data = await res.json();
-    var resposta = (data.content && data.content[0] && data.content[0].text) || "Não consegui responder agora.";
+    if (data.error) throw new Error(data.error.message);
+    var resposta = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text;
+    if (!resposta) throw new Error("Sem resposta");
     iaMessages.push({ role: "assistant", content: resposta });
   } catch(e) {
     iaMessages.push({ role: "assistant", content: "Erro ao conectar com a IA. Tente novamente." });
