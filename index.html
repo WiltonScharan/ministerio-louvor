@@ -74,8 +74,12 @@ body { font-family:'Segoe UI',sans-serif; background:var(--bg); min-height:100vh
 .badge { background:var(--primary-badge-bg); color:var(--primary-badge-text); padding:3px 8px; border-radius:20px; font-size:11px; font-weight:600; }
 .badge-green { background:#d1fae5; color:#059669; }
 .badge-blue { background:#dbeafe; color:#1d4ed8; }
+.badge-purple { background:#ede9fe; color:#6d28d9; }
+.badge-gray { background:#f3f4f6; color:#374151; }
 [data-theme="dark"] .badge-green { background:#064e3b; color:#6ee7b7; }
 [data-theme="dark"] .badge-blue { background:#1e3a5f; color:#93c5fd; }
+[data-theme="dark"] .badge-purple { background:#2e1065; color:#c4b5fd; }
+[data-theme="dark"] .badge-gray { background:#374151; color:#d1d5db; }
 .search-input { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:8px; font-size:13px; margin-top:16px; background:var(--surface); color:var(--text); outline:none; }
 .search-input:focus { border-color:var(--primary); }
 .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-top:16px; }
@@ -106,6 +110,18 @@ body { font-family:'Segoe UI',sans-serif; background:var(--bg); min-height:100vh
 .print-table td { padding:7px 12px; border:1px solid #e5e7eb; text-align:center; font-size:12px; color:#1f2937; white-space:nowrap; }
 .print-table tr:nth-child(even) td { background:#f9fafb; }
 .print-table td.func-name { background:#1f2937 !important; color:white; font-weight:700; text-align:left; }
+/* checkboxes grupo instrumentos */
+.instr-group { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+.instr-item { display:flex; align-items:center; gap:5px; background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:4px 10px; cursor:pointer; font-size:12px; transition:background 0.15s,border 0.15s; }
+.instr-item input[type=checkbox] { accent-color:var(--primary); width:14px; height:14px; cursor:pointer; }
+.instr-item.checked { background:var(--primary-bg); border-color:var(--primary); color:var(--primary); font-weight:600; }
+/* member card */
+.member-card { background:var(--surface); border-radius:12px; padding:16px; box-shadow:var(--card-shadow); display:flex; flex-direction:column; gap:8px; }
+.member-card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+.member-name { font-weight:700; font-size:15px; color:var(--text); }
+.member-info { font-size:12px; color:var(--text-soft); display:flex; flex-direction:column; gap:3px; }
+.member-instruments { display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
+/* metronomo */
 @keyframes bar1 { 0%,100%{height:6px} 50%{height:16px} }
 @keyframes bar2 { 0%,100%{height:12px} 50%{height:20px} }
 @keyframes bar3 { 0%,100%{height:18px} 50%{height:6px} }
@@ -117,7 +133,6 @@ body { font-family:'Segoe UI',sans-serif; background:var(--bg); min-height:100vh
 .listening .voice-bar:nth-child(3) { animation:bar3 0.5s ease-in-out infinite 0.2s; }
 .listening .voice-bar:nth-child(4) { animation:bar4 0.5s ease-in-out infinite 0.1s; }
 .listening .voice-bar:nth-child(5) { animation:bar5 0.5s ease-in-out infinite 0.05s; }
-/* METRONOMO */
 .metro-circle { width:120px; height:120px; border-radius:50%; border:6px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:800; color:var(--text); margin:0 auto; transition:background 0.05s,border-color 0.05s; }
 .metro-circle.beat { background:var(--primary); border-color:var(--primary); color:white; }
 @media print { .no-print{display:none!important} body{background:white} .print-wrap{margin:0} }
@@ -140,54 +155,60 @@ const EDITOR_PASSWORD = "DH#2026";
 firebase.initializeApp(FIREBASE_CONFIG);
 const db = firebase.database();
 
-const FUNCOES = ["Ministro","Backing 1","Backing 2","Backing 3","Backing 4","Bateria","Baixo","Guitarra","Violão","Teclado"];
-const CULTOS  = ["Domingo","Quinta-feira","Vigília","Mulheres","Homens","Outro"];
-const MESES   = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-const NOTAS   = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const FUNCOES     = ["Ministro","Backing 1","Backing 2","Backing 3","Backing 4","Bateria","Baixo","Guitarra","Violão","Teclado"];
+const CULTOS      = ["Domingo","Quinta-feira","Vigília","Mulheres","Homens","Outro"];
+const MESES       = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const NOTAS       = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 const STATUS_LABELS = {pendente:"🟡 Pendente",concluido:"🟢 Concluído",cancelado:"🔴 Cancelado"};
+const INSTRUMENTOS = ["Violão","Guitarra","Baixo","Teclado","Bateria","Vocal / Backing","Flauta","Trompete","Violino","Percussão","Outro"];
 
-// Círculo das quintas para calcular proximidade entre tons
+// Círculo das quintas
 const CIRCLE_OF_FIFTHS = ["C","G","D","A","E","B","F#","C#","G#","D#","A#","F"];
-function toneDistance(a, b) {
-  if (!a || !b) return 99;
-  var flat = {"Db":"C#","Eb":"D#","Gb":"F#","Ab":"G#","Bb":"A#"};
-  a = flat[a]||a; b = flat[b]||b;
-  var ia = CIRCLE_OF_FIFTHS.indexOf(a), ib = CIRCLE_OF_FIFTHS.indexOf(b);
-  if (ia===-1||ib===-1) return 6;
-  var d = Math.abs(ia-ib); return Math.min(d,12-d);
+function toneDistance(a,b){
+  if(!a||!b)return 99;
+  var flat={"Db":"C#","Eb":"D#","Gb":"F#","Ab":"G#","Bb":"A#"};
+  a=flat[a]||a;b=flat[b]||b;
+  var ia=CIRCLE_OF_FIFTHS.indexOf(a),ib=CIRCLE_OF_FIFTHS.indexOf(b);
+  if(ia===-1||ib===-1)return 6;
+  var d=Math.abs(ia-ib);return Math.min(d,12-d);
 }
 
-let isEditor=false, activeTab="escala", showPasswordModal=false, passwordError="";
-let showBirthdayPopup=true, editIndex=null, isDark=false;
-let escala=[],louvores=[],aniversariantes=[],cronograma=[],regras=[];
-let escalaMesFiltro=new Date().getMonth(), buscaLouvor="";
+let isEditor=false,activeTab="escala",showPasswordModal=false,passwordError="";
+let showBirthdayPopup=true,editIndex=null,isDark=false;
+let escala=[],louvores=[],aniversariantes=[],cronograma=[],regras=[],membros=[];
+let escalaMesFiltro=new Date().getMonth(),buscaLouvor="";
 
 // Ferramentas
 let ferraTab="transpositor";
-let transResult=null, transOrigem="", transDestino="", transCifra="";
-let medleyTipo="agitado", medleyResult=null;
-let vozLouvor="", vozResult=null;
-// Metrônomo
-let metroRunning=false, metroBPM=80, metroTimer=null, metroBeat=false, metroManualBPM="";
+let transResult=null,transOrigem="",transDestino="",transCifra="";
+let medleyTipo="agitado",medleyResult=null;
+let vozLouvor="",vozResult=null;
+let metroRunning=false,metroBPM=80,metroTimer=null,metroBeat=false;
+var metroAudio=null;
 
 function emptyEscala(){return{data:"",culto:"",funcao:"",nome:"",obs:"",mes:new Date().getMonth()};}
 function emptyLouvor(){return{titulo:"",artista:"",nota:"",bpm:"",link:"",trecho:""};}
-let formEscala=emptyEscala(), formLouvor=emptyLouvor();
+function emptyMembro(){return{id:"",nome:"",telefone:"",nascimento:"",instrumentos:[],tipo:"membro"};}
+
+let formEscala=emptyEscala(),formLouvor=emptyLouvor();
 let formAniv={nome:"",dia:"",mes:"",funcao:"",tel:""};
 let formCron={data:"",titulo:"",descricao:"",responsavel:"",status:"pendente"};
 let formRegra={titulo:"",descricao:""};
+let formMembro=emptyMembro();
 
 function toggleTheme(){isDark=!isDark;document.documentElement.setAttribute("data-theme",isDark?"dark":"light");render();}
 
 function initListeners(){
-  ["escala","louvores","aniversariantes","cronograma","regras"].forEach(function(key){
+  ["escala","louvores","aniversariantes","cronograma","regras","membros"].forEach(function(key){
     db.ref("ministerio/"+key).on("value",function(snap){
       var val=snap.val();
-      if(key==="escala")          escala          =val?Object.values(val):[];
-      if(key==="louvores")        louvores        =val?Object.values(val):[];
-      if(key==="aniversariantes") aniversariantes =val?Object.values(val):[];
-      if(key==="cronograma")      cronograma      =val?Object.values(val):[];
-      if(key==="regras")          regras          =val?Object.values(val):[];
+      var arr=val?Object.values(val):[];
+      if(key==="escala")          escala          =arr;
+      if(key==="louvores")        louvores        =arr;
+      if(key==="aniversariantes") aniversariantes =arr;
+      if(key==="cronograma")      cronograma      =arr;
+      if(key==="regras")          regras          =arr;
+      if(key==="membros")         membros         =arr;
       render();
     });
   });
@@ -210,7 +231,7 @@ function togglePreview(btn,ytId,link){
     }
     btn.textContent="⏹ Fechar";
   } else {
-    preview.style.display="none"; preview.innerHTML=""; btn.textContent="▶ Ouvir / Ver";
+    preview.style.display="none";preview.innerHTML="";btn.textContent="▶ Ouvir / Ver";
   }
 }
 
@@ -230,14 +251,15 @@ function render(){
       '</div>'+
     '</div>'+
     '<div class="tabs">'+
-      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"],["ferramentas","🎸 Ferramentas"]].map(function(t){
-        return '<button class="tab '+(activeTab===t[0]?"active":"")+'" onclick="setTab(\''+t[0]+'\')">'+t[1]+'</button>';
+      [["escala","📅 Escala"],["louvores","🎵 Louvores"],["membros","👥 Membros"],["aniversariantes","🎂 Aniversariantes"],["cronograma","📋 Cronograma"],["regras","📜 Regras"],["ferramentas","🎸 Ferramentas"]].map(function(t){
+        return'<button class="tab '+(activeTab===t[0]?"active":"")+'" onclick="setTab(\''+t[0]+'\')">'+t[1]+'</button>';
       }).join("")+
     '</div>'+
     '<div class="content">'+
       (!isEditor?'<div class="view-only-banner no-print">👁️ Modo visualização. Clique em "Entrar como editor" para editar.</div>':"")+
       (activeTab==="escala"          ?renderEscala()         :"")+
       (activeTab==="louvores"        ?renderLouvores()       :"")+
+      (activeTab==="membros"         ?renderMembros()        :"")+
       (activeTab==="aniversariantes" ?renderAniversariantes():"")+
       (activeTab==="cronograma"      ?renderCronograma()     :"")+
       (activeTab==="regras"          ?renderRegras()         :"")+
@@ -247,7 +269,7 @@ function render(){
   if(activeTab==="louvores"&&buscaLouvor!==""){var inp=document.querySelector(".search-input");if(inp){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}}
 }
 
-// BIRTHDAY
+// BIRTHDAY POPUP
 function renderBirthdayPopup(){
   if(!showBirthdayPopup)return"";
   var hoje=new Date(),dia=hoje.getDate(),mes=hoje.getMonth()+1;
@@ -375,7 +397,7 @@ function saveEscala(){
 }
 function cancelEscala(){editIndex=null;formEscala=emptyEscala();render();}
 function editEscala(i){formEscala=Object.assign({},escala[i],{mes:parseInt(escala[i].mes)||0});editIndex=i;escalaMesFiltro=formEscala.mes;window.scrollTo(0,0);render();}
-function delEscala(i){if(confirm("Remover?")){ var arr=escala.slice();arr.splice(i,1);saveData("escala",arr);}}
+function delEscala(i){if(confirm("Remover?")){var arr=escala.slice();arr.splice(i,1);saveData("escala",arr);}}
 
 // ============================
 // LOUVORES
@@ -406,7 +428,7 @@ function renderLouvores(){
   }
   html+='<div style="position:relative;margin-top:16px">'+
     '<input class="search-input" style="margin-top:0;padding-right:52px" placeholder="Buscar por nome, artista, tom, trecho da letra..." value="'+esc(buscaLouvor)+'" oninput="buscaLouvor=this.value;render()" id="search-louvor"/>'+
-    '<button onclick="startVoiceSearch()" title="Busca por voz" id="btn-voice" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:2px;height:36px;" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'none\'">'+
+    '<button onclick="startVoiceSearch()" title="Busca por voz" id="btn-voice" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:2px;height:36px;">'+
       '<span class="voice-bar" style="height:6px"></span><span class="voice-bar" style="height:12px"></span><span class="voice-bar" style="height:18px"></span><span class="voice-bar" style="height:12px"></span><span class="voice-bar" style="height:6px"></span>'+
     '</button>'+
   '</div>';
@@ -448,11 +470,208 @@ function editLouvor(i){formLouvor=Object.assign({},louvores[i]);editIndex=i;wind
 function delLouvor(i){if(confirm("Remover?")){var arr=louvores.slice();arr.splice(i,1);saveData("louvores",arr);}}
 
 // ============================
+// MEMBROS
+// ============================
+
+// Sync: sincroniza o aniversariante vinculado ao membro dentro de um array de aniversariantes
+function syncMembroAniversariante(membro, anivArr) {
+  // Remove entrada vinculada anterior (se existir)
+  var arr = anivArr.filter(function(a){ return a._membroId !== membro.id; });
+  // Se tem data de nascimento, cria/atualiza entrada em aniversariantes
+  if (membro.nascimento) {
+    var partes = membro.nascimento.split("-"); // YYYY-MM-DD
+    var dia = parseInt(partes[2], 10);
+    var mes = parseInt(partes[1], 10);
+    if (dia && mes) {
+      arr.push({
+        nome:    membro.nome,
+        dia:     dia,
+        mes:     mes,
+        funcao:  membro.tipo === "lider" ? "Líder" : "Membro",
+        tel:     membro.telefone || "",
+        _membroId: membro.id
+      });
+    }
+  }
+  arr.sort(function(a,b){ return (parseInt(a.mes)*100+parseInt(a.dia))-(parseInt(b.mes)*100+parseInt(b.dia)); });
+  return arr;
+}
+
+function renderMembros(){
+  var f = formMembro;
+  var html = '<h2 class="section-title">Membros do Ministério</h2>';
+
+  // Contadores resumo
+  var lideres = membros.filter(function(m){ return m.tipo === "lider"; }).length;
+  var membrosCt = membros.filter(function(m){ return m.tipo !== "lider"; }).length;
+  if(membros.length > 0){
+    html += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">'+
+      '<div style="background:var(--primary-bg);border-radius:10px;padding:10px 18px;display:flex;flex-direction:column;gap:2px">'+
+        '<span style="font-size:22px;font-weight:800;color:var(--primary)">'+membros.length+'</span>'+
+        '<span style="font-size:11px;color:var(--text-soft);font-weight:600">TOTAL</span>'+
+      '</div>'+
+      '<div style="background:#ede9fe;border-radius:10px;padding:10px 18px;display:flex;flex-direction:column;gap:2px">'+
+        '<span style="font-size:22px;font-weight:800;color:#6d28d9">'+lideres+'</span>'+
+        '<span style="font-size:11px;color:#6d28d9;font-weight:600">LÍDERES</span>'+
+      '</div>'+
+      '<div style="background:#d1fae5;border-radius:10px;padding:10px 18px;display:flex;flex-direction:column;gap:2px">'+
+        '<span style="font-size:22px;font-weight:800;color:#059669">'+membrosCt+'</span>'+
+        '<span style="font-size:11px;color:#059669;font-weight:600">MEMBROS</span>'+
+      '</div>'+
+    '</div>';
+  }
+
+  if(isEditor){
+    // Checkboxes de instrumentos
+    var instrHtml = INSTRUMENTOS.map(function(inst){
+      var checked = Array.isArray(f.instrumentos) && f.instrumentos.indexOf(inst) !== -1;
+      return '<label class="instr-item '+(checked?"checked":"")+'">'+
+        '<input type="checkbox" '+(checked?"checked":"")+' onchange="toggleInstrumento(\''+inst.replace(/'/g,"\\'")+'\')" /> '+inst+
+      '</label>';
+    }).join("");
+
+    html += '<div class="form-box" style="grid-template-columns:repeat(2,1fr)">'+
+      '<div class="form-group full"><label>Nome Completo *</label>'+
+        '<input placeholder="Nome do membro" value="'+esc(f.nome)+'" oninput="formMembro.nome=this.value" /></div>'+
+      '<div class="form-group"><label>Telefone</label>'+
+        '<input placeholder="(99) 99999-9999" value="'+esc(f.telefone)+'" oninput="formMembro.telefone=this.value" /></div>'+
+      '<div class="form-group"><label>Data de Nascimento</label>'+
+        '<input type="date" value="'+esc(f.nascimento)+'" onchange="formMembro.nascimento=this.value" /></div>'+
+      '<div class="form-group"><label>Tipo</label>'+
+        '<select onchange="formMembro.tipo=this.value">'+
+          '<option value="membro"'+(f.tipo==="membro"?" selected":"")+'>👤 Membro</option>'+
+          '<option value="lider"'+(f.tipo==="lider"?" selected":"")+'>⭐ Líder</option>'+
+        '</select></div>'+
+      '<div class="form-group full"><label>Instrumento(s)</label>'+
+        '<div class="instr-group">'+instrHtml+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="form-actions">'+
+      '<button class="btn-primary" onclick="saveMembro()">'+(editIndex!==null?"✏️ Atualizar":"➕ Adicionar")+'</button>'+
+      (editIndex!==null?'<button class="btn-secondary" onclick="cancelMembro()">Cancelar</button>':"")+
+    '</div>';
+
+    // Aviso sobre sincronização
+    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--text-soft);margin-bottom:16px">'+
+      '💡 <strong>Sincronização automática:</strong> ao informar a data de nascimento, o membro é adicionado automaticamente à aba Aniversariantes. '+
+      'Editar nome/data atualiza o aniversariante vinculado. Excluir o membro remove também o aniversariante vinculado.'+
+    '</div>';
+  }
+
+  if(membros.length === 0){
+    html += '<div class="empty">Nenhum membro cadastrado ainda.</div>';
+  } else {
+    // Líderes primeiro, depois membros, ordem alfabética
+    var sorted = membros.slice().sort(function(a,b){
+      if(a.tipo==="lider" && b.tipo!=="lider") return -1;
+      if(a.tipo!=="lider" && b.tipo==="lider") return 1;
+      return (a.nome||"").localeCompare(b.nome||"");
+    });
+
+    html += '<div class="cards-grid">';
+    sorted.forEach(function(m){
+      var i = membros.indexOf(m);
+      var isLider = m.tipo === "lider";
+      var instrs = Array.isArray(m.instrumentos) ? m.instrumentos : [];
+      var nascFormatado = m.nascimento ? fmtDate(m.nascimento) : "";
+      html +=
+        '<div class="member-card">'+
+          '<div class="member-card-top">'+
+            '<div>'+
+              '<div class="member-name">'+esc(m.nome)+'</div>'+
+              '<div style="margin-top:4px">'+
+                (isLider
+                  ? '<span class="badge badge-purple">⭐ Líder</span>'
+                  : '<span class="badge badge-gray">👤 Membro</span>')+
+              '</div>'+
+            '</div>'+
+            (isEditor?'<div style="display:flex;gap:4px">'+
+              '<button class="icon-btn" onclick="editMembro('+i+')">✏️</button>'+
+              '<button class="icon-btn" onclick="delMembro('+i+')">🗑️</button>'+
+            '</div>':"")+
+          '</div>'+
+          '<div class="member-info">'+
+            (m.telefone?'<span>📱 '+esc(m.telefone)+'</span>':"")+
+            (nascFormatado?'<span>🎂 '+nascFormatado+'</span>':"")+
+          '</div>'+
+          (instrs.length > 0
+            ? '<div class="member-instruments">'+
+                instrs.map(function(inst){ return '<span class="badge badge-green" style="font-size:10px">'+esc(inst)+'</span>'; }).join("")+
+              '</div>'
+            : "")+
+        '</div>';
+    });
+    html += '</div>';
+  }
+  return html;
+}
+
+function toggleInstrumento(inst){
+  var arr = Array.isArray(formMembro.instrumentos) ? formMembro.instrumentos.slice() : [];
+  var idx = arr.indexOf(inst);
+  if(idx === -1){ arr.push(inst); } else { arr.splice(idx,1); }
+  formMembro.instrumentos = arr;
+  // Atualiza apenas os checkboxes sem rerender tudo
+  var labels = document.querySelectorAll(".instr-item");
+  labels.forEach(function(lbl){
+    var cb = lbl.querySelector("input[type=checkbox]");
+    if(cb){
+      var v = lbl.textContent.trim();
+      var isChecked = arr.indexOf(v) !== -1;
+      cb.checked = isChecked;
+      if(isChecked){ lbl.classList.add("checked"); } else { lbl.classList.remove("checked"); }
+    }
+  });
+}
+
+function saveMembro(){
+  if(!formMembro.nome.trim()){ alert("Preencha o nome do membro."); return; }
+  var arr = membros.slice();
+  var membro = Object.assign({}, formMembro);
+  // Garante ID único para novos membros
+  if(!membro.id){ membro.id = "m_" + Date.now(); }
+  if(editIndex !== null){ arr[editIndex] = membro; editIndex = null; }
+  else { arr.push(membro); }
+  saveData("membros", arr);
+  // Sincroniza aniversariantes
+  var anivAtualizado = syncMembroAniversariante(membro, aniversariantes.slice());
+  saveData("aniversariantes", anivAtualizado);
+  formMembro = emptyMembro();
+}
+
+function cancelMembro(){ editIndex = null; formMembro = emptyMembro(); render(); }
+
+function editMembro(i){
+  var m = membros[i];
+  formMembro = Object.assign({}, m, {
+    instrumentos: Array.isArray(m.instrumentos) ? m.instrumentos.slice() : []
+  });
+  editIndex = i;
+  window.scrollTo(0, 0);
+  render();
+}
+
+function delMembro(i){
+  if(confirm("Remover este membro? O aniversariante vinculado também será removido.")){
+    var m = membros[i];
+    var arr = membros.slice();
+    arr.splice(i, 1);
+    saveData("membros", arr);
+    // Remove aniversariante vinculado (somente o vinculado, manuais ficam intactos)
+    if(m.id){
+      var anivAtualizado = aniversariantes.filter(function(a){ return a._membroId !== m.id; });
+      saveData("aniversariantes", anivAtualizado);
+    }
+  }
+}
+
+// ============================
 // ANIVERSARIANTES
 // ============================
 function renderAniversariantes(){
   var f=formAniv,hoje=new Date(),mesAtual=hoje.getMonth()+1;
   var html='<h2 class="section-title">Aniversariantes</h2>';
+
   if(isEditor){
     html+='<div class="form-box">'+
       '<div class="form-group full"><label>Nome *</label><input placeholder="Nome completo" value="'+esc(f.nome)+'" oninput="formAniv.nome=this.value" /></div>'+
@@ -468,17 +687,22 @@ function renderAniversariantes(){
       (editIndex!==null?'<button class="btn-secondary" onclick="editIndex=null;formAniv={nome:\'\',dia:\'\',mes:\'\',funcao:\'\',tel:\'\'};render()">Cancelar</button>':"")+
     '</div>';
   }
+
   if(aniversariantes.length===0){html+='<div class="empty">Nenhum aniversariante cadastrado.</div>';}
   else{
     MESES.forEach(function(mes,mi){
       var doMes=aniversariantes.filter(function(a){return parseInt(a.mes)===mi+1;});
       if(!doMes.length)return;
       html+='<h3 class="mes-header '+(mi+1===mesAtual?"mes-atual":"")+'">'+mes+(mi+1===mesAtual?" 🎉":"")+'</h3>'+
-        '<table class="table"><thead><tr><th>Dia</th><th>Nome</th><th>Função</th><th>Telefone</th>'+(isEditor?"<th></th>":"")+'</tr></thead><tbody>'+
+        '<table class="table"><thead><tr><th>Dia</th><th>Nome</th><th>Função</th><th>Telefone</th><th>Origem</th>'+(isEditor?"<th></th>":"")+'</tr></thead><tbody>'+
         doMes.map(function(a){
           var i=aniversariantes.indexOf(a),d=mi+1===mesAtual&&parseInt(a.dia)===hoje.getDate();
+          var origemBadge = a._membroId
+            ? '<span class="badge badge-blue" style="font-size:10px">👥 Membro</span>'
+            : '<span class="badge badge-gray" style="font-size:10px">✍️ Manual</span>';
           return'<tr class="'+(d?"row-destaque":"")+'"><td><strong>'+String(a.dia).padStart(2,"0")+'</strong></td><td>'+esc(a.nome)+'</td>'+
             '<td><span class="badge">'+esc(a.funcao)+'</span></td><td>'+esc(a.tel)+'</td>'+
+            '<td>'+origemBadge+'</td>'+
             (isEditor?'<td><button class="icon-btn" onclick="editAniv('+i+')">✏️</button><button class="icon-btn" onclick="delAniv('+i+')">🗑️</button></td>':"")+
           '</tr>';
         }).join("")+
@@ -635,7 +859,7 @@ function renderFerramentas(){
 // --- TRANSPOSITOR ---
 function renderTranspositor(){
   var html='<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">'+
-    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Transponha qualquer louvor para outro tom. Cole a cifra e veja os acordes convertidos automaticamente.</p>'+
+    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Transponha qualquer louvor para outro tom.</p>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">'+
       '<div class="form-group"><label>Tom Original</label><select onchange="transOrigem=this.value"><option value="">Selecionar...</option>'+
         CHROMATIC.map(function(n){return'<option value="'+n+'"'+(transOrigem===n?" selected":"")+'>'+n+'</option>';}).join("")+
@@ -681,7 +905,7 @@ function calcTranspositor(){
   render();
 }
 
-// --- MEDLEY / SEQUÊNCIA (com lógica de transposição por proximidade de tons) ---
+// --- MEDLEY ---
 function renderMedley(){
   var tipos=[
     {v:"agitado",l:"🔥 Mais agitados / animados"},
@@ -698,7 +922,6 @@ function renderMedley(){
     '</select></div>'+
     '<button onclick="calcMedley()" class="btn-primary">🎶 Montar Sequência</button>'+
   '</div>';
-
   if(medleyResult){
     html+='<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow)">'+
       '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)">'+medleyResult.titulo+'</h3>'+
@@ -730,32 +953,21 @@ function renderMedley(){
 function calcMedley(){
   if(louvores.length===0){alert("Nenhum louvor cadastrado ainda!");return;}
   var lista=louvores.slice();
-  var titulo,descricao,dica_geral,dicas;
-
   var cfgs={
-    agitado:{titulo:"🔥 Sequência Agitada",descricao:"Ordenada por proximidade de tons para transições suaves.",dica_geral:"💡 Mantenha o BPM alto. Faça transições rápidas sem parar. Tons próximos = menos reapinação!",dicas:["Abra com tudo! Tom de entrada.","Mesma energia, transição suave.","Mantém o ritmo, varia o estilo.","Começa a desacelerar um pouco.","Fecha a fase agitada aqui."]},
-    adoracao:{titulo:"🕊️ Sequência de Adoração",descricao:"Progressão suave entre tons próximos para adoração contínua.",dica_geral:"💡 Reduza o volume gradualmente. Deixe espaços. Tons próximos permitem modular sem quebrar o momento.",dicas:["Convide à adoração com suavidade.","Aprofunde o momento espiritual.","Vá para algo mais íntimo.","Reduza a dinâmica ao máximo.","Silence e oração."]},
-    misto:{titulo:"🎵 Sequência Mista",descricao:"Começa agitado e termina em adoração, com transições cuidadosas.",dica_geral:"💡 Sobe a energia e desce suavemente. Os tons foram escolhidos para facilitar a transição entre os momentos.",dicas:["Celebração — energia total!","Mantém a animação.","Começa a transição.","Momento mais reflexivo.","Adoração profunda."]},
-    vigilia:{titulo:"🌙 Sequência para Vigília",descricao:"Tons compatíveis para uma noite de clamor e adoração.",dica_geral:"💡 Alterne clamor e adoração. Com tons próximos, você pode medleyar sem parar.",dicas:["Clamor de abertura.","Adoração íntima.","Intercessão musical.","Espera no Senhor.","Encerramento."]},
-    mulheres:{titulo:"🌸 Culto de Mulheres",descricao:"Seleção acolhedora com progressão harmônica suave.",dica_geral:"💡 Valorize as vozes femininas. Tons próximos facilitam a transição sem quebrar a atmosfera.",dicas:["Boas-vindas musicais.","Louvor expressivo.","Adoração profunda.","Ministração suave.","Encerramento com graça."]}
+    agitado:{titulo:"🔥 Sequência Agitada",descricao:"Ordenada por proximidade de tons para transições suaves.",dica_geral:"💡 Mantenha o BPM alto. Tons próximos = menos reapinação!",dicas:["Abra com tudo!","Mesma energia.","Mantém o ritmo.","Começa a desacelerar.","Fecha a fase agitada."]},
+    adoracao:{titulo:"🕊️ Sequência de Adoração",descricao:"Progressão suave entre tons próximos.",dica_geral:"💡 Reduza o volume gradualmente. Tons próximos permitem modular sem quebrar o momento.",dicas:["Convide à adoração.","Aprofunde o momento.","Algo mais íntimo.","Reduza a dinâmica.","Silêncio e oração."]},
+    misto:{titulo:"🎵 Sequência Mista",descricao:"Começa agitado e termina em adoração.",dica_geral:"💡 Sobe a energia e desce suavemente.",dicas:["Celebração total!","Mantém a animação.","Começa a transição.","Momento reflexivo.","Adoração profunda."]},
+    vigilia:{titulo:"🌙 Sequência para Vigília",descricao:"Tons compatíveis para clamor e adoração.",dica_geral:"💡 Alterne clamor e adoração.",dicas:["Clamor de abertura.","Adoração íntima.","Intercessão musical.","Espera no Senhor.","Encerramento."]},
+    mulheres:{titulo:"🌸 Culto de Mulheres",descricao:"Progressão harmônica suave e acolhedora.",dica_geral:"💡 Valorize as vozes femininas.",dicas:["Boas-vindas.","Louvor expressivo.","Adoração profunda.","Ministração suave.","Encerramento."]}
   };
   var cfg=cfgs[medleyTipo];
-
-  // Ordenar por proximidade de tons (greedy nearest neighbor)
-  var disponivel=lista.slice();
-  var ordenado=[];
-  // Começa com qualquer (primeiro da lista)
+  var disponivel=lista.slice(),ordenado=[];
   ordenado.push(disponivel.splice(0,1)[0]);
   while(disponivel.length>0){
-    var ultimo=ordenado[ordenado.length-1];
-    var melhorIdx=0, melhorDist=99;
-    for(var i=0;i<disponivel.length;i++){
-      var d=toneDistance(ultimo.nota,disponivel[i].nota);
-      if(d<melhorDist){melhorDist=d;melhorIdx=i;}
-    }
+    var ultimo=ordenado[ordenado.length-1],melhorIdx=0,melhorDist=99;
+    for(var i=0;i<disponivel.length;i++){var d=toneDistance(ultimo.nota,disponivel[i].nota);if(d<melhorDist){melhorDist=d;melhorIdx=i;}}
     ordenado.push(disponivel.splice(melhorIdx,1)[0]);
   }
-
   var total=Math.min(ordenado.length,6);
   var sequencia=ordenado.slice(0,total).map(function(l,i){
     return{titulo:l.titulo,artista:l.artista,nota:l.nota,bpm:l.bpm,dica:cfg.dicas[Math.min(i,cfg.dicas.length-1)]};
@@ -767,7 +979,7 @@ function calcMedley(){
 // --- DIVISÃO DE VOZES ---
 function renderVozes(){
   var html='<div style="background:var(--surface);border-radius:14px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:16px">'+
-    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Veja como dividir as vozes do back vocal para um louvor cadastrado.</p>'+
+    '<p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">Veja como dividir as vozes do back vocal.</p>'+
     '<div class="form-group" style="margin-bottom:12px"><label>Escolha o louvor</label>'+
       '<select onchange="vozLouvor=this.value"><option value="">Selecionar...</option>'+
         louvores.map(function(l){return'<option value="'+esc(l.titulo)+'"'+(vozLouvor===l.titulo?" selected":"")+'>'+esc(l.titulo)+(l.nota?" (Tom: "+l.nota+")":"")+'</option>';}).join("")+
@@ -802,10 +1014,10 @@ function calcVozes(){
   var l=louvores.find(function(x){return x.titulo===vozLouvor;})||{};
   vozResult={
     louvor:vozLouvor,tom:l.nota||"",
-    soprano:"Canta a melodia principal nas partes mais agudas. No refrão pode subir uma terça acima para enriquecer o arranjo.",
-    contralto:"Harmoniza abaixo da melodia. Geralmente uma terça ou quinta abaixo. É o alicerce do back vocal feminino.",
-    tenor:"Voz masculina mais aguda. Pode dobrar a melodia uma oitava abaixo ou fazer 2ª voz masculina. Essencial no clamor.",
-    falsete:"Usado em momentos suaves de adoração. Cria textura etérea e delicada nas pontes e momentos íntimos.",
+    soprano:"Canta a melodia principal nas partes mais agudas. No refrão pode subir uma terça acima.",
+    contralto:"Harmoniza abaixo da melodia, geralmente uma terça ou quinta abaixo. Alicerce do back vocal feminino.",
+    tenor:"Voz masculina mais aguda. Pode dobrar a melodia uma oitava abaixo ou fazer 2ª voz masculina.",
+    falsete:"Usado em momentos suaves de adoração. Cria textura etérea nas pontes e momentos íntimos.",
     segunda:"Canta em terça ou quarta paralela à melodia. Com melodia + 2ª voz já soa completo para grupos pequenos.",
     dica:"Para 3 pessoas: Melodia (Soprano) + 2ª Voz + Tenor/Falsete. Para 2 pessoas: Melodia + 2ª Voz já funciona muito bem!"
   };
@@ -818,37 +1030,31 @@ function setMetroBPM(bpm){
   ferraTab="metronomo";
   stopMetro();
   render();
-  // Auto-inicia após renderizar
   setTimeout(function(){startMetro();},100);
 }
 function renderMetronomo(){
   var bpmOptions=[60,70,80,90,100,110,120,130,140];
   var html='<div style="background:var(--surface);border-radius:14px;padding:28px 20px;box-shadow:var(--card-shadow);text-align:center">'+
     '<p style="font-size:13px;color:var(--text-soft);margin-bottom:24px">Use o metrônomo para manter o andamento durante o ensaio ou culto.</p>'+
-    // Círculo visual
     '<div class="metro-circle '+(metroRunning&&metroBeat?"beat":"")+'">'+metroBPM+'</div>'+
     '<p style="font-size:12px;color:var(--text-soft);margin-top:8px;margin-bottom:24px">BPM</p>'+
-    // Slider
     '<div style="max-width:340px;margin:0 auto 20px">'+
       '<input type="range" min="40" max="220" value="'+metroBPM+'" oninput="metroBPM=parseInt(this.value);document.getElementById(\'bpm-num\').textContent=this.value;document.querySelector(\'.metro-circle\').textContent=this.value;if(metroRunning)restartMetro()" '+
         'style="width:100%;accent-color:var(--primary)">'+
       '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)"><span>40</span><span>220</span></div>'+
     '</div>'+
-    // Input manual
     '<div style="display:flex;gap:8px;justify-content:center;align-items:center;margin-bottom:20px">'+
       '<input type="number" min="40" max="220" value="'+metroBPM+'" id="bpm-num" '+
         'onchange="metroBPM=Math.min(220,Math.max(40,parseInt(this.value)||80));if(metroRunning)restartMetro();render()" '+
         'style="width:80px;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:18px;font-weight:700;text-align:center;background:var(--input-bg);color:var(--text);outline:none">'+
       '<span style="font-size:14px;color:var(--text-soft)">BPM</span>'+
     '</div>'+
-    // BPM rápidos
     '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:24px">'+
       bpmOptions.map(function(b){
         return'<button onclick="metroBPM='+b+';if(metroRunning)restartMetro();render()" '+
           'style="padding:5px 12px;border-radius:16px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:'+(metroBPM===b?"var(--primary)":"var(--surface2)")+';color:'+(metroBPM===b?"white":"var(--text)")+'">'+ b+'</button>';
       }).join("")+
     '</div>'+
-    // Referências de BPM
     '<div style="background:var(--surface2);border-radius:10px;padding:12px 16px;margin-bottom:24px;text-align:left;max-width:340px;margin-left:auto;margin-right:auto">'+
       '<p style="font-size:11px;font-weight:700;color:var(--text-soft);margin-bottom:8px">REFERÊNCIAS</p>'+
       [["Lento / Adoração","50–75"],["Médio / Balada","76–100"],["Animado","101–120"],["Agitado / Gospel","121–150"]].map(function(r){
@@ -856,16 +1062,14 @@ function renderMetronomo(){
           '<span>'+r[0]+'</span><span style="font-weight:600;color:var(--primary)">'+r[1]+' BPM</span></div>';
       }).join("")+
     '</div>'+
-    // Botões
     '<div style="display:flex;gap:12px;justify-content:center">'+
       '<button onclick="toggleMetro()" id="btn-metro" '+
         'style="background:'+(metroRunning?"#ef4444":"var(--primary)")+';color:white;border:none;border-radius:12px;padding:12px 32px;font-size:16px;font-weight:700;cursor:pointer">'+
         (metroRunning?"⏹ Parar":"▶ Iniciar")+
       '</button>'+
     '</div>'+
-    // Louvores com BPM cadastrado
     (louvores.filter(function(l){return l.bpm;}).length>0?
-      '<div style="margin-top:28px;text-align:left"><p style="font-size:12px;font-weight:700;color:var(--text-soft);margin-bottom:10px">LOUVORES CADASTRADOS COM BPM</p>'+
+      '<div style="margin-top:28px;text-align:left"><p style="font-size:12px;font-weight:700;color:var(--text-soft);margin-bottom:10px">LOUVORES COM BPM</p>'+
       '<div style="display:flex;flex-wrap:wrap;gap:8px">'+
         louvores.filter(function(l){return l.bpm;}).map(function(l){
           return'<button onclick="metroBPM='+parseInt(l.bpm)+';if(metroRunning)restartMetro();render()" '+
@@ -888,8 +1092,7 @@ function toggleMetro(){
 function getAudioCtx(){if(!metroAudio)metroAudio=new(window.AudioContext||window.webkitAudioContext)();return metroAudio;}
 function playClick(accent){
   var ctx=getAudioCtx();
-  var osc=ctx.createOscillator();
-  var gain=ctx.createGain();
+  var osc=ctx.createOscillator(),gain=ctx.createGain();
   osc.connect(gain);gain.connect(ctx.destination);
   osc.frequency.value=accent?1200:800;
   gain.gain.setValueAtTime(0.8,ctx.currentTime);
@@ -903,23 +1106,16 @@ function startMetro(){
   var interval=60000/metroBPM;
   metroTimer=setInterval(function(){
     metroBeatCount++;
-    var accent=metroBeatCount%4===1;
-    playClick(accent);
+    playClick(metroBeatCount%4===1);
     metroBeat=true;
     var circ=document.querySelector(".metro-circle");
-    if(circ){circ.classList.add("beat");}
+    if(circ)circ.classList.add("beat");
     setTimeout(function(){
       metroBeat=false;
       var c=document.querySelector(".metro-circle");
-      if(c){c.classList.remove("beat");}
+      if(c)c.classList.remove("beat");
     },80);
   },interval);
-  // Re-render só o círculo sem rerender tudo
-  var circ=document.querySelector(".metro-circle");
-  if(circ){
-    var btn=document.querySelector("[onclick*='stopMetro']")||document.querySelector("[onclick*='startMetro']");
-    if(btn){btn.textContent="⏹ Parar";btn.style.background="#ef4444";}
-  }
 }
 function stopMetro(){
   if(metroTimer){clearInterval(metroTimer);metroTimer=null;}
@@ -933,7 +1129,7 @@ function startVoiceSearch(){
   if(!SR){alert("Seu navegador não suporta busca por voz. Use o Chrome.");return;}
   var rec=new SR();rec.lang="pt-BR";rec.interimResults=false;rec.maxAlternatives=1;
   var btn=document.getElementById("btn-voice");
-  if(btn){btn.classList.add("listening");}
+  if(btn)btn.classList.add("listening");
   rec.start();
   rec.onresult=function(e){buscaLouvor=e.results[0][0].transcript;render();};
   rec.onerror=function(){if(btn)btn.classList.remove("listening");};
