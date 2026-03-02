@@ -722,6 +722,14 @@ function renderAniversariantes(){
   }
   return html;
 }
+function waLink(tel){
+  if(!tel) return "";
+  var num = tel.replace(/\D/g,"");
+  if(!num) return "";
+  if(num.length <= 11) num = "55" + num;
+  return "https://wa.me/" + num;
+}
+
 function saveAniv(){
   if(!formAniv.nome.trim()||!formAniv.dia||!formAniv.mes){alert("Preencha nome, dia e mês.");return;}
   var arr=aniversariantes.slice();
